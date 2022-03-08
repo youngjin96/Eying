@@ -71,9 +71,13 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 # 2. Set-up for Accessing Database
 
+### Install Database Connector
+
+`pip install mysqlclient`
+
 ### Create MySQL Account (Local MySQL)
 
-`1. CREATE USER 'capstone'@'localhost' IDENTIFIED BY 'capstone';`
+`1. CREATE USER 'capstone'@'localhost' IDENTIFIED BY 'capstone';`\
 `2. GRANT ALL PRIVILEGES ON *.* 'capstone'@'localhost';`
 
 ### Create New Database (Local MySQL)
@@ -82,5 +86,5 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 ### Database Migrations (Console)
 
-`1. manage.py makemigrations [app_name]`
+`1. manage.py makemigrations [app_name]`\
 `2. manage.py migrate`
