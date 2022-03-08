@@ -1,4 +1,4 @@
-# Getting Started with Create React App
+# 1. Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -68,3 +68,19 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+# 2. Set-up for Accessing Database
+
+### Create MySQL Account (Local MySQL)
+
+`1. CREATE USER 'capstone'@'localhost' IDENTIFIED BY 'capstone';`
+`2. GRANT ALL PRIVILEGES ON *.* 'capstone'@'localhost';`
+
+### Create New Database (Local MySQL)
+
+`CREATE DATABASE NFT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;`
+
+### Database Migrations (Console)
+
+`1. manage.py makemigrations [app_name]`
+`2. manage.py migrate`
