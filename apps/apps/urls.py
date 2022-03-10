@@ -20,4 +20,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('nft/', include('nft.urls')),
     path('trade/', include('trade.urls')),
+    path('user/',include('user.urls')),
+    path('exhibition/',include('exhibition.urls')),
 ]
