@@ -13,7 +13,7 @@ const Home = () => {
     const [value, setValue] = useState(0);
 
     return (
-        <div style={{position: 'relative', minHeight: '100%', paddingBottom: 114}}>
+        <div style={{position: 'relative', minHeight: '100%', height: '100%', paddingBottom: 114}}>
             <Grid container spacing={20} style={{ paddingLeft: "10%", paddingRight: "10%" }} >
                 <Grid item xs={12} sm={6} md={4}>
                     <Card raised sx={{}}>
