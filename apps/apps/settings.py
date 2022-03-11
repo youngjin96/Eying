@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'nft',
     'trade',
+    'exhibition.apps.ExhibitionConfig',
+    'user.apps.UserConfig',
 ]
 
 MIDDLEWARE = [
@@ -121,3 +123,5 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# DATE_INPUT_FORMATS = ['%d-%m-%Y']

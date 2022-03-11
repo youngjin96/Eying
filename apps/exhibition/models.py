@@ -11,4 +11,4 @@ class Exhibition(models.Model):
     exhibition_end = models.DateTimeField()
     likes = models.IntegerField(default=0)
     fee = models.IntegerField(default=0)
-    # link 는 뭐지?
+    link = models.CharField(max_length=100)
