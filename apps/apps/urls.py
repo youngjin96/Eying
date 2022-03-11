@@ -18,7 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('nft/', include('nft.urls')),
+    path('masterpiece/', include('masterpiece.urls')),
     path('trade/', include('trade.urls')),
     path('user/',include('user.urls')),
     path('exhibition/',include('exhibition.urls')),
