@@ -1,8 +1,8 @@
 from django.urls import path
 from trade import views
+from trade.views import *
 
 urlpatterns = [
-    # READ ALL
-    path('find/all/', views.get_all, name="trade-get-all"),
-    path('find/uid/<int:user_id>/', views.get_by_id, name="trade-get-by-id"),
+    path("api/find/all/", TradeListAPI.as_view()),
+    path("api/find/uid/<int:user_id>/", TradeListFindByUserAPI.as_view()),
 ]

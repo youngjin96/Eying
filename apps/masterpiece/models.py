@@ -13,10 +13,14 @@ class Masterpiece(models.Model):
     exhibition_id = models.ForeignKey(Exhibition, on_delete=models.CASCADE, db_column="exhibition_id")
     
     # Contents
+    name = models.CharField(max_length=50, default="Annoymous")
     image = models.ImageField(upload_to="masterpieces/")
     comment = models.TextField()
     price = models.IntegerField()
-    trade_status = models.BooleanField()
+    trade_status = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.name

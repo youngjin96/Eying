@@ -1,9 +1,8 @@
 from django.urls import path
-from masterpiece import views
+from masterpiece.views import *
 
 urlpatterns = [
-    # READ ALL
-    path('find/all/', views.get_all, name="masterpiece-get-all"),
-    path('find/uid/<int:user_id>/', views.get_by_user, name="masterpiece-get-by-user"),
-    path('find/mid/<int:masterpiece_id>/', views.get_by_exhibition, name="masterpiece-get-by-exhibition"),
+    path("api/find/all/", MasterpieceListAPI.as_view()),
+    path("api/find/uid/<int:user_id>/", MasterpieceListFindByUserAPI.as_view()),
+    path("api/find/eid/<int:exhibition_id>/", MasterpieceListFindByExhibitionAPI.as_view()),
 ]

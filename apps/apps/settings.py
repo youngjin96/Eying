@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'trade.apps.TradeConfig',
     'exhibition.apps.ExhibitionConfig',
     'user.apps.UserConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -83,6 +84,9 @@ DATABASES = SECURITY_SETTINGS.DATABASES
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
+
+AUTH_USER_MODEL = 'user.User'
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
