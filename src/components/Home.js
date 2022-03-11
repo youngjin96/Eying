@@ -13,8 +13,8 @@ const Home = () => {
     const [value, setValue] = useState(0);
 
     return (
-        <div style={{position: 'relative', minHeight: '100%', height: '100%', paddingBottom: 114}}>
-            <Grid container spacing={20} style={{ paddingLeft: "10%", paddingRight: "10%" }} >
+        <div style={{position: 'relative', paddingBottom: 114}}>
+            <Grid container spacing={10} style={{ paddingLeft: "10%", paddingRight: "10%", marginTop: "0" }} >
                 <Grid item xs={12} sm={6} md={4}>
                     <Card raised sx={{}}>
                         <CardMedia
@@ -83,8 +83,8 @@ const Home = () => {
                 </Grid>
             </Grid>
             <div>
-                <hr style={{position: 'absolute', bottom: -60, width: '100%'}}/>
-                <div style={{position: 'absolute', bottom: -80}}>
+                <hr style={{position: 'absolute', bottom: '50px', width: '100%'}}/>
+                <div style={{position: 'absolute', bottom: '40px'}}>
                     hi
                 </div>
             </div>

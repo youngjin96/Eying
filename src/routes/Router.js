@@ -5,7 +5,6 @@ import Gallery from "../components/Gallery"
 import How_to_use from "../components/How_to_use"
 import Service_center from "../components/Service_center"
 import Apply_exhibition from "../components/Apply_exhibition"
-import Admin from "../components/Admin"
 
 
 const Router = () => {
@@ -18,7 +17,6 @@ const Router = () => {
             <Route path="how_to_use" element={<How_to_use />} />
             <Route path="service_center" element={<Service_center />} />
             <Route path="login" element={<Login />} />
-            <Route path="admin" element={<Admin />} />
         </Routes>
     );
 };
