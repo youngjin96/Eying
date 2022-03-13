@@ -6,17 +6,17 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Rating from '@mui/material/Rating';
-import { Grid } from '@mui/material';
+import { Box, Container, Grid } from '@mui/material';
 
 
 const Home = () => {
     const [value, setValue] = useState(0);
 
     return (
-        <div style={{position: 'relative', paddingBottom: 114}}>
-            <Grid container spacing={10} style={{ paddingLeft: "10%", paddingRight: "10%", marginTop: "0" }} >
+        <div style={{position: 'relative', paddingBottom: "10%"}}>
+            <Grid container spacing={10} style={{ paddingLeft: "5%", paddingRight: "5%", marginTop: "0" }} >
                 <Grid item xs={12} sm={6} md={4}>
-                    <Card raised sx={{}}>
+                    <Card raised>
                         <CardMedia
                             component="img"
                             height="300"
@@ -38,7 +38,29 @@ const Home = () => {
                     </Card>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <Card raised sx={{}}>
+                    <Card raised>
+                        <CardMedia
+                            component="img"
+                            height="300"
+                            image="img/example2.png"
+                            alt="ape"
+                        />
+                        <CardContent>
+                            <Typography gutterBottom variant="h5" component="div">
+                                전시회 제목
+                        </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                전시회 설명 원숭이 엉덩이는 빨개 빨갛면 사과 사과는 맛있어.
+                        </Typography>
+                        </CardContent>
+                        <CardActions disableSpacing>
+                            <Button size="middle" variant="text">입장하기</Button>
+                            <Rating style={{ marginLeft: "auto" }} name="half-rating-read" defaultValue={3.5} precision={0.5} readOnly />
+                        </CardActions>
+                    </Card>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                    <Card raised>
                         <CardMedia
                             component="img"
                             height="300"
@@ -60,7 +82,7 @@ const Home = () => {
                     </Card>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <Card raised sx={{}}>
+                    <Card raised>
                         <CardMedia
                             component="img"
                             height="300"
@@ -82,11 +104,13 @@ const Home = () => {
                     </Card>
                 </Grid>
             </Grid>
-            <div>
-                <hr style={{position: 'absolute', bottom: '50px', width: '100%'}}/>
-                <div style={{position: 'absolute', bottom: '40px'}}>
-                    hi
-                </div>
+            <div style={{bottom: 0, position: 'relative', width:"100%", marginTop: "10%"}}>
+                <footer>
+                    <hr />
+                    <Typography variant="h3" component="div">
+                        ㅇㅇ
+                    </Typography>
+                </footer>
             </div>
         </div>
     )

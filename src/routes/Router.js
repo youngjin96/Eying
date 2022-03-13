@@ -6,7 +6,6 @@ import How_to_use from "../components/How_to_use"
 import Service_center from "../components/Service_center"
 import Apply_exhibition from "../components/Apply_exhibition"
 
-
 const Router = () => {
     return (
         <Routes>
