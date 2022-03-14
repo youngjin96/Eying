@@ -19,6 +19,7 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const NavBar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const [isLoggedIn, setisLoggedIn] = useState(false);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -155,11 +156,19 @@ const NavBar = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="../img/example.jpg" />
-              </IconButton>
-            </Tooltip>
+            {isLoggedIn ? (
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="Remy Sharp" src="../img/example.jpg" />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Button>
+                <Link to="login" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                  로그인
+                </Link>
+              </Button>
+            )}
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"
