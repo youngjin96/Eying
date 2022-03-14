@@ -13,6 +13,8 @@ import MenuItem from '@mui/material/MenuItem';
 import { useState } from 'react';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from './Fbase'
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -36,6 +38,20 @@ const NavBar = () => {
     setAnchorElUser(null);
   };
 
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // User is signed in, see docs for a list of available properties
+      // https://firebase.google.com/docs/reference/js/firebase.User
+      setisLoggedIn(true);
+      const uid = user.uid;
+      // ...
+    } else {
+      // User is signed out
+      // ...
+    }
+
+  });
+
   return (
     <AppBar position="sticky">
       <Container maxWidth="xl">
@@ -47,7 +63,7 @@ const NavBar = () => {
             sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
           >
             <Link to="home" style={{ textDecoration: 'none', textTransform: 'none', color: "white" }}>
-                LOGO
+              LOGO
             </Link>
           </Typography>
 
@@ -80,34 +96,34 @@ const NavBar = () => {
                 display: { xs: 'block', md: 'none' }
               }}
             >
-                <MenuItem onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">
-                        <Link to="how_to_use" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                            이용방법
-                        </Link>
-                    </Typography>
-                </MenuItem>
-                <MenuItem onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">
-                        <Link to="gallery" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                            갤러리
-                        </Link>
-                    </Typography>
-                </MenuItem>
-                <MenuItem onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">
-                        <Link to="apply_exhibition" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                            전시신청
-                        </Link>
-                    </Typography>
-                </MenuItem>
-                <MenuItem onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">
-                        <Link to="service_center" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                            고객센터
-                        </Link>
-                    </Typography>
-                </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">
+                  <Link to="how_to_use" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                    이용방법
+                  </Link>
+                </Typography>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">
+                  <Link to="gallery" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                    갤러리
+                  </Link>
+                </Typography>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">
+                  <Link to="apply_exhibition" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                    전시신청
+                  </Link>
+                </Typography>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">
+                  <Link to="service_center" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                    고객센터
+                  </Link>
+                </Typography>
+              </MenuItem>
             </Menu>
           </Box>
           <Typography
@@ -117,41 +133,41 @@ const NavBar = () => {
             sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
           >
             <Link to="home" style={{ textDecoration: 'none', textTransform: 'none', color: "white" }}>
-                LOGO
+              LOGO
             </Link>
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, ml: 15, gap : 14 }}>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, ml: 15, gap: 14 }}>
             <Button
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
+              onClick={handleCloseNavMenu}
+              sx={{ my: 2, color: 'white', display: 'block' }}
             >
-                <Link to="how_to_use" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                    이용방법
-                </Link>
+              <Link to="how_to_use" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                이용방법
+              </Link>
             </Button>
             <Button
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
+              onClick={handleCloseNavMenu}
+              sx={{ my: 2, color: 'white', display: 'block' }}
             >
-                <Link to="gallery" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                    갤러리
-                </Link>
+              <Link to="gallery" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                갤러리
+              </Link>
             </Button>
             <Button
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
+              onClick={handleCloseNavMenu}
+              sx={{ my: 2, color: 'white', display: 'block' }}
             >
-                <Link to="apply_exhibition" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                    전시신청
-                </Link>
+              <Link to="apply_exhibition" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                전시신청
+              </Link>
             </Button>
             <Button
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
+              onClick={handleCloseNavMenu}
+              sx={{ my: 2, color: 'white', display: 'block' }}
             >
-                <Link to="service_center" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                    고객센터
-                </Link>
+              <Link to="service_center" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                고객센터
+              </Link>
             </Button>
           </Box>
 

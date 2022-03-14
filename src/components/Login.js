@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { auth } from "./Fbase";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, browserSessionPersistence } from "firebase/auth";
+import { signInWithEmailAndPassword, setPersistence, browserSessionPersistence } from "firebase/auth";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -18,7 +18,6 @@ import { Link } from 'react-router-dom';
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState("");
 
     const onChange = (event) => {
         const { target: { name, value } } = event;
@@ -44,11 +43,15 @@ const Login = () => {
         provider.setCustomParameters({ prompt: 'select_account' });
         signInWithPopup(auth, provider)
             .then((result) => {
-                console.log(result);
+                window.location.replace("http://localhost:3000/home");
             }).catch((error) => {
                 console.log(error);
             })
     }
+
+
+
+
 
     const theme = createTheme();
 
