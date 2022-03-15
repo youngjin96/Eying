@@ -40,14 +40,10 @@ const NavBar = () => {
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
       setisLoggedIn(true);
-      const uid = user.uid;
-      // ...
+      console.log(user.uid);
     } else {
-      // User is signed out
-      // ...
+      console.log("유저 없음");
     }
 
   });
@@ -203,7 +199,9 @@ const NavBar = () => {
             >
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+                  <Typography textAlign="center">
+                    {setting}
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>

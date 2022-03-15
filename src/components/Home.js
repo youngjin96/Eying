@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -12,6 +12,7 @@ import { Grid } from '@mui/material';
 const Home = () => {
     const [value, setValue] = useState(0);
     const [exhibitionId, setExhibitionId] = useState("");
+    const [exhibitionComment, setExhibitionComment] = useState("");
 
     return (
         <div style={{position: 'relative', paddingBottom: "10%"}}>
@@ -29,7 +30,7 @@ const Home = () => {
                                 {exhibitionId}
                         </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                전시회 설명 원숭이 엉덩이는 빨개 빨갛면 사과 사과는 맛있어.
+                                {exhibitionComment}
                         </Typography>
                         </CardContent>
                         <CardActions disableSpacing>
