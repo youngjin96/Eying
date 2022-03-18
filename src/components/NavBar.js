@@ -10,10 +10,10 @@ import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from './Fbase'
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -21,7 +21,7 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const NavBar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [isLoggedIn, setisLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -38,15 +38,25 @@ const NavBar = () => {
     setAnchorElUser(null);
   };
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      setisLoggedIn(true);
-      console.log(user.uid);
-    } else {
-      console.log("유저 없음");
-    }
+  const onClickLogout = () => {
+    signOut(auth).then(() => {
+      window.location.replace("http://localhost:3000/home");
+    }).catch((error) => {
+      alert(error.message);
+    });
+  }
 
-  });
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+        console.log(user.uid);
+      } else {
+        setIsLoggedIn(false);
+        console.log("유저 없음");
+      }
+    })
+  }, []);
 
   return (
     <AppBar position="sticky">
@@ -197,13 +207,18 @@ const NavBar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">
-                    {setting}
-                  </Typography>
-                </MenuItem>
-              ))}
+              <MenuItem onClick={handleCloseUserMenu}>
+                <Typography textAlign="center">
+                  마이페이지
+                </Typography>
+              </MenuItem>
+              <MenuItem onClick={handleCloseUserMenu}>
+                <Typography textAlign="center">
+                  <Button style={{ textDecoration: 'none', textTransform: 'none', color: "black" }} onClick={onClickLogout}>
+                    로그아웃
+                  </Button>
+                </Typography>
+              </MenuItem>
             </Menu>
           </Box>
         </Toolbar>
