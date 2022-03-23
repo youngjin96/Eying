@@ -51,7 +51,7 @@ const Enroll = () => {
 
     return (
         <Container component="main" maxWidth="xs">
-            <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '79vh' }}>
                 <Box component="form" noValidate sx={{ mt: 3 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>

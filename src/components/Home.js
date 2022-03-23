@@ -106,14 +106,6 @@ const Home = () => {
                     </Card>
                 </Grid>
             </Grid>
-            <div style={{bottom: 0, position: 'relative', width:"100%", marginTop: "10%"}}>
-                <footer>
-                    <hr />
-                    <Typography variant="h3" component="div">
-                        ㅇㅇ
-                    </Typography>
-                </footer>
-            </div>
         </div>
     )
 }

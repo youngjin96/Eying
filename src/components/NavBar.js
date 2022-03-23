@@ -164,7 +164,7 @@ const NavBar = () => {
               sx={{ my: 2, color: 'white', display: 'block' }}
             >
               <Link to="apply_exhibition" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                전시신청
+                PDF 업로드
               </Link>
             </Button>
             <Button
