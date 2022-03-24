@@ -4,7 +4,7 @@ import Login from "../components/Login"
 import Gallery from "../components/Gallery"
 import How_to_use from "../components/How_to_use"
 import Service_center from "../components/Service_center"
-import Apply_exhibition from "../components/Apply_exhibition"
+import PdfUpload from "../components/PdfUpload"
 import Enroll from "../components/Enroll"
 
 const Router = () => {
@@ -12,7 +12,7 @@ const Router = () => {
         <Routes>
             <Route path="/" element={<Home />} />
             <Route path="home" element={<Home />} />
-            <Route path="apply_exhibition" element={<Apply_exhibition />} />
+            <Route path="PdfUpload" element={<PdfUpload />} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="how_to_use" element={<How_to_use />} />
             <Route path="service_center" element={<Service_center />} />

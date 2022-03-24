@@ -118,8 +118,8 @@ const NavBar = () => {
               </MenuItem>
               <MenuItem onClick={handleCloseNavMenu}>
                 <Typography textAlign="center">
-                  <Link to="apply_exhibition" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                    전시신청
+                  <Link to="PdfUpload" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                    PDF 업로드
                   </Link>
                 </Typography>
               </MenuItem>
@@ -163,7 +163,7 @@ const NavBar = () => {
               onClick={handleCloseNavMenu}
               sx={{ my: 2, color: 'white', display: 'block' }}
             >
-              <Link to="apply_exhibition" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+              <Link to="PdfUpload" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
                 PDF 업로드
               </Link>
             </Button>

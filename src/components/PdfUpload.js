@@ -7,11 +7,11 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Typography from '@mui/material/Typography';
-import ImageList from '@mui/material/ImageList';
-import ImageListItem from '@mui/material/ImageListItem';
-import { AppBar, Button, Dialog, IconButton, Slide, Toolbar } from '@mui/material';
+import { AppBar, Button, Dialog, IconButton, Toolbar, Slide } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import SimpleImageSlider from "react-simple-image-slider";
+import ReactSlidy from 'react-slidy'
+import 'react-slidy/lib/styles.css'
+
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -19,6 +19,7 @@ const Transition = forwardRef(function Transition(props, ref) {
 
 const Apply_exhibition = () => {
     const [open, setOpen] = useState(false);
+    const [data, setData] = useState([]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -28,11 +29,32 @@ const Apply_exhibition = () => {
         setOpen(false);
     };
 
+    const slides = ['img/example.jpg', 'img/example2.png'];
+
+    const createStyles = isActive => ({
+        background: 'transparent',
+        border: 0,
+        color: isActive ? '#333' : '#ccc',
+        cursor: 'pointer',
+        fontSize: '32px',
+    });
+
+    const [actualSlide, setActualSlide] = useState(0)
+
+    const updateSlide = ({currentSlide}) => {
+        setActualSlide(currentSlide)
+    }
+
     const theme = createTheme();
 
     const card = (
         <CardActions>
-            <Dropzone onDrop={acceptedFiles => console.log(acceptedFiles)}>
+            <Dropzone onDrop={acceptedFiles => 
+                fetch("/pdf/api/").then((response) => response.json()).then((acceptedFiles) => {
+                    console.log(acceptedFiles[0].imgs_url)
+                    setData(data => [...data, acceptedFiles[0].imgs_url]);
+                    // setImage(acceptedFiles[0].imgs_url)
+                })}>
                 {({ getRootProps, getInputProps }) => (
                     <section>
                         <div {...getRootProps()}>
@@ -48,15 +70,6 @@ const Apply_exhibition = () => {
             </Dropzone>
         </CardActions>
     )
-
-    const itemData = [
-        {
-            url: "img/example.jpg"
-        },
-        {
-            url: "img/example2.png"
-        }
-    ]
 
     return (
         <ThemeProvider theme={theme}>
@@ -87,27 +100,24 @@ const Apply_exhibition = () => {
                                     </IconButton>
                                 </Toolbar>
                             </AppBar>
-                            
-                                    <SimpleImageSlider
-                                    width={400}
-                                    height={400}
-                                    images={itemData}
-                                    showBullets={true}
-                                    showNavs={true}
-                                    />
-                            
-                            
-                            {/* <ImageList sx={{ width: '100%', height: '100vh' }} cols={1}>
-                                {itemData.map((item) => (
-                                    <ImageListItem key={item.img}>
-                                        <img
-                                            src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
-                                            srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                                            loading="lazy"
-                                        />
-                                    </ImageListItem>
+                            <ReactSlidy imageObjectFit="contain" doAfterSlide={updateSlide} slide={actualSlide}>
+                                {slides.map(src => (
+                                    <img alt="" key={src} src={src} style={{ maxHeight: 600, maxWidth: 500 }}/>
                                 ))}
-                            </ImageList> */}
+                            </ReactSlidy>
+                            <div className="Dots" style={{textAlign: 'center'}}>
+                                {slides.map((_, index) => {
+                                    return (
+                                        <button
+                                            key={index}
+                                            style={createStyles(index === actualSlide) }
+                                            onClick={() => updateSlide({currentSlide: index})}
+                                        >
+                                            &bull;
+                                        </button>
+                                    )
+                                })}
+                            </div>
                         </Dialog>
                     </div>
                 </Box>
