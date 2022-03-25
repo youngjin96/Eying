@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Trade
+from .models import PDFModel
 
 # Register your models here.
-admin.site.register(Trade)
+
+admin.site.register(PDFModel)
