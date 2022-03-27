@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'pdf.apps.PdfConfig',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +78,33 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'apps.wsgi.application'
 
+#############AWS
+AWS_ACCESS_KEY_ID = 'AKIARAITQK5LWYIM5I5U'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_REGION = 'ap-northeast-2'
+
+### S3 Storages
+AWS_STORAGE_BUCKET_NAME = 'capstone-storage'
+AWS_S3_CUSTOME_DOMAIN = '%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME,AWS_REGION)
+AWS_S3_OBJECT_PARAMETERS ={
+    'CacheContrl' : 'max-age=86400',
+}
+# AWS_DEFAULT_ACL = 'public-read'
+# AWS_LOCATION = 'static'
+
+# S3 Storage
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+STATIC_URL = '/static/'
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
+
+
+# MEDIA_ROOT = os.path.join(BASE_DIR,'path/to/store/myfile')
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
