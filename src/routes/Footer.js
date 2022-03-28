@@ -13,9 +13,9 @@ const Footer = () => {
         }
     });
     return (
-        <footer style={{ backgroundColor: "#3e3e3e" }}>
+        <footer style={{backgroundColor: "#555555"}}>
             <ThemeProvider theme={theme}>
-                <Typography variant="h5" sx={{ color: "white" }} gutterBottom>
+                <Typography variant="h5" gutterBottom>
                     Group 44
                     </Typography>
                 <Typography variant="subtitle1" align="center" color="textSecondary" component="p">

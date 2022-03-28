@@ -65,7 +65,7 @@ const NavBar = () => {
   });
 
   return (
-    <AppBar position="sticky" style={{backgroundColor: "white"}}>
+    <AppBar position="sticky" style={{backgroundColor: "white", height: 80}}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <ThemeProvider theme={theme}>
@@ -73,7 +73,7 @@ const NavBar = () => {
               variant="h6"
               noWrap
               component="div"
-              sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+              sx={{ display: { xs: 'none', md: 'flex' } }}
             >
               <Link to="home" style={{ textDecoration: 'none', textTransform: 'none', color:'black' }}>
                 Group 44
