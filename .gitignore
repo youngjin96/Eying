@@ -27,3 +27,6 @@ yarn-error.log*
 
 # Django Secret settings
 /apps/apps/security_settings.py
+poppler
+firebase-config.json
+/apps/pdfs/

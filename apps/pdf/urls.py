@@ -1,8 +1,6 @@
 from django.urls import path
-from . import views
-from .views import PDFListAPI, PDFViewAPI
+from .views import PDFAPI
 
 urlpatterns = [
-    path('api/', PDFListAPI.as_view()),
-    path('api/<int:pdf_id>/', PDFViewAPI.as_view()),
+    path('', PDFAPI.as_view()),
 ]

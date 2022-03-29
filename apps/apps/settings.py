@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -41,9 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user.apps.UserConfig',
+    'pdf.apps.PdfConfig',
     'rest_framework',
     'corsheaders',
-    'pdf.apps.PdfConfig',
     'storages',
 ]
 
@@ -162,5 +162,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 FIREBASE_CONFIG = os.path.join(BASE_DIR, 'firebase-config.json')
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
