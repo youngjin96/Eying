@@ -24,7 +24,7 @@ def pdf_to_image(instance):
         buffer = BytesIO()
         image.save(buffer, format="JPEG")
         buffer.seek(0)
-        s3r.Bucket(AWS_STORAGE_BUCKET_NAME).put_object(Key='pdf/{0}/{1}/images/{2}.jpg'.format(str(instance.user.id), str(instance.id), str(i)), 
+        s3r.Bucket(AWS_STORAGE_BUCKET_NAME).put_object(Key='pdf/{0}/{1}/{2}.jpg'.format(str(instance.user.id), str(instance.id), str(i)), 
                                                     Body=buffer, 
                                                     ContentType='image/jpeg')
     return len(images)

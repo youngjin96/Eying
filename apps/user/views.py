@@ -1,6 +1,5 @@
-from django.http import HttpResponse, JsonResponse
-
 from rest_framework.response import Response
+from rest_framework import status
 from .models import User
 from rest_framework.views import APIView
 from .serializers import UserSerializer
@@ -8,7 +7,7 @@ from .serializers import UserSerializer
 from django.views.decorators.csrf import csrf_exempt
 
 import firebase_admin
-from firebase_admin import credentials, auth
+from firebase_admin import credentials
 from django.conf import settings
 
 import json
@@ -21,10 +20,18 @@ firebase_app = firebase_admin.initialize_app(firebase_creds)
 
 class UserAPI(APIView):
     def get(self, request):
-        queryset = User.objects.all()
-        print(queryset)
-        serializer = UserSerializer(queryset, many=True)
-        return Response(serializer.data)
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+
+            if "user_id" in data:
+                queryset = User.objects.filter(pk=data["user_id"])
+            else:
+                raise
+        except:
+            queryset = User.objects.all()
+        finally:
+            serializer = UserSerializer(queryset, many=True)
+            return Response(serializer.data)
 
     @csrf_exempt
     def post(self, request):
@@ -39,6 +46,7 @@ class UserAPI(APIView):
                 job=data["job"],
             )
             user.save()
-            return HttpResponse(200)
+            serializer = UserSerializer(user, many=False)
+            return Response(serializer.data)
         except:
-            return HttpResponse(400)
+            return Response({'data': ""}, status=status.HTTP_400_BAD_REQUEST)
