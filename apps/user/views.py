@@ -8,14 +8,15 @@ from django.views.decorators.csrf import csrf_exempt
 
 import firebase_admin
 from firebase_admin import credentials
+
 from django.conf import settings
 
 import json
 from django.contrib.auth.hashers import make_password
 
 
-firebase_creds = credentials.Certificate(settings.FIREBASE_CONFIG)
-firebase_app = firebase_admin.initialize_app(firebase_creds)
+# firebase_creds = credentials.Certificate(settings.FIREBASE_CONFIG)
+# firebase_app = firebase_admin.initialize_app(firebase_creds)
 
 
 class UserAPI(APIView):

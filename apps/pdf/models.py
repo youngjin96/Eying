@@ -31,7 +31,7 @@ def pdf_to_image(instance):
 
 
 class PDFModel(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user", db_column="user")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user", db_column="user",null=True)
     name = models.CharField(default="unknown", max_length=255)
     pdf = models.FileField(upload_to=pdf_path)
     img_length = models.IntegerField(default=0, editable=False)
