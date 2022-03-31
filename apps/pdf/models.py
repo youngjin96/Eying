@@ -31,7 +31,7 @@ def pdf_to_image(instance):
 
 
 class PDFModel(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user", db_column="user",null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="user", db_column="user", null=True)
     name = models.CharField(default="unknown", max_length=255)
     pdf = models.FileField(upload_to=pdf_path)
     img_length = models.IntegerField(default=0, editable=False)
@@ -45,3 +45,6 @@ class PDFModel(models.Model):
             self.img_length = pdf_to_image(self)
             self.pdf = None # PDF Field는 Image Convert 이후에 사용되지 않으므로 NULL
             super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name

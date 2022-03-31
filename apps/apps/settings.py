@@ -27,7 +27,7 @@ SECRET_KEY = SECURITY_SETTINGS.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -92,20 +92,24 @@ AWS_S3_OBJECT_PARAMETERS ={
 }
 # AWS_DEFAULT_ACL = 'public-read'
 # AWS_LOCATION = 'static'
+AWS_QUERYSTRING_AUTH = False
 
 # S3 Storage
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-STATIC_URL = '/static/'
-STATIC_DIR = os.path.join(BASE_DIR,'static')
-STATICFILES_DIRS = [
-    STATIC_DIR,
-]
-STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+STATIC_URL = 'https://'+AWS_S3_CUSTOME_DOMAIN+'/'
+# STATIC_DIR = os.path.join(BASE_DIR,'static')
+# STATICFILES_DIRS = [
+#     STATIC_DIR,
+# ]
+# STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
 
-# MEDIA_ROOT = os.path.join(BASE_DIR,'path/to/store/myfile')
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -148,12 +152,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-
-STATIC_URL = '/static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -162,6 +160,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # DATE_INPUT_FORMATS = ['%d-%m-%Y']
 
 FIREBASE_CONFIG = os.path.join(BASE_DIR, 'firebase-config.json')
-
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# MEDIA_URL = '/media/'

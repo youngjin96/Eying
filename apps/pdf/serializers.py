@@ -18,11 +18,11 @@ class PDFSerializer(serializers.ModelSerializer) :
     
     img_path = serializers.SerializerMethodField()
     def get_img_path(self, obj):
-        return "{0}/pdf/{1}/{2}/".format(AWS_S3_CUSTOME_DOMAIN, str(obj.user.id), str(obj.id))
+        return "https://{0}/pdf/{1}/{2}/".format(AWS_S3_CUSTOME_DOMAIN, str(obj.user.id), str(obj.id))
     
     imgs_url = serializers.SerializerMethodField()
     def get_imgs_url(self, obj):
-        return ["{0}/pdf/{1}/{2}/{3}.jpg".format(AWS_S3_CUSTOME_DOMAIN, str(obj.user.id), str(obj.id), str(i)) for i in range(obj.img_length)]
+        return ["https://{0}/pdf/{1}/{2}/{3}.jpg".format(AWS_S3_CUSTOME_DOMAIN, str(obj.user.id), str(obj.id), str(i)) for i in range(obj.img_length)]
     
     class Meta :
         model = PDFModel

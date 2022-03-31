@@ -24,7 +24,7 @@ class PDFAPI(APIView):
         finally:
             serializer = PDFSerializer(queryset, many=True)
             return Response(serializer.data)
-        
+            
     
     @csrf_exempt # CSRF 토큰 없이 POST Request 받도록 함
     def post(self, request):
