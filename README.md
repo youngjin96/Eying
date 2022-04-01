@@ -16,7 +16,8 @@
             
 ### 주요 기능
 
-* webgazer.js를 통해 웹페이지에서 eye tracking을 통해 사용자가 올린 pdf파일의 시선을 분석 & eye tracking 데이터 시각화
+* webgazer.js를 통해 웹페이지에서 eye tracking을 통해 사용자가 올린 pdf파일의 시선을 분석
+* PPT 슬라이드 별 사용자와 평가자의 eye tracking 데이터 비교 분석
 
 ### 플랫폼
 
