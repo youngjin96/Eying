@@ -6,6 +6,7 @@ import AboutUs from "../components/AboutUs"
 import Service_center from "../components/Service_center"
 import Upload from "../components/Upload"
 import Enroll from "../components/Enroll"
+import WebGazer from '../components/WebGazer'
 
 const Router = () => {
     return (
@@ -18,6 +19,7 @@ const Router = () => {
             <Route path="service_center" element={<Service_center />} />
             <Route path="login" element={<Login />} />
             <Route path="login/enroll" element={<Enroll />} />
+            <Route path="/webgazer" element={<WebGazer />} />
         </Routes>
     );
 };

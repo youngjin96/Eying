@@ -9,25 +9,24 @@ const AboutUs = () => {
             <Box
                 sx={{
                     width: '100vw',
-                    height: '60vh',
+                    height: '100vh',
                     display: 'flex',
                     background: '#555555',
                     flexGrow: 1,
-                    alignItems: "center"
                 }}
             >
                 <Grid container columns={{ xs: 6, sm: 6, md: 12 }} alignItems="center">
                     <Grid item xs={6} >
-                        <Typography variant="h2" style={{color: "white", marginLeft:300}}>
+                        <Typography variant="h2" style={{color: "white", textAlign:"center"}}>
                             We Provide
                         </Typography>
-                        <Typography variant="h2" style={{color: "white", marginLeft:300}}>
+                        <Typography variant="h2" style={{color: "white", textAlign:"center"}}>
                             the Predict Data
                         </Typography>
-                        <Typography variant="subtitle1" style={{color: "white", marginLeft:300, marginTop:30}}>
+                        <Typography variant="subtitle1" style={{color: "white", marginTop:30, textAlign:"center"}}>
                             We Predict People's Gaze On Your PDF
                         </Typography>
-                        <Typography variant="subtitle1" style={{color: "white", marginLeft:300}}>
+                        <Typography variant="subtitle1" style={{color: "white", textAlign:"center"}}>
                             We Will Provide Satisfactory Results In Data
                         </Typography>
                     </Grid>
@@ -43,28 +42,32 @@ const AboutUs = () => {
                             interval={2000}
                         >
                             <div>
-                                <img src="/img/back.png" style={{ height: 450, width: 700 }} />
+                                <img src="/img/back.png" style={{ height: 400, width: 700 }} />
                             </div>
                             <div>
-                                <img src="/img/example.jpg" style={{ height: 450, width: 700 }} />
+                                <img src="/img/example.jpg" style={{ height: 400, width: 700 }} />
                             </div>
                             <div>
-                                <img src="/img/example2.png" style={{ height: 450, width: 700 }} />
+                                <img src="/img/example2.png" style={{ height: 400, width: 700 }} />
                             </div>
                         </Carousel>
                     </Grid>
+                    <Grid item xs={6} >
+                        <Typography variant="h2" style={{color: "white"}}>
+                            We Provide
+                        </Typography>
+                        <Typography variant="h2" style={{color: "white"}}>
+                            the Predict Data
+                        </Typography>
+                        <Typography variant="subtitle1" style={{color: "white", marginTop:30}}>
+                            We Predict People's Gaze On Your PDF
+                        </Typography>
+                        <Typography variant="subtitle1" style={{color: "white"}}>
+                            We Will Provide Satisfactory Results In Data
+                        </Typography>
+                    </Grid>
                 </Grid>
             </Box>
-            <Box
-                sx={{
-                    width: '100vw',
-                    height: '20vh',
-                    display: 'flex',
-                    
-                    flexGrow: 1,
-                    alignItems: "center"
-                }}
-            ></Box>
         </>    
     )
 }
