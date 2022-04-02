@@ -2,6 +2,7 @@ import { Typography } from "@mui/material";
 import * as React from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+
 const Footer = () => {
     const font = "'Roboto', sans-serif";
     const theme = createTheme({
@@ -13,7 +14,7 @@ const Footer = () => {
         }
     });
     return (
-        <footer style={{backgroundColor: "#555555"}}>
+        <footer style={{backgroundColor: "#555555", clear: "both", zIndex:1, height: "-3em", position: "relative", width: "100%"}}>
             <ThemeProvider theme={theme}>
                 <Typography variant="h5" gutterBottom>
                     Group 44
