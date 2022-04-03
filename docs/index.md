@@ -34,7 +34,7 @@
 
 ## 3. 팀 소개
 
-<img align=left src="https://user-images.githubusercontent.com/65219386/161411347-3861c764-652c-4fbf-9278-56f6681ad83b.JPG" width="200px" height="180px">
+<img align=left src="https://user-images.githubusercontent.com/65219386/161412366-18d1cec7-f8f8-4045-b235-c20df4be9d3e.jpeg" width="200px" height="180px">
 
 ```
 😀 이름 : 송영진(팀장)
