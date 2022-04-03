@@ -72,7 +72,7 @@
 
 <img align=left src="https://user-images.githubusercontent.com/65219386/161412302-994a0081-c534-4305-8813-dba03e5642b7.png" width="200px"  height="180px">
 
-```markdown
+```
 😀 이름 : 고동훈
 💼 학번 : ****3027
 📧 이메일 : kdhkdh0101@kookmin.ac.kr
