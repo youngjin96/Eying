@@ -46,7 +46,7 @@
     - Eyetracking 모델 적용
 ```
 
-<img align=left src="https://user-images.githubusercontent.com/65219386/161413918-e1e2cf98-df3a-4151-a541-47005a751750.jpeg" width="200px"  height="168px">
+<img align=left src="https://user-images.githubusercontent.com/65219386/161422172-265e6486-5628-442d-812c-5298d7d6ab13.jpeg" width="200px"  height="168px">
 
 ```
 😀 이름 : 김창규
