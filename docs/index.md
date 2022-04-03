@@ -36,6 +36,7 @@
 
 <img align=left src="https://user-images.githubusercontent.com/65219386/161412366-18d1cec7-f8f8-4045-b235-c20df4be9d3e.jpeg" width="200px" height="180px">
 
+
 ```
 😀 이름 : 송영진(팀장)
 💼 학번 : ****0176
@@ -47,6 +48,7 @@
 ```
 
 <img align=left src="https://user-images.githubusercontent.com/65219386/161411347-3861c764-652c-4fbf-9278-56f6681ad83b.JPG" width="200px"  height="180px">
+
 
 ```
 😀 이름 : 김창규
@@ -60,6 +62,7 @@
 
 <img align=left src="https://user-images.githubusercontent.com/65219386/161411347-3861c764-652c-4fbf-9278-56f6681ad83b.JPG" width="200px"  height="180px">
 
+
 ```
 😀 이름 : 채지윤
 💼 학번 : ****1313
@@ -72,6 +75,7 @@
 
 <img align=left src="https://user-images.githubusercontent.com/65219386/161412302-994a0081-c534-4305-8813-dba03e5642b7.png" width="200px"  height="180px">
 
+
 ```
 😀 이름 : 고동훈
 💼 학번 : ****3027
@@ -81,7 +85,6 @@
     - 웹 사이트 제작
     - Eye tracking 모델 적용
 ```
-
 
 
 ## 4. 사용법
