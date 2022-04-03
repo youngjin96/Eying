@@ -70,7 +70,7 @@
     - Eyetracking 모델 탐색
 ```
 
-<img align=left src="https://user-images.githubusercontent.com/65219386/161411347-3861c764-652c-4fbf-9278-56f6681ad83b.JPG" width="200px"  height="180px">
+<img align=left src="https://user-images.githubusercontent.com/65219386/161412302-994a0081-c534-4305-8813-dba03e5642b7.png" width="200px"  height="180px">
 
 ```markdown
 😀 이름 : 고동훈
