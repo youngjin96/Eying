@@ -17,8 +17,8 @@ const Home = () => {
 
     return (
         <>
-            <AboutUs />
             <Upload />
+            <AboutUs />
         </>
     )
 }
