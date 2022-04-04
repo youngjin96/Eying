@@ -76,7 +76,7 @@ const NavBar = () => {
               sx={{ display: { xs: 'none', md: 'flex' } }}
             >
               <Link to="home" style={{ textDecoration: 'none', textTransform: 'none', color:'black' }}>
-                Group 44
+                EYING
               </Link>
             </Typography>
 

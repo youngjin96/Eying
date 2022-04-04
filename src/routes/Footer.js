@@ -14,10 +14,10 @@ const Footer = () => {
         }
     });
     return (
-        <footer style={{backgroundColor: "#555555", clear: "both", zIndex:1, height: "-3em", position: "relative", width: "100%"}}>
+        <footer style={{ clear: "both", zIndex:1, height: "-3em", position: "relative", width: "100%"}}>
             <ThemeProvider theme={theme}>
                 <Typography variant="h5" gutterBottom>
-                    Group 44
+                    EYING
                     </Typography>
                 <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
                     Something here to give the footer a purpose!

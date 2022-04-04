@@ -97,7 +97,8 @@ const Upload = () => {
                         </Typography>
                     </Grid>
                 </Grid>
-                <Grid container spacing={{ xs: 2, md: 4 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 100 }}>
+                <hr style={{marginTop: 40}} />
+                <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 20}}>
                     <Grid item xs={3} style={{ textAlign: "center" }}>
                         <Typography variant="h5" style={{ color: "#636261" }}>
                             U s e
@@ -168,7 +169,8 @@ const Upload = () => {
                         </Button>
                     </Grid>
                 </Grid>
-                <Grid container container spacing={{ xs: 2, md: 4 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 100 }}>
+                <hr style={{marginTop: 40}} />
+                <Grid container container spacing={{ xs: 2, md: 4 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 20 }}>
                     <Grid item xs={3} style={{ textAlign: "center" }}>
                         <Typography variant="h5" style={{ color: "#636261" }}>
                             E x a m p l e

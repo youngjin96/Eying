@@ -19,7 +19,7 @@ const WebGazer = () => {
     useEffect(async () => {
         try {
             const datas = [];
-            setLoading(true);
+            setLoading(false);
             const response = await axios.get(
                 'http://54.180.126.190:8000/pdf/'
             );
@@ -130,10 +130,12 @@ const WebGazer = () => {
                             renderNextButton={nextArrow}
                             renderPrevButton={prevArrow}
                         >
-                            {imgsUrl && imgsUrl.map((e, index) => (
+                            <img src="/img/s.png" style={{ width: "100%", height: 500 }}>
+                            </img>
+                            {/* {imgsUrl && imgsUrl.map((e, index) => (
                                 <img key={index} src={e} style={{ width: "100%", height: 500 }} />
 
-                            ))}
+                            ))} */}
                         </AliceCarousel>
                         <Button onClick={onClickStart}>
                             Start
