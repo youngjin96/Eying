@@ -125,7 +125,7 @@ const NavBar = () => {
                 </MenuItem>
                 <MenuItem onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">
-                    <Link to="Upload" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                    <Link to="upload" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
                       UPLOAD
                     </Link>
                   </Typography>
@@ -146,7 +146,7 @@ const NavBar = () => {
               sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
             >
               <Link to="home" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                GROUP 44
+                EYING
               </Link>
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, ml: 15, gap: 14 }}>
@@ -165,7 +165,7 @@ const NavBar = () => {
                 noWrap
                 sx={{ my:4 }}
               >
-                <Link to="Upload" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                <Link to="upload" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
                   UPLOAD
                 </Link>
               </Typography>
