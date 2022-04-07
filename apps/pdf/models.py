@@ -19,7 +19,7 @@ def pdf_path(instance, filename):
 def pdf_to_image(instance):
     # pdf_bytes = s3r.Bucket(AWS_STORAGE_BUCKET_NAME).Object("pdf/{0}/{1}/{2}".format(str(instance.user.id), str(instance.id), str(instance.name))).get()['Body'].read()
     pdf_bytes = instance.pdf.open('rb').read() # PDF를 저장하지 않고 bytes data로 직접 가져오도록 변경
-    images = convert_from_bytes(pdf_bytes, poppler_path="pdf/poppler/Library/bin/", fmt="jpeg")
+    images = convert_from_bytes(pdf_bytes, fmt="jpeg")
     for i, image in enumerate(images):
         buffer = BytesIO()
         image.save(buffer, format="JPEG")
