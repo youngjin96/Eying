@@ -1,4 +1,4 @@
-import { Box, createTheme, Grid, ThemeProvider, Typography } from "@mui/material";
+import { createTheme, Grid, ThemeProvider, Typography } from "@mui/material";
 import { Link } from 'react-router-dom';
 import * as React from 'react';
 
@@ -14,7 +14,7 @@ const Footer = () => {
         }
     });
     return (
-        <footer style={{ clear: "both", zIndex: 1, height: "-3em", position: "relative", width: "100%", background: "#515251" }}>
+        <footer style={{ clear: "both", zIndex: 1, height: "-3em", position: "relative", width: "100%", background: "#515251", marginTop: 50 }}>
             <ThemeProvider theme={theme}>
                 <Grid container columns={{ xs: 6, sm: 6, md: 12 }}>
                     <Grid item xs={6}>
@@ -53,8 +53,13 @@ const Footer = () => {
                             </Link>
                         </Typography>
                         <Typography style={{ marginLeft: 10, marginTop: 40, marginRight:50 }}>
-                            <Link to="service_center" style={{ textDecoration: 'none', textTransform: 'none', color: "#b2b2b2" }}>
-                                QnA
+                            <Link to="track" style={{ textDecoration: 'none', textTransform: 'none', color: "#b2b2b2" }}>
+                                TRACK
+                            </Link>
+                        </Typography>
+                        <Typography style={{ marginLeft: 10, marginTop: 40, marginRight:50 }}>
+                            <Link to="FAQ" style={{ textDecoration: 'none', textTransform: 'none', color: "#b2b2b2" }}>
+                                FAQ
                             </Link>
                         </Typography>
                     </Grid>

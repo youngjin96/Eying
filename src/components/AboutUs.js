@@ -1,7 +1,7 @@
-import { Box, Button, createTheme, Grid, IconButton, ThemeProvider, Typography } from '@mui/material';
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { Carousel } from 'react-responsive-carousel';
 import React from 'react';
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Box, createTheme, Grid, IconButton, ThemeProvider, Typography } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
@@ -87,7 +87,7 @@ const AboutUs = () => {
                             </Typography>
                             <hr style={{ width: "85%", marginTop: 20 }} />
                         </Grid>
-                        <Grid item xs={3} direction="column" style={{ textAlign: "center", marginTop: 100 }}>
+                        <Grid item xs={3} style={{ textAlign: "center", marginTop: 100 }}>
                             <img src="/img/1.png" style={{ width: 200, height: 200 }} />
                             <Typography style={{ color: "#636261" }}>
                                 Song YoungJin
@@ -96,7 +96,7 @@ const AboutUs = () => {
                                 sssk03016@naver.com
                             </Typography>
                         </Grid>
-                        <Grid item xs={3} direction="column" style={{ textAlign: "center", marginTop: 100 }}>
+                        <Grid item xs={3} style={{ textAlign: "center", marginTop: 100 }}>
                             <img src="/img/2.png" style={{ width: 200, height: 200 }} />
                             <Typography style={{ color: "#636261" }}>
                                 Kim ChangGyu
@@ -105,7 +105,7 @@ const AboutUs = () => {
                                 kimc980106@naver.com
                             </Typography>
                         </Grid>
-                        <Grid item xs={3} direction="column" style={{ textAlign: "center", marginTop: 100 }}>
+                        <Grid item xs={3} style={{ textAlign: "center", marginTop: 100 }}>
                             <img src="/img/3.png" style={{ width: 200, height: 200 }} />
                             <Typography style={{ color: "#636261" }}>
                                 Chae JiYun
@@ -114,7 +114,7 @@ const AboutUs = () => {
                                 cjy3378@kookmin.ac.kr
                             </Typography>
                         </Grid>
-                        <Grid item xs={3} direction="column" style={{ textAlign: "center", marginTop: 100 }}>
+                        <Grid item xs={3} style={{ textAlign: "center", marginTop: 100 }}>
                             <img src="/img/4.png" style={{ width: 200, height: 200 }} />
                             <Typography style={{ color: "#636261" }}>
                                 Ko DongHun
@@ -148,7 +148,7 @@ const AboutUs = () => {
                         <Grid item xs={12} style={{ display: "flex", justifyContent: "center" }}>
                             <img src="/img/location.png" style={{ width: 800, height: 500 }} />
                         </Grid>
-                        <Grid item xs={12} style={{ textAlign: "center" }}>
+                        <Grid item xs={12} style={{ textAlign: "center", marginTop: 20 }}>
                             <Typography variant="caption" style={{ color: "#636261", marginTop: 10 }}>
                                 77, Jeongneung-ro, Seongbuk-gu, Seoul, Republic of Korea
                             </Typography>
@@ -158,7 +158,7 @@ const AboutUs = () => {
                                 Tel. 070-1234-5647  |  Fax. 02-1234-5678  |  kookmin@kookmin.com
                             </Typography>
                         </Grid>
-                        <Grid container direction="row" justifyContent="center" alignItems="center" style={{ textAlign: "center", marginTop: 10 }}>
+                        <Grid container direction="row" justifyContent="center" alignItems="center" style={{ textAlign: "center", marginTop: 30, marginBottom: 20 }}>
                             <IconButton style={{ color: "#636261" }}>
                                 <FacebookIcon fontSize="large" />
                             </IconButton>

@@ -1,18 +1,30 @@
-import React, { useState } from 'react';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { Button, Grid } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Button, Grid, Box, Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { auth } from './Fbase'
+import axios from 'axios';
+import { onAuthStateChanged } from "firebase/auth";
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import PersonSearchOutlinedIcon from '@mui/icons-material/PersonSearchOutlined';
 import DifferenceOutlinedIcon from '@mui/icons-material/DifferenceOutlined';
 import RecommendOutlinedIcon from '@mui/icons-material/RecommendOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
 
 const Upload = () => {
-    //const fileType = ["application/pdf"];
+    // 처음 렌더링할 때 유저가 로그인이 되어있는지 확인 로그인 되어 있을 때만 페이지 사용 가능
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log(user.uid);
+            } else {
+                window.location.replace("login");
+                alert("You Need Login To Use This Service.");
+            }
+        })
+    }, []);
+
+    // pdf 업로드 함수
     const handlePdfFileChange = (e) => {
         var frm = new FormData();
         frm.append("data", e.target.files[0]);
@@ -97,8 +109,8 @@ const Upload = () => {
                         </Typography>
                     </Grid>
                 </Grid>
-                <hr style={{marginTop: 40}} />
-                <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 20}}>
+                <hr style={{ marginTop: 40 }} />
+                <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 20 }}>
                     <Grid item xs={3} style={{ textAlign: "center" }}>
                         <Typography variant="h5" style={{ color: "#636261" }}>
                             U s e
@@ -169,7 +181,7 @@ const Upload = () => {
                         </Button>
                     </Grid>
                 </Grid>
-                <hr style={{marginTop: 40}} />
+                <hr style={{ marginTop: 40 }} />
                 <Grid container container spacing={{ xs: 2, md: 4 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 20 }}>
                     <Grid item xs={3} style={{ textAlign: "center" }}>
                         <Typography variant="h5" style={{ color: "#636261" }}>
