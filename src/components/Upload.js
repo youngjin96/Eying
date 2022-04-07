@@ -141,6 +141,8 @@ const Upload = () => {
                                 color="primary"
                                 component="span"
                                 style={{ marginTop: 5, color: "black" }}
+                                onClick={() => window.open('https://webgazer.cs.brown.edu/calibration.html?', '_blank')}
+
                             >
                                 Upload
                             </Button>
@@ -160,7 +162,7 @@ const Upload = () => {
                             style={{ marginTop: 5, color: "black" }}
                         >
                             Continue
-                            </Button>
+                        </Button>
                     </Grid>
                     <Grid item xs={3} style={{ textAlign: "center" }}>
                         <Typography variant="subtitle1" style={{ color: "#636261" }}>
