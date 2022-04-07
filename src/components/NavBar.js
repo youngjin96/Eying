@@ -1,4 +1,3 @@
-
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -76,7 +75,7 @@ const NavBar = () => {
               sx={{ display: { xs: 'none', md: 'flex' } }}
             >
               <Link to="home" style={{ textDecoration: 'none', textTransform: 'none', color:'black' }}>
-                Group 44
+                EYING
               </Link>
             </Typography>
 
@@ -125,15 +124,22 @@ const NavBar = () => {
                 </MenuItem>
                 <MenuItem onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">
-                    <Link to="Upload" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                    <Link to="upload" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
                       UPLOAD
                     </Link>
                   </Typography>
                 </MenuItem>
                 <MenuItem onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">
-                    <Link to="service_center" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                      QnA
+                    <Link to="track" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                      Track
+                    </Link>
+                  </Typography>
+                </MenuItem>
+                <MenuItem onClick={handleCloseNavMenu}>
+                  <Typography textAlign="center">
+                    <Link to="FAQ" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                      FAQ
                     </Link>
                   </Typography>
                 </MenuItem>
@@ -146,11 +152,10 @@ const NavBar = () => {
               sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
             >
               <Link to="home" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                GROUP 44
+                EYING
               </Link>
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, ml: 15, gap: 14 }}>
-  
               <Typography
                 component="div"
                 noWrap
@@ -165,8 +170,17 @@ const NavBar = () => {
                 noWrap
                 sx={{ my:4 }}
               >
-                <Link to="Upload" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                <Link to="upload" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
                   UPLOAD
+                </Link>
+              </Typography>
+              <Typography
+                component="div"
+                noWrap
+                sx={{ my:4 }}
+              >
+                <Link to="track" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                  TRACK
                 </Link>
               </Typography>
               <Typography
@@ -183,8 +197,8 @@ const NavBar = () => {
                 noWrap
                 sx={{ my:4 }}
               >
-                <Link to="service_center" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                  QnA
+                <Link to="FAQ" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                  FAQ
                 </Link>
               </Typography>
             </Box>
