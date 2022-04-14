@@ -13,7 +13,7 @@ from firebase_admin import credentials
 from django.conf import settings
 
 import json
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 
 
 # firebase_creds = credentials.Certificate(settings.FIREBASE_CONFIG)
@@ -27,14 +27,18 @@ class UserAPI(APIView):
             user_email = request.GET.get("email", None)
             user_password = request.GET.get("password", None)
             
-            if user_email == None or user_password == None:
+            if not user_email or not user_password:
                 error_message = "아이디 / 비밀번호 입력 오류입니다."
-            print(user_email, user_password)
+                raise
             
             queryset = User.objects.get(Q(email=user_email))
-            print(queryset, queryset.password, make_password(user_password))
-            serializer = UserSerializer(queryset, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            
+            if check_password(user_password, queryset.password):
+                serializer = UserSerializer(queryset, many=False)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                error_message = "비밀번호가 올바르지 않습니다."
+                raise
         except:
             return Response({'error_message': error_message}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -50,7 +54,7 @@ class UserAPI(APIView):
             
             user = User(
                 username=data["username"],
-                password=data["password"],
+                password=make_password(str(data["password"])),
                 email=data["email"],
                 birth_year=data["birth_year"],
                 gender=data["gender"],
@@ -81,9 +85,9 @@ class UserSearchAPI(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:                       # 조건 입력
                 query = Q()
-                if query_user_id != None:
+                if query_user_id:
                     query = query & Q(pk=query_user_id)
-                if query_user_name != None:
+                if query_user_name:
                     query = query & Q(username=query_user_name)
                 
                 if query == Q():

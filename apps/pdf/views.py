@@ -59,13 +59,13 @@ class PDFSearchAPI(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:                       # 조건 입력
                 query = Q()
-                if query_pdf_id != None:
+                if query_pdf_id:
                     query = query & Q(pk=query_pdf_id)
-                if query_pdf_name != None:
+                if query_pdf_name:
                     query = query & Q(name__contains=query_pdf_name)
-                if query_user_id != None:
+                if query_user_id:
                     query = query & Q(user=query_user_id)
-                if query_user_name != None:
+                if query_user_name:
                     query = query & Q(user=User.objects.get(username=query_user_name))
                 
                 if query == Q():
