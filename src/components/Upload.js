@@ -141,7 +141,6 @@ const Upload = () => {
                                 color="primary"
                                 component="span"
                                 style={{ marginTop: 5, color: "black" }}
-                                onClick={() => window.open('https://webgazer.cs.brown.edu/calibration.html?', '_blank')}
 
                             >
                                 Upload
@@ -160,6 +159,7 @@ const Upload = () => {
                             color="primary"
                             component="span"
                             style={{ marginTop: 5, color: "black" }}
+                            onClick={() => window.open('https://webgazer.cs.brown.edu/calibration.html?', '_blank')}
                         >
                             Continue
                         </Button>
