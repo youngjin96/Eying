@@ -22,7 +22,7 @@ const WebGazer = () => {
         try {
             setLoading(true);
             const datas = []; // get 받아올 배열
-            const response = await axios.get('http://54.180.126.190:8000/pdf/'); // get 함수
+            const response = await axios.get('http://13.124.83.96:8000/pdf/'); // get 함수
             datas.push(response.data[0]); // 데이터는 response.data 안에 들어있습니다.
             setImgsUrl(datas[0].imgs_url);
             setLength(datas[0].img_length);
@@ -52,7 +52,10 @@ const WebGazer = () => {
     )
     
     // error가 있을 때 alert
-    if (error) return alert("에러가 발생했습니다");
+    if (error) {
+        alert("에러가 발생했습니다");
+        window.location.replace("upload");
+    }
     
     // webgazer 시작 함수
     const onClickStart = () => {
@@ -60,14 +63,14 @@ const WebGazer = () => {
             if (data == null) {
                 return;
             }
-            dimensionArr.push([data.x, data.y]);
+            dimensionArr.push([Math.floor(data.x), Math.floor(data.y)]);
         }).begin();
     }
 
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://54.180.126.190:8000/eyetracking/", {
+        await axios.post("http://13.124.83.96:8000/eyetracking/", {
             'user_id': 1,
             'page_number': `${pageNum}`,
             'rating_time': '00:00:00',
@@ -83,7 +86,7 @@ const WebGazer = () => {
     
     // 화살표 오른쪽 함수
     const onClickRightArrow = async () => {
-        await axios.post("http://54.180.126.190:8000/eyetracking/", {
+        await axios.post("http://13.124.83.96:8000/eyetracking/", {
             'user_id': 1,
             'page_number': `${pageNum}`,
             'rating_time': '00:00:00',
@@ -91,7 +94,7 @@ const WebGazer = () => {
             'owner_id': userId,
             'pdf_id': pdfId
         });
-        // TODO post.then(arr = []) arr null 처리 arr boundary 밖 값들 무시
+        //TODO post.then(arr = []) arr null 처리 arr boundary 밖 값들 무시
         if(pageNum === length){
             pageNum = length;
         } else{
@@ -102,7 +105,7 @@ const WebGazer = () => {
 
     // 화살표 왼쪽 함수
     const onClickLeftArrow = async () => {
-        await axios.post("http://54.180.126.190:8000/eyetracking/", {
+        await axios.post("http://13.124.83.96:8000/eyetracking/", {
             'user_id': 1,
             'page_number': `${pageNum}`,
             'rating_time': '00:00:00',
@@ -153,13 +156,16 @@ const WebGazer = () => {
                             animationDuration={1}
                             renderNextButton={nextArrow}
                             renderPrevButton={prevArrow}
+                            
                         >
-                            <img src="/img/s.png" style={{ width: "100%", height: 500 }}>
+                            {/* <img src="/img/s.png" style={{ width: "100%", height: 500 }}> 
                             </img>
-                            {/* {imgsUrl && imgsUrl.map((e, index) => (
+                            <img src="/img/example2.png" style={{ width: "100%", height: 500 }}> 
+                            </img> */}
+                            {imgsUrl && imgsUrl.map((e, index) => (
                                 <img key={index} src={e} style={{ width: "100%", height: 500 }} />
 
-                            ))} */}
+                            ))} 
                         </AliceCarousel>
                         <Button onClick={onClickStart}>
                             Start

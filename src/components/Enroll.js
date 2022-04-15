@@ -39,19 +39,19 @@ const Enroll = () => {
     const onClickEnroll = async () => {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
-            fetch("https://jsonplaceholder.typicode.com/posts", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    title: "Test",
-                    body: "I am testing!",
-                    userId: 1,
-                }),
-            })
-                .then((response) => response.json())
-                .then((data) => console.log(data))
+            // fetch("hhttp://3.36.60.4:8000/pdf/", {
+            //     method: "POST",
+            //     headers: {
+            //         "Content-Type": "application/json",
+            //     },
+            //     body: JSON.stringify({
+            //         title: "Test",
+            //         body: "I am testing!",
+            //         userId: 1,
+            //     }),
+            // })
+            //     .then((response) => response.json())
+            //     .then((data) => console.log(data))
             alert("정상적으로 회원가입이 완료되었습니다.")
             window.location.replace("http://localhost:3000/home");
         } catch (error) {
