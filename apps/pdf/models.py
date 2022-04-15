@@ -19,7 +19,7 @@ def pdf_path(instance, filename):
 def pdf_to_image(instance):
     # pdf_bytes = s3r.Bucket(AWS_STORAGE_BUCKET_NAME).Object("pdf/{0}/{1}/{2}".format(str(instance.user.id), str(instance.id), str(instance.name))).get()['Body'].read()
     pdf_bytes = instance.pdf.open('rb').read() # PDF를 저장하지 않고 bytes data로 직접 가져오도록 변경
-    images = convert_from_bytes(pdf_bytes, fmt="jpeg") # poppler_path="pdf/poppler/Library/bin/" 
+    images = convert_from_bytes(pdf_bytes, fmt="jpeg", poppler_path="pdf/poppler/Library/bin/") #  
     for i, image in enumerate(images):
         buffer = BytesIO()
         image.save(buffer, format="JPEG")
@@ -33,8 +33,11 @@ def pdf_to_image(instance):
 class PDFModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="user", db_column="user", null=True)
     name = models.CharField(default="unknown", max_length=255)
-    pdf = models.FileField(upload_to=pdf_path)
+    pdf = models.FileField(upload_to=pdf_path, null=True)
     img_length = models.IntegerField(default=0, editable=False)
+    upload_at = models.DateField(auto_now_add=True)
+    deadline = models.DateField(default=None)
+    views = models.IntegerField(default=0)
     
     def save(self, *args, **kwargs):
         if self.id is None:

@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 class PDFAPI(APIView):
     def get(self, request):
         try:
-            queryset = PDFModel.objects.all()
+            queryset = PDFModel.objects.all().order_by('-pk') # 등록 최신순
             serializer = PDFSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
