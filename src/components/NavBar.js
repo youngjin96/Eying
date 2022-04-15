@@ -218,7 +218,7 @@ const NavBar = () => {
                   >
                     <Link to="login" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
                       LOGIN
-                  </Link>
+                    </Link>
                   </Typography>
                 )}
               <Menu
@@ -239,7 +239,9 @@ const NavBar = () => {
               >
                 <MenuItem onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">
-                    마이페이지
+                    <Link to="mypage" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                      마이페이지
+                    </Link>
                   </Typography>
                 </MenuItem>
                 <MenuItem onClick={handleCloseUserMenu}>
