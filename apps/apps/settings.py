@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'storages',
     'eyetracking.apps.EyetrackingConfig',
+    'cs.apps.CsConfig',
 ]
 
 MIDDLEWARE = [
