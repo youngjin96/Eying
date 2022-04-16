@@ -22,7 +22,7 @@ const NavBar = () => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsLoggedIn(true);
-        console.log(user.uid);
+        console.log(user.email);
       } else {
         setIsLoggedIn(false);
         console.log("유저 없음");

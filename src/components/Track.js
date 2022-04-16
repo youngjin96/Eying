@@ -1,51 +1,89 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import { Button } from '@mui/material';
+import axios from 'axios';
 
 const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'firstName', headerName: 'First name', width: 130 },
-    { field: 'lastName', headerName: 'Last name', width: 130 },
-    {
-        field: 'age',
-        headerName: 'Age',
-        type: 'number',
-        width: 90,
-    },
-    {
-        field: 'fullName',
-        headerName: 'Full name',
-        description: 'This column has a value getter and is not sortable.',
-        sortable: false,
-        width: 160,
-        valueGetter: (params) =>
-            `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-    },
+    { field: 'id', headerName: '번호', width: 100 },
+    { field: 'pdf_name', headerName: '제목', width: 300 },
+    { field: 'job', headerName: '업종', width: 130 },
+    { field: 'user_name', headerName: '작성자', width: 130 },
+    { field: 'upload_at', headerName: '등록일', width: 160 },
+    { field: 'deadline', headerName: '마감일', width: 160 },
+    { field: 'views', headerName: '조회수', width: 90}
 ];
 
 const rows = [
-    { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-    { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-    { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-    { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-    { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-    { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-    { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-    { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-    { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
+    {   id: 1, 
+        title: "발표 준비 자세와 연습", 
+        job: 'Snow', 
+        nickName: 'Jon', 
+        uploadTime: "2022-04-23", 
+        deadline: "2022-04-23", 
+        view: "43" 
+    },
+    {   id: 2, 
+        title: "2", 
+        job: 'Lannister', 
+        nickName: 'Cersei', 
+        uploadTime: "2022-04-23", 
+        deadline: "2022-04-23", 
+        view: "43" 
+    },
+    {   id: 3, 
+        title: "2", 
+        job: 'Lannister', 
+        nickName: 'Jaime', 
+        uploadTime: "2022-04-23", 
+        deadline: "2022-04-23", 
+        view: "43" 
+    },
 ];
 
-
 const Track = () => {
+    const [isClickedTrack, setIsClickedTrack] = useState(false);
+    const [selectionModel, setSelectionModel] = useState();
+    
+    let datas = [];
+    let dataa = [];
+
+    // TODO 모든 파일 get요청 후 테이블에 뿌리기
+    useEffect(async() => {
+        const response = await axios.get('http://52.79.198.166:8000/pdf/');
+        
+        datas.push(response.data);
+        dataa = datas[0];
+        console.log(dataa);
+        console.log(rows);
+    }, []);
+
+    const onClickTrack = async () => {
+        const response = await axios.get('http://52.79.198.166:8000/pdf/', {
+            params: {
+                // TODO pdfId로 가져오기
+                id : selectionModel[0]
+            }
+        });
+    }
+
     return (
-        <div style={{ height: 400, width: '100%' }}>
-            <DataGrid
-                rows={rows}
-                columns={columns}
-                pageSize={5}
-                rowsPerPageOptions={[5]}
-                checkboxSelection
-            />
-        </div>
+        <>
+            <div style={{ height: 400, width: '100%', margin: "auto", marginTop: 100 }}>
+                <DataGrid
+                    rows={dataa}
+                    columns={columns}
+                    pageSize={5}
+                    rowsPerPageOptions={[5]}
+                    onSelectionModelChange={(newSelectionModel) => {
+                        setSelectionModel(newSelectionModel);
+                    }}
+                    selectionModel={selectionModel}
+                />
+            </div>
+            <Button onClick={onClickTrack}>
+                TRACK
+            </Button>
+        </>
     )
 }
 

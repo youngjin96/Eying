@@ -17,12 +17,14 @@ const WebGazer = () => {
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
     var pageNum = 0; // pdf 현재 페이지
     var dimensionArr = []; // webgazer x, y 좌표가 담길 배열
+    const datas = []; // get 받아올 배열
     
     useEffect(async () => {
         try {
-            setLoading(true);
-            const datas = []; // get 받아올 배열
-            const response = await axios.get('http://13.124.83.96:8000/pdf/'); // get 함수
+            if(datas === []){
+                setLoading(true);
+            }
+            const response = await axios.get('http://3.38.104.20:8000/pdf/'); // get 함수
             datas.push(response.data[0]); // 데이터는 response.data 안에 들어있습니다.
             setImgsUrl(datas[0].imgs_url);
             setLength(datas[0].img_length);
@@ -70,7 +72,7 @@ const WebGazer = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://13.124.83.96:8000/eyetracking/", {
+        await axios.post("http://3.38.104.20:8000/eyetracking/", {
             'user_id': 1,
             'page_number': `${pageNum}`,
             'rating_time': '00:00:00',
@@ -86,7 +88,7 @@ const WebGazer = () => {
     
     // 화살표 오른쪽 함수
     const onClickRightArrow = async () => {
-        await axios.post("http://13.124.83.96:8000/eyetracking/", {
+        await axios.post("http://3.38.104.20:8000/eyetracking/", {
             'user_id': 1,
             'page_number': `${pageNum}`,
             'rating_time': '00:00:00',
@@ -105,7 +107,7 @@ const WebGazer = () => {
 
     // 화살표 왼쪽 함수
     const onClickLeftArrow = async () => {
-        await axios.post("http://13.124.83.96:8000/eyetracking/", {
+        await axios.post("http://3.38.104.20:8000/eyetracking/", {
             'user_id': 1,
             'page_number': `${pageNum}`,
             'rating_time': '00:00:00',

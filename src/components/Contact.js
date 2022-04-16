@@ -35,12 +35,19 @@ const Gallery = () => {
     }
 
     const onClickSubmit = async () => {
-        await axios.post("http://13.124.83.96:8000/eyetracking/", {
+        try{
+            await axios.post("http://3.38.104.20:8000/cs/", {
             'name': name,
             'email': email,
             'phoneNumber': phoneNumber,
             'content': content,
-        });
+            });
+            alert("접수가 완료됐습니다.");
+            window.location.reload();
+        } catch (error){
+            alert("접수하지 못했습니다.");
+        }
+        
     }
 
     return (

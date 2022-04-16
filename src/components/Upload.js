@@ -16,7 +16,7 @@ const Upload = () => {
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log(user.uid);
+                console.log(user.email);
             } else {
                 window.location.replace("login");
                 alert("You Need Login To Use This Service.");
@@ -28,8 +28,8 @@ const Upload = () => {
     const handlePdfFileChange = (e) => {
         var frm = new FormData();
         frm.append("data", e.target.files[0]);
-        axios.post('http://13.124.83.96:8000/pdf/', frm);
-    }
+        axios.post('http://3.38.104.20:8000/pdf/', frm);
+    };
 
     return (
         <>
@@ -152,7 +152,7 @@ const Upload = () => {
                             2. Click This Button
                         </Typography>
                         <Typography variant="subtitle1" style={{ color: "#636261" }}>
-                            To Prevent Shaking Of The Gaze Point
+                            To Prevent Shaking Of The Gaze
                         </Typography>
                         <Button
                             variant="outlined"
@@ -184,7 +184,7 @@ const Upload = () => {
                     </Grid>
                 </Grid>
                 <hr style={{ marginTop: 40 }} />
-                <Grid container container spacing={{ xs: 2, md: 4 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 20 }}>
+                <Grid container spacing={{ xs: 2, md: 4 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 20 }}>
                     <Grid item xs={3} style={{ textAlign: "center" }}>
                         <Typography variant="h5" style={{ color: "#636261" }}>
                             E x a m p l e
