@@ -60,9 +60,8 @@ class PDFSearchAPI(APIView):
         try:
             query_pdf_id = request.GET.get("pdf_id", None)
             query_pdf_name = request.GET.get("pdf_name", None)
-            query_user_id = request.GET.get("user_id", None)
-            query_user_name = request.GET.get("user_name", None)
-            query_user_email = request.GET.get("user_email", None)
+            query_username = request.GET.get("username", None)
+            query_email = request.GET.get("email", None)
                 
             if len(request.GET) == 0:   # 조건 미입력
                 queryset = PDFModel.objects.all().order_by('-pk')
@@ -74,12 +73,10 @@ class PDFSearchAPI(APIView):
                     query = query & Q(pk=query_pdf_id)
                 if query_pdf_name:
                     query = query & Q(name__contains=query_pdf_name)
-                if query_user_id:
-                    query = query & Q(user=query_user_id)
-                if query_user_name:
-                    query = query & Q(user=User.objects.get(username=query_user_name))
-                if query_user_email:
-                    query = query & Q(user=User.objects.get(email=query_user_email))
+                if query_username:
+                    query = query & Q(user=User.objects.get(username=query_username))
+                if query_email:
+                    query = query & Q(user=User.objects.get(email=query_email))
                 
                 if query == Q():
                     raise

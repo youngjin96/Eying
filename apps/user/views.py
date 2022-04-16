@@ -22,7 +22,7 @@ from django.contrib.auth.hashers import make_password, check_password
 
 class UserAPI(APIView):
     def get(self, request):
-        error_message = "알 수 없는 오류가 발생했습니다."
+        error_message = "존재하지 않는 이메일이거나 알 수 없는 오류가 발생했습니다."
         try:
             user_email = request.GET.get("email", None)
             user_password = request.GET.get("password", None)
@@ -59,6 +59,8 @@ class UserAPI(APIView):
                 birth_year=data["birth_year"],
                 gender=data["gender"],
                 job=data["job"],
+                job_field=data["job_field"],
+                position=data["position"],
             )
             user.save()
             serializer = UserSerializer(user, many=False)
@@ -76,8 +78,8 @@ class UserAPI(APIView):
 class UserSearchAPI(APIView):
     def get(self, request):
         try:
-            query_user_email = request.GET.get("user_email", None)
-            query_user_name = request.GET.get("user_name", None)
+            query_email = request.GET.get("email", None)
+            query_username = request.GET.get("username", None)
                 
             if len(request.GET) == 0:   # 조건 미입력
                 queryset = User.objects.all()
@@ -85,10 +87,10 @@ class UserSearchAPI(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:                       # 조건 입력
                 query = Q()
-                if query_user_email:
-                    query = query & Q(email=query_user_email)
-                if query_user_name:
-                    query = query & Q(username=query_user_name)
+                if query_email:
+                    query = query & Q(email=query_email)
+                if query_username:
+                    query = query & Q(username=query_username)
                 
                 if query == Q():
                     raise
