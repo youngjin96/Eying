@@ -13,64 +13,37 @@ const columns = [
     { field: 'views', headerName: '조회수', width: 90}
 ];
 
-const rows = [
-    {   id: 1, 
-        title: "발표 준비 자세와 연습", 
-        job: 'Snow', 
-        nickName: 'Jon', 
-        uploadTime: "2022-04-23", 
-        deadline: "2022-04-23", 
-        view: "43" 
-    },
-    {   id: 2, 
-        title: "2", 
-        job: 'Lannister', 
-        nickName: 'Cersei', 
-        uploadTime: "2022-04-23", 
-        deadline: "2022-04-23", 
-        view: "43" 
-    },
-    {   id: 3, 
-        title: "2", 
-        job: 'Lannister', 
-        nickName: 'Jaime', 
-        uploadTime: "2022-04-23", 
-        deadline: "2022-04-23", 
-        view: "43" 
-    },
-];
-
 const Track = () => {
-    const [isClickedTrack, setIsClickedTrack] = useState(false);
     const [selectionModel, setSelectionModel] = useState();
-    
-    let datas = [];
-    let dataa = [];
+    const [pdfs, setPdfs] = useState(() => []);
 
     // TODO 모든 파일 get요청 후 테이블에 뿌리기
     useEffect(async() => {
+        let datas = [];
         const response = await axios.get('http://52.79.198.166:8000/pdf/');
-        
         datas.push(response.data);
-        dataa = datas[0];
-        console.log(dataa);
-        console.log(rows);
+        setPdfs(datas[0]);
     }, []);
 
     const onClickTrack = async () => {
-        const response = await axios.get('http://52.79.198.166:8000/pdf/', {
+        console.log(selectionModel[0]);
+        const response = await axios.get('http://52.79.198.166:8000/pdf/search', {
             params: {
-                // TODO pdfId로 가져오기
-                id : selectionModel[0]
+                pdf_id : selectionModel[0]
             }
         });
+        console.log(response.data[0].imgs_url);
     }
+
 
     return (
         <>
-            <div style={{ height: 400, width: '100%', margin: "auto", marginTop: 100 }}>
+            <Button style={{marginTop: 100}} onClick={onClickTrack}>
+                TRACK
+            </Button>
+            <div style={{ height: 400, width: '100%', margin: "auto" }}>
                 <DataGrid
-                    rows={dataa}
+                    rows={pdfs}
                     columns={columns}
                     pageSize={5}
                     rowsPerPageOptions={[5]}
@@ -80,9 +53,6 @@ const Track = () => {
                     selectionModel={selectionModel}
                 />
             </div>
-            <Button onClick={onClickTrack}>
-                TRACK
-            </Button>
         </>
     )
 }
