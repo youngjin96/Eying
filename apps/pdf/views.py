@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from .serializers import PDFSerializer
 
 import json
+import datetime
 from django.views.decorators.csrf import csrf_exempt
 
 class PDFAPI(APIView):
@@ -21,21 +22,30 @@ class PDFAPI(APIView):
     @csrf_exempt # CSRF 토큰 없이 POST Request 받도록 함
     def post(self, request):
         try:
+            try:
+                deadline = request.data['deadline']
+            except:
+                deadline = (datetime.datetime.now() + datetime.timedelta(days=7)).strftime("%Y-%m-%d")
+               
+            email = request.data['email']
             pdf = request.data['data']
-            
+                
             # 파일 확장자 Validation
             if pdf.content_type == "application/pdf":
-                pdf = PDFModel(user=User.objects.get(pk=1), 
+                pdf = PDFModel(user=User.objects.get(email=email),
                                name=request.data['data'].name, 
-                               pdf=request.data['data'])
+                               pdf=request.data['data'],
+                               deadline=deadline,
+                               views=0,
+                               )
                 pdf.save()
                 
                 serializer = PDFSerializer(pdf, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
-                Response({}, status=status.HTTP_400_BAD_REQUEST)
+                raise
         except:
-            return Response({'error_message': pdf}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': "이메일 또는 PDF 데이터에 문제가 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
         
     def delete(self, request):
         try:
@@ -52,9 +62,10 @@ class PDFSearchAPI(APIView):
             query_pdf_name = request.GET.get("pdf_name", None)
             query_user_id = request.GET.get("user_id", None)
             query_user_name = request.GET.get("user_name", None)
+            query_user_email = request.GET.get("user_email", None)
                 
             if len(request.GET) == 0:   # 조건 미입력
-                queryset = PDFModel.objects.all()
+                queryset = PDFModel.objects.all().order_by('-pk')
                 serializer = PDFSerializer(queryset, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:                       # 조건 입력
@@ -67,11 +78,17 @@ class PDFSearchAPI(APIView):
                     query = query & Q(user=query_user_id)
                 if query_user_name:
                     query = query & Q(user=User.objects.get(username=query_user_name))
+                if query_user_email:
+                    query = query & Q(user=User.objects.get(email=query_user_email))
                 
                 if query == Q():
                     raise
                 
-                queryset = PDFModel.objects.filter(query)
+                queryset = PDFModel.objects.filter(query).order_by('-pk')
+                # for q in queryset:
+                #     q.views += 1
+                #     q.save()
+                
                 serializer = PDFSerializer(queryset, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
         except:

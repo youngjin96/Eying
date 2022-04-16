@@ -76,7 +76,7 @@ class UserAPI(APIView):
 class UserSearchAPI(APIView):
     def get(self, request):
         try:
-            query_user_id = request.GET.get("user_id", None)
+            query_user_email = request.GET.get("user_email", None)
             query_user_name = request.GET.get("user_name", None)
                 
             if len(request.GET) == 0:   # 조건 미입력
@@ -85,8 +85,8 @@ class UserSearchAPI(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:                       # 조건 입력
                 query = Q()
-                if query_user_id:
-                    query = query & Q(pk=query_user_id)
+                if query_user_email:
+                    query = query & Q(email=query_user_email)
                 if query_user_name:
                     query = query & Q(username=query_user_name)
                 
