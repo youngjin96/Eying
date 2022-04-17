@@ -28,7 +28,7 @@ const Upload = () => {
     const handlePdfFileChange = (e) => {
         var frm = new FormData();
         frm.append("data", e.target.files[0]);
-        axios.post('http://3.38.104.20:8000/pdf/', frm);
+        axios.post('http://3.35.216.82:8000/pdf/', frm);
     };
 
     return (

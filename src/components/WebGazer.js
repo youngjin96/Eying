@@ -24,7 +24,7 @@ const WebGazer = () => {
             if(datas === []){
                 setLoading(true);
             }
-            const response = await axios.get('http://3.38.104.20:8000/pdf/'); // get 함수
+            const response = await axios.get('http://3.35.216.82:8000/pdf/'); // get 함수
             datas.push(response.data[0]); // 데이터는 response.data 안에 들어있습니다.
             setImgsUrl(datas[0].imgs_url);
             setLength(datas[0].img_length);
