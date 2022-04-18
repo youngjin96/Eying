@@ -32,6 +32,7 @@ class PDFAPI(APIView):
                 
             # 파일 확장자 Validation
             if pdf.content_type == "application/pdf":
+                print("2")
                 pdf = PDFModel(user=User.objects.get(email=email),
                                name=request.data['data'].name, 
                                pdf=request.data['data'],
@@ -45,6 +46,7 @@ class PDFAPI(APIView):
             else:
                 raise
         except:
+            print("1")
             return Response({'error_message': "이메일 또는 PDF 데이터에 문제가 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
         
     def delete(self, request):

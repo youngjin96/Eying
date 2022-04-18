@@ -17,7 +17,7 @@ class EyetrackList(APIView):
         print(request.data)
         # try :
 
-        eyetrackdatas = Eyetracking(user_id = User.objects.get(pk=request.data['user_id']), owner_id = User.objects.get(pk=request.data['owner_id']), page_num = request.data['page_number'], 
+        eyetrackdatas = Eyetracking(user_id = User.objects.get(email=email), owner_id = User.objects.get(email=email), page_num = request.data['page_number'], 
                                     pdf_fk = PDFModel.objects.get(pk=request.data['pdf_id']), rating_time= request.data['rating_time'],coordinate= request.data['coordinate'])
         eyetrackdatas.save()
 
