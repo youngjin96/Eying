@@ -101,14 +101,14 @@ AWS_QUERYSTRING_AUTH = False
 
 
 AWS_STATIC_LOCATION = ''
-STATICFILES_STORAGE = 'apps.config.static_storage.StaticStorage' # 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'config.static_storage.StaticStorage' # 'storages.backends.s3boto3.S3Boto3Storage'
 STATIC_URL = 'https://'+AWS_S3_CUSTOME_DOMAIN+'/'
 
 AWS_PUBLIC_MEDIA_LOCATION = "media/public"
-DEFAULT_FILE_STORAGE = 'apps.config.media_storage.PublicMediaStorage' # 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'config.media_storage.PublicMediaStorage' # 'storages.backends.s3boto3.S3Boto3Storage'
 
 AWS_PRIVATE_MEDIA_LOCATION = "media/private"
-PRIVATE_FILE_STORAGE = 'apps.config.media_storage.PrivateMediaStorage'
+PRIVATE_FILE_STORAGE = 'config.media_storage.PrivateMediaStorage'
 
 # STATIC_DIR = os.path.join(BASE_DIR,'static')
 # STATICFILES_DIRS = [
