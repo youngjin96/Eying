@@ -13,7 +13,8 @@ class CSAPI(APIView):
             queryset = CS.objects.all()
             serializer = CSSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
+        except Exception as e:
+            print(e)
             Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     @csrf_exempt
@@ -31,5 +32,6 @@ class CSAPI(APIView):
             cs.save()
             serializer = CSSerializer(cs, many=False)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
+        except Exception as e:
+            print(e)
             return Response({'error_message': error_message}, status=status.HTTP_400_BAD_REQUEST)

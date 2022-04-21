@@ -13,13 +13,17 @@ s3r = boto3.resource('s3', aws_access_key_id = AWS_ACCESS_KEY_ID, aws_secret_acc
 
 
 def pdf_path(instance, filename):
-    return "pdfs/{0}/{1}".format(instance.id, filename)
+    return "pdfs/{0}/{1}/{2}".format(instance.user.id, instance.id, filename)
 
 
 def pdf_to_image(instance):
     # pdf_bytes = s3r.Bucket(AWS_STORAGE_BUCKET_NAME).Object("pdf/{0}/{1}/{2}".format(str(instance.user.id), str(instance.id), str(instance.name))).get()['Body'].read()
     pdf_bytes = instance.pdf.open('rb').read() # PDF를 저장하지 않고 bytes data로 직접 가져오도록 변경
-    images = convert_from_bytes(pdf_bytes, fmt="jpeg", poppler_path="pdf/poppler/Library/bin/") #
+    try:
+        images = convert_from_bytes(pdf_bytes, fmt="jpeg")
+    except:
+        images = convert_from_bytes(pdf_bytes, fmt="jpeg", poppler_path="pdf/poppler/Library/bin/")
+        
     for i, image in enumerate(images):
         buffer = BytesIO()
         image.save(buffer, format="JPEG")
@@ -46,7 +50,6 @@ class PDFModel(models.Model):
             super().save(*args, **kwargs)
             self.pdf = temp_pdf
             self.img_length = pdf_to_image(self)
-            self.pdf = None # PDF Field는 Image Convert 이후에 사용되지 않으므로 NULL
             super().save(*args, **kwargs)
 
     def __str__(self):

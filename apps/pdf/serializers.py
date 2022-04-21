@@ -4,10 +4,6 @@ from .models import PDFModel
 from apps.settings import AWS_S3_CUSTOME_DOMAIN
 
 class PDFSerializer(serializers.ModelSerializer):
-    id = serializers.SerializerMethodField('get_pdf_id')
-    def get_pdf_id(self, obj):
-        return obj.id
-    
     pdf_name = serializers.SerializerMethodField()
     def get_pdf_name(self, obj):
         return obj.name
@@ -37,6 +33,7 @@ class PDFSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'pdf_name',
+            'pdf',
             'user_id',
             'user_name',
             'user_email',

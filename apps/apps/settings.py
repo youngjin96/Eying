@@ -89,20 +89,27 @@ AWS_REGION = 'ap-northeast-2'
 AWS_STORAGE_BUCKET_NAME = 'capstone-storage'
 AWS_S3_CUSTOME_DOMAIN = '%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME,AWS_REGION)
 AWS_S3_OBJECT_PARAMETERS ={
-    'CacheContrl' : 'max-age=86400',
+    'CacheControl' : 'max-age=86400',
 }
 # AWS_DEFAULT_ACL = 'public-read'
 # AWS_LOCATION = 'static'
 AWS_QUERYSTRING_AUTH = False
 
 # S3 Storage
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+
+AWS_STATIC_LOCATION = ''
+STATICFILES_STORAGE = 'apps.config.static_storage.StaticStorage' # 'storages.backends.s3boto3.S3Boto3Storage'
 STATIC_URL = 'https://'+AWS_S3_CUSTOME_DOMAIN+'/'
+
+AWS_PUBLIC_MEDIA_LOCATION = "media/public"
+DEFAULT_FILE_STORAGE = 'apps.config.media_storage.PublicMediaStorage' # 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_PRIVATE_MEDIA_LOCATION = "media/private"
+PRIVATE_FILE_STORAGE = 'apps.config.media_storage.PrivateMediaStorage'
+
 # STATIC_DIR = os.path.join(BASE_DIR,'static')
 # STATICFILES_DIRS = [
 #     STATIC_DIR,

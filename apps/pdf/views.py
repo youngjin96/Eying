@@ -6,7 +6,6 @@ from django.db.models import Q
 from rest_framework.views import APIView
 from .serializers import PDFSerializer
 
-import json
 import datetime
 from django.views.decorators.csrf import csrf_exempt
 
@@ -16,7 +15,8 @@ class PDFAPI(APIView):
             queryset = PDFModel.objects.all().order_by('-pk') # 등록 최신순
             serializer = PDFSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
+        except Exception as e:
+            print(e)
             Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     @csrf_exempt # CSRF 토큰 없이 POST Request 받도록 함
@@ -32,7 +32,6 @@ class PDFAPI(APIView):
                 
             # 파일 확장자 Validation
             if pdf.content_type == "application/pdf":
-                print("2")
                 pdf = PDFModel(user=User.objects.get(email=email),
                                name=request.data['data'].name, 
                                pdf=request.data['data'],
@@ -45,18 +44,19 @@ class PDFAPI(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 raise
-        except:
-            print("1")
+        except Exception as e:
+            print(e)
             return Response({'error_message': "이메일 또는 PDF 데이터에 문제가 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
         
     def delete(self, request):
         try:
             print("DELETE 요청")
             return Response({}, status=status.HTTP_200_OK)
-        except:
+        except Exception as e:
+            print(e)
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
         
-        
+
 class PDFSearchAPI(APIView):
     def get(self, request):
         try:
@@ -90,5 +90,6 @@ class PDFSearchAPI(APIView):
                 
                 serializer = PDFSerializer(queryset, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
+        except Exception as e:
+            print(e)
             return Response({}, status=status.HTTP_400_BAD_REQUEST)

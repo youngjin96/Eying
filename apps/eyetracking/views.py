@@ -3,7 +3,6 @@ from rest_framework.views import APIView
 from django.http import HttpResponse, JsonResponse
 from rest_framework.response import Response
 from rest_framework import status
-# Create your views here.
 from user.models import User
 from pdf.models import PDFModel
 from .models import Eyetracking
