@@ -20,10 +20,6 @@ class PDFSerializer(serializers.ModelSerializer):
     def get_user_email(self, obj):
         return obj.user.email
     
-    img_path = serializers.SerializerMethodField()
-    def get_img_path(self, obj):
-        return "https://{0}/pdf/{1}/{2}/".format(AWS_S3_CUSTOME_DOMAIN, str(obj.user.id), str(obj.id))
-    
     imgs_url = serializers.SerializerMethodField()
     def get_imgs_url(self, obj):
         return ["https://{0}/pdf/{1}/{2}/{3}.jpg".format(AWS_S3_CUSTOME_DOMAIN, str(obj.user.id), str(obj.id), str(i)) for i in range(obj.img_length)]
@@ -41,6 +37,5 @@ class PDFSerializer(serializers.ModelSerializer):
             'deadline',
             'views',
             'img_length',
-            'img_path',
             'imgs_url',
         )

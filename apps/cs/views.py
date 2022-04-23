@@ -10,7 +10,7 @@ import json
 class CSAPI(APIView):
     def get(self, request):
         try:
-            queryset = CS.objects.all()
+            queryset = CS.objects.all().order_by('-pk')
             serializer = CSSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:

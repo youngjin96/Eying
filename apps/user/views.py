@@ -37,7 +37,7 @@ class UserAPI(APIView):
     def post(self, request):
         error_message = "알 수 없는 오류가 발생했습니다."
         try:
-            if len(User.objects.filter(email=request.data["email"])) >= 1:
+            if User.objects.filter(email=request.data["email"]):
                 error_message = "이미 존재하는 이메일입니다."
                 raise
             
@@ -67,7 +67,7 @@ class UserAPI(APIView):
             return Response({}, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
                 
 class UserSearchAPI(APIView):
     def get(self, request):
@@ -75,23 +75,17 @@ class UserSearchAPI(APIView):
             query_email = request.GET.get("email", None)
             query_username = request.GET.get("username", None)
                 
-            if len(request.GET) == 0:   # 조건 미입력
-                queryset = User.objects.all()
-                serializer = UserSerializer(queryset, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:                       # 조건 입력
-                query = Q()
-                if query_email:
-                    query = query & Q(email=query_email)
-                if query_username:
-                    query = query & Q(username=query_username)
-                
-                if query == Q():
-                    raise
-                
-                queryset = User.objects.filter(query)
-                serializer = UserSerializer(queryset, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+            # 쿼리 적용 (Q() = 조건 없음)
+            query = Q()
+            if query_email:
+                query = query & Q(email=query_email)
+            if query_username:
+                query = query & Q(username=query_username)
+            
+            queryset = User.objects.filter(query)
+            serializer = UserSerializer(queryset, many=True)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

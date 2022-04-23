@@ -14,6 +14,7 @@ class PDFAPI(APIView):
         try:
             queryset = PDFModel.objects.all().order_by('-pk') # 등록 최신순
             serializer = PDFSerializer(queryset, many=True)
+            
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
@@ -28,17 +29,22 @@ class PDFAPI(APIView):
                 deadline = (datetime.datetime.now() + datetime.timedelta(days=7)).strftime("%Y-%m-%d")
                
             email = request.data['email']
-            pdf = request.data['data']
+            pdf = request.data['pdf']
                 
             # 파일 확장자 Validation
             if pdf.content_type == "application/pdf":
+                start = datetime.datetime.now()
+                
                 pdf = PDFModel(user=User.objects.get(email=email),
-                               name=request.data['data'].name, 
-                               pdf=request.data['data'],
+                               name=request.data['pdf'].name, 
+                               pdf=request.data['pdf'],
                                deadline=deadline,
                                views=0,
                                )
                 pdf.save()
+                
+                end = datetime.datetime.now()
+                print("PDF 변환 및 저장 시간 : {0}".format(end-start))
                 
                 serializer = PDFSerializer(pdf, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -65,31 +71,23 @@ class PDFSearchAPI(APIView):
             query_username = request.GET.get("username", None)
             query_email = request.GET.get("email", None)
                 
-            if len(request.GET) == 0:   # 조건 미입력
-                queryset = PDFModel.objects.all().order_by('-pk')
-                serializer = PDFSerializer(queryset, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:                       # 조건 입력
-                query = Q()
-                if query_pdf_id:
-                    query = query & Q(pk=query_pdf_id)
-                if query_pdf_name:
-                    query = query & Q(name__contains=query_pdf_name)
-                if query_username:
-                    query = query & Q(user=User.objects.get(username=query_username))
-                if query_email:
-                    query = query & Q(user=User.objects.get(email=query_email))
+            query = Q()
+            if query_pdf_id:
+                query = query & Q(pk=query_pdf_id)
+            if query_pdf_name:
+                query = query & Q(name__contains=query_pdf_name)
+            if query_username:
+                query = query & Q(user=User.objects.get(username=query_username))
+            if query_email:
+                query = query & Q(user=User.objects.get(email=query_email))
+                 
+            queryset = PDFModel.objects.filter(query).order_by('-pk')
+            # for q in queryset:
+            #     q.views += 1
+            #     q.save()
                 
-                if query == Q():
-                    raise
-                
-                queryset = PDFModel.objects.filter(query).order_by('-pk')
-                # for q in queryset:
-                #     q.views += 1
-                #     q.save()
-                
-                serializer = PDFSerializer(queryset, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = PDFSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
