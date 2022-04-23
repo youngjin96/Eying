@@ -1,4 +1,3 @@
-from distutils.command.upload import upload
 from django.db import models
 from user.models import User
 
@@ -17,12 +16,11 @@ def pdf_path(instance, filename):
 
 
 def pdf_to_image(instance):
-    # pdf_bytes = s3r.Bucket(AWS_STORAGE_BUCKET_NAME).Object("pdf/{0}/{1}/{2}".format(str(instance.user.id), str(instance.id), str(instance.name))).get()['Body'].read()
     pdf_bytes = instance.pdf.open('rb').read() # PDF를 저장하지 않고 bytes data로 직접 가져오도록 변경
     try:
-        images = convert_from_bytes(pdf_bytes, fmt="jpeg")
+        images = convert_from_bytes(pdf_bytes, fmt="jpeg", dpi=100)
     except:
-        images = convert_from_bytes(pdf_bytes, fmt="jpeg", poppler_path="pdf/poppler/Library/bin/")
+        images = convert_from_bytes(pdf_bytes, fmt="jpeg", poppler_path="pdf/poppler/Library/bin/", dpi=100)
         
     for i, image in enumerate(images):
         buffer = BytesIO()
