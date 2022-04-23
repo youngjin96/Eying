@@ -1,13 +1,14 @@
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
+
 from .models import PDFModel
 from user.models import User
 from django.db.models import Q
-from rest_framework.views import APIView
 from .serializers import PDFSerializer
 
 import datetime
-from django.views.decorators.csrf import csrf_exempt
+
 
 class PDFAPI(APIView):
     def get(self, request):
@@ -20,7 +21,6 @@ class PDFAPI(APIView):
             print(e)
             Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    @csrf_exempt # CSRF 토큰 없이 POST Request 받도록 함
     def post(self, request):
         try:
             try:

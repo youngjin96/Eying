@@ -1,11 +1,10 @@
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
+
 from .models import User
 from django.db.models import Q
-from rest_framework.views import APIView
 from .serializers import UserSerializer
-
-from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.hashers import make_password, check_password
 
@@ -33,7 +32,6 @@ class UserAPI(APIView):
             print(e)
             return Response({'error_message': error_message}, status=status.HTTP_400_BAD_REQUEST)
 
-    @csrf_exempt
     def post(self, request):
         error_message = "알 수 없는 오류가 발생했습니다."
         try:
