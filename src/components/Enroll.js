@@ -12,6 +12,8 @@ import { useState } from "react";
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./Fbase";
+import axios from 'axios';
+
 
 const Enroll = () => {
     const [email, setEmail] = useState("");
@@ -20,6 +22,8 @@ const Enroll = () => {
     const [sex, setSex] = useState("");
     const [personJob, setPersonJob] = useState([]);
     const [confirmpassword, setConfirmPassword] = useState("");
+    const [selected, setSelected] = useState("");
+
 
     const onChange = (event) => {
         const { target: { name, value } } = event;
@@ -71,18 +75,36 @@ const Enroll = () => {
     };
 
     const jobs = [
-        '중학생',
-        '고등학생',
-        '대학생',
-        '취준생',
-        '직장인',
-        '무직',
+        "중학생",
+        "고등학생",
+        "대학생",
+        "직장인",
     ];
+    const student = ["1학년", "2학년", "3학년", "4학년",];
+    const salary = ["인턴", "사원", "대리", "과장", "차장", "부장",];
+
+    let type = null;
+    let options = null;
+
+    if (personJob === "중학생" || personJob === "고등학생" || personJob === "대학생") {
+        type = student;
+    } else if (personJob === "직장인") {
+        type = salary;
+    }
 
     function getStyles(job, personJob, theme) {
         return {
             fontWeight:
                 personJob.indexOf(job) === -1
+                    ? theme.typography.fontWeightRegular
+                    : theme.typography.fontWeightMedium,
+        };
+    }
+
+    function getStyles2(el, type, theme) {
+        return {
+            fontWeight:
+                type.indexOf(el) === -1
                     ? theme.typography.fontWeightRegular
                     : theme.typography.fontWeightMedium,
         };
@@ -97,6 +119,32 @@ const Enroll = () => {
         } = event;
         setPersonJob(event.target.value)
     };
+
+    const handleChange2 = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setSelected(event.target.value)
+    };
+
+    const businessCardUpload = (event) => {
+        let bc = new FormData();
+        bc.append('file', event.target.files[0]);
+        axios.post('http://54.180.126.190:8000/', bc);
+
+    }
+
+    if (type) {
+        options = type.map((el) => (
+            <MenuItem
+                key={el}
+                value={el}
+                style={getStyles2(el, type, theme)}
+            >
+                {el}
+            </MenuItem>
+        ))
+    }
 
     function componentDidMount() {
         // custom rule will have name 'isPasswordMatch'
@@ -174,8 +222,8 @@ const Enroll = () => {
                                 </RadioGroup>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={12}>
-                            <FormControl sx={{ width: 300 }}>
+                        <Grid item xs={12} spacing={2}>
+                            <FormControl sx={{ minWidth: 120 }}>
                                 <InputLabel id="demo-multiple-job-label">Job</InputLabel>
                                 <Select
                                     labelId="demo-multiple-job-label"
@@ -196,6 +244,36 @@ const Enroll = () => {
                                     ))}
                                 </Select>
                             </FormControl>
+                            <FormControl sx={{ minWidth: 120 }}>
+                                <InputLabel id="demo-multiple-sub-label">Sub</InputLabel>
+                                <Select
+                                    labelId="demo-multiple-sub-label"
+                                    id="demo-multiple-sub"
+                                    onChange={handleChange2}
+                                    input={<OutlinedInput label="Sub" />}
+                                    MenuProps={MenuProps}
+                                >
+                                    {options}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <input
+                                type="file"
+                                style={{ display: 'none' }}
+                                id="contained-button-file"
+                                required
+                                onChange={businessCardUpload}
+                            />
+                            <label htmlFor="contained-button-file">
+                                <Button
+                                    variant="outlined"
+                                    component="span"
+                                    style={{ marginTop: 5, color: "black" }}
+                                >
+                                    명함 Upload
+                                </Button>
+                            </label>
                         </Grid>
                         <Grid item xs={12}>
                             <Button
