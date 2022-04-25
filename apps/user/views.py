@@ -8,8 +8,10 @@ from .serializers import UserSerializer
 
 from django.contrib.auth.hashers import make_password, check_password
 
+from apps.decorator import TIME_MEASURE
 
 class UserAPI(APIView):
+    @TIME_MEASURE
     def get(self, request):
         error_message = "존재하지 않는 이메일이거나 알 수 없는 오류가 발생했습니다."
         try:
@@ -32,6 +34,7 @@ class UserAPI(APIView):
             print(e)
             return Response({'error_message': error_message}, status=status.HTTP_400_BAD_REQUEST)
 
+    @TIME_MEASURE
     def post(self, request):
         error_message = "알 수 없는 오류가 발생했습니다."
         try:
@@ -59,6 +62,7 @@ class UserAPI(APIView):
             print(e)
             return Response({'error_message': error_message}, status=status.HTTP_400_BAD_REQUEST)
         
+    @TIME_MEASURE
     def delete(self, request):
         try:
             print("DELETE 요청")
@@ -68,6 +72,7 @@ class UserAPI(APIView):
             return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
                 
 class UserSearchAPI(APIView):
+    @TIME_MEASURE
     def get(self, request):
         try:
             query_email = request.GET.get("email", None)

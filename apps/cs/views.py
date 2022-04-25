@@ -1,13 +1,17 @@
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
+
 from .models import CS
 from django.db.models import Q
-from rest_framework.views import APIView
 from .serializers import CSSerializer
-from django.views.decorators.csrf import csrf_exempt
+
 import json
 
+from apps.decorator import TIME_MEASURE
+
 class CSAPI(APIView):
+    @TIME_MEASURE
     def get(self, request):
         try:
             queryset = CS.objects.all().order_by('-pk')
@@ -17,7 +21,7 @@ class CSAPI(APIView):
             print(e)
             Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    @csrf_exempt
+    @TIME_MEASURE
     def post(self, request):
         error_message = "알 수 없는 오류가 발생했습니다."
         try:

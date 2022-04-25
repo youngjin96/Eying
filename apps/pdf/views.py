@@ -9,8 +9,10 @@ from .serializers import PDFSerializer
 
 import datetime
 
+from apps.decorator import TIME_MEASURE
 
 class PDFAPI(APIView):
+    @TIME_MEASURE
     def get(self, request):
         try:
             queryset = PDFModel.objects.all().order_by('-pk') # 등록 최신순
@@ -21,6 +23,7 @@ class PDFAPI(APIView):
             print(e)
             Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+    @TIME_MEASURE
     def post(self, request):
         try:
             try:
@@ -54,6 +57,7 @@ class PDFAPI(APIView):
             print(e)
             return Response({'error_message': "이메일 또는 PDF 데이터에 문제가 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
         
+    @TIME_MEASURE
     def delete(self, request):
         try:
             print("DELETE 요청")
@@ -64,6 +68,7 @@ class PDFAPI(APIView):
         
 
 class PDFSearchAPI(APIView):
+    @TIME_MEASURE
     def get(self, request):
         try:
             query_pdf_id = request.GET.get("pdf_id", None)
