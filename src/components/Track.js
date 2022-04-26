@@ -7,6 +7,8 @@ import "react-alice-carousel/lib/alice-carousel.css";
 import AliceCarousel from 'react-alice-carousel';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './Fbase'
 
 const columns = [
     { field: 'pdf_name', headerName: '제목', flex: 1, align: 'center', headerAlign: "center" },
@@ -20,7 +22,8 @@ const columns = [
 
 const Track = () => {
     const [selectionModel, setSelectionModel] = useState();
-    const [pdfs, setPdfs] = useState(() => []);
+    const [email, setEmail] = useState(""); // 유저 이메일
+    const [pdfs, setPdfs] = useState(() => []); // 전체 pdf
     const [isTracking, setIsTracking] = useState(false);
     const webgazer = window.webgazer; // webgazer instance
     const [loading, setLoading] = useState(true); // pdf 가져올 때 까지 로딩
@@ -35,14 +38,22 @@ const Track = () => {
     
     useEffect(async () => {
         var datas = [];
-        const response = await axios.get('http://3.35.216.82:8000/pdf/');
+        const response = await axios.get('http://54.180.156.83:8000/pdf/');
         datas.push(response.data);
         setPdfs(datas[0]);
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+              setEmail(user);
+              console.log(email);
+            } else {
+              console.log("유저 없음");
+            }
+        });
     }, []);
 
     const onClickTrack = async () => {
         setIsTracking(true);
-        const response = await axios.get('http://3.35.216.82:8000/pdf/search', {
+        const response = await axios.get('http://54.180.156.83:8000/pdf/search', {
             params: {
                 pdf_id : selectionModel[0]
             }
@@ -51,7 +62,7 @@ const Track = () => {
         setImgsUrl(datas[0].imgs_url);
         setLength(datas[0].img_length);
         setUserId(datas[0].user_id);
-        setPdfId(datas[0].pdf_id);
+        setPdfId(datas[0].id);
     }
 
     const onClickStart = () => {
@@ -66,7 +77,7 @@ const Track = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://3.35.216.82:8000/eyetracking/", {
+        await axios.post("http://54.180.156.83:8000/eyetracking/", {
             'user_id': 1,
             'page_number': `${pageNum}`,
             'rating_time': '00:00:00',
@@ -83,7 +94,7 @@ const Track = () => {
     
     // 화살표 오른쪽 함수
     const onClickRightArrow = async () => {
-        await axios.post("http://3.35.216.82:8000/eyetracking/", {
+        await axios.post("http://54.180.156.83:8000/eyetracking/", {
             'user_id': 1,
             'page_number': `${pageNum}`,
             'rating_time': '00:00:00',
@@ -102,7 +113,7 @@ const Track = () => {
 
     // 화살표 왼쪽 함수
     const onClickLeftArrow = async () => {
-        await axios.post("http://3.35.216.82:8000/eyetracking/", {
+        await axios.post("http://54.180.156.83:8000/eyetracking/", {
             'user_id': 1,
             'page_number': `${pageNum}`,
             'rating_time': '00:00:00',
@@ -134,6 +145,10 @@ const Track = () => {
                 <ArrowBackOutlinedIcon style={{ justifyContent: "center", left: 0, top: 0, color: "black", fontSize: "50" }} />
             </Button>
         )
+    }
+
+    const onClickBack = () => {
+        window.location.reload();
     }
 
     if(isTracking) return (
@@ -170,6 +185,9 @@ const Track = () => {
                         <Button onClick={onClickEnd}>
                             End
                         </Button>
+                        <Button onClick={onClickBack}>
+                            Back
+                        </Button>
                     </Grid>
                 </Grid>
             </Box>
@@ -189,6 +207,7 @@ const Track = () => {
                     rowsPerPageOptions={[5]}
                     onSelectionModelChange={(newSelectionModel) => {
                         setSelectionModel(newSelectionModel);
+                        console.log(newSelectionModel)
                     }}
                     selectionModel={selectionModel}
                     style={{align: "center"}}

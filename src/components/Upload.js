@@ -12,11 +12,13 @@ import RecommendOutlinedIcon from '@mui/icons-material/RecommendOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 
 const Upload = () => {
-    // 처음 렌더링할 때 유저가 로그인이 되어있는지 확인 로그인 되어 있을 때만 페이지 사용 가능
+    var email = "";
+    // 처음 렌더링 후 유저가 로그인이 되어있는지 확인 로그인한 상태가 아니라면 로그인 페이지로 이동
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log(user.email);
+                // TODO email = user.email;
+                email = "kimc980106@naver.com";
             } else {
                 window.location.replace("login");
                 alert("You Need Login To Use This Service.");
@@ -27,8 +29,9 @@ const Upload = () => {
     // pdf 업로드 함수
     const handlePdfFileChange = (e) => {
         var frm = new FormData();
-        frm.append("data", e.target.files[0]);
-        axios.post('http://3.35.216.82:8000/pdf/', frm);
+        frm.append("pdf", e.target.files[0]);
+        frm.append("email", email);
+        axios.post('http://54.180.156.83:8000/pdf/', frm);
     };
 
     return (

@@ -22,10 +22,8 @@ const NavBar = () => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsLoggedIn(true);
-        console.log(user.email);
       } else {
         setIsLoggedIn(false);
-        console.log("유저 없음");
       }
     })
   }, []);
@@ -211,16 +209,17 @@ const NavBar = () => {
                   </IconButton>
                 </Tooltip>
               ) : (
-                  <Typography
-                    component="div"
-                    noWrap
-                    sx={{ my:4 }}
-                  >
-                    <Link to="login" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                      LOGIN
-                    </Link>
-                  </Typography>
-                )}
+                    <Typography
+                      component="div"
+                      noWrap
+                      sx={{ my:4 }}
+                    >
+                      <Link to="login" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                        LOGIN
+                      </Link>
+                    </Typography>
+                  )
+              }
               <Menu
                 sx={{ mt: '45px' }}
                 id="menu-appbar"
