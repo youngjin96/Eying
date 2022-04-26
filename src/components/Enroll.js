@@ -15,6 +15,8 @@ import { auth } from "./Fbase";
 import axios from 'axios';
 
 
+
+
 const Enroll = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -22,7 +24,10 @@ const Enroll = () => {
     const [sex, setSex] = useState("");
     const [personJob, setPersonJob] = useState([]);
     const [confirmpassword, setConfirmPassword] = useState("");
-    const [selected, setSelected] = useState("");
+    const [selected, setSelected] = useState([]);
+    const [image, setImage] = useState("");
+    const [username, setUsername] = useState("");
+    const [fields, setFields] = useState([]);
 
 
     const onChange = (event) => {
@@ -37,25 +42,33 @@ const Enroll = () => {
             setSex(event.target.value)
         } else if (name === "confirmpassword") {
             setConfirmPassword(value)
+        } else if (name === "username") {
+            setUsername(value)
         }
     }
 
-    const onClickEnroll = async () => {
+
+
+    const onClickEnroll = async (event) => {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
-            fetch("https://jsonplaceholder.typicode.com/posts", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    title: "Test",
-                    body: "I am testing!",
-                    userId: 1,
-                }),
-            })
-                .then((response) => response.json())
-                .then((data) => console.log(data))
+            let enfrm = new FormData();
+            enfrm.append("username", username);
+            enfrm.append("job_field", fields)
+            enfrm.append("email", email);
+            enfrm.append("password", password);
+            enfrm.append("age", age);
+            enfrm.append("gender", sex);
+            enfrm.append("job", personJob);
+            enfrm.append("position", selected);
+            enfrm.append("credit", '0');
+            enfrm.append('card', image);
+
+            for (let key of enfrm.keys()) {
+                console.log(`${key}: $[enfrm.get(key)}]`);
+            }
+            await axios.post('http://54.180.156.83:8000/user/', enfrm);
+
             alert("정상적으로 회원가입이 완료되었습니다.")
             window.location.replace("http://localhost:3000/home");
         } catch (error) {
@@ -74,14 +87,11 @@ const Enroll = () => {
         },
     };
 
-    const jobs = [
-        "중학생",
-        "고등학생",
-        "대학생",
-        "직장인",
-    ];
+    const jobs = ["중학생", "고등학생", "대학생", "직장인",];
     const student = ["1학년", "2학년", "3학년", "4학년",];
     const salary = ["인턴", "사원", "대리", "과장", "차장", "부장",];
+    const job_fields = ["IT", "ART", "SPORTS", "ETC",];
+
 
     let type = null;
     let options = null;
@@ -110,27 +120,39 @@ const Enroll = () => {
         };
     }
 
+    function getStyles3(field, fields, theme) {
+        return {
+            fontWeight:
+                fields.indexOf(field) === -1
+                    ? theme.typography.fontWeightRegular
+                    : theme.typography.fontWeightMedium,
+        };
+    }
+
     const theme = useTheme();
 
 
     const handleChange = (event) => {
-        const {
-            target: { value },
-        } = event;
         setPersonJob(event.target.value)
     };
 
     const handleChange2 = (event) => {
-        const {
-            target: { value },
-        } = event;
         setSelected(event.target.value)
     };
 
-    const businessCardUpload = (event) => {
-        let bc = new FormData();
-        bc.append('file', event.target.files[0]);
-        axios.post('http://54.180.126.190:8000/', bc);
+    const handleChange3 = (event) => {
+        setFields(event.target.value)
+    };
+
+
+
+    const onLoadFile = (event) => {
+        const image = event.target.files[0];
+        console.log(image);
+        setImage(image);
+    }
+
+    const handleSubmit = () => {
 
     }
 
@@ -160,7 +182,7 @@ const Enroll = () => {
     return (
         <Container component="main" maxWidth="xs">
             <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '79vh' }} >
-                <ValidatorForm component="form" sx={{ mt: 3 }} >
+                <ValidatorForm noValidate onSubmit={handleSubmit} component="form" sx={{ mt: 3 }} >
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
@@ -201,8 +223,19 @@ const Enroll = () => {
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
+                                name="username"
+                                label="User Name"
+                                value={username}
+                                autoComplete="usernmae"
+                                onChange={onChange}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
                                 name="age"
                                 label="age"
+                                value={age}
                                 autoComplete="age"
                                 onChange={onChange}
                             />
@@ -214,6 +247,7 @@ const Enroll = () => {
                                     row
                                     aria-labelledby="demo-row-radio-buttons-group-label"
                                     name="sex"
+                                    value={sex}
                                     onChange={onChange}
                                 >
                                     <FormControlLabel value="female" control={<Radio />} label="Female" />
@@ -222,8 +256,8 @@ const Enroll = () => {
                                 </RadioGroup>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={12} spacing={2}>
-                            <FormControl sx={{ minWidth: 120 }}>
+                        <Grid item xs={12}>
+                            <FormControl sx={{ minWidth: 150 }}>
                                 <InputLabel id="demo-multiple-job-label">Job</InputLabel>
                                 <Select
                                     labelId="demo-multiple-job-label"
@@ -244,11 +278,12 @@ const Enroll = () => {
                                     ))}
                                 </Select>
                             </FormControl>
-                            <FormControl sx={{ minWidth: 120 }}>
+                            <FormControl sx={{ minWidth: 150 }}>
                                 <InputLabel id="demo-multiple-sub-label">Sub</InputLabel>
                                 <Select
                                     labelId="demo-multiple-sub-label"
                                     id="demo-multiple-sub"
+                                    value={selected}
                                     onChange={handleChange2}
                                     input={<OutlinedInput label="Sub" />}
                                     MenuProps={MenuProps}
@@ -258,14 +293,38 @@ const Enroll = () => {
                             </FormControl>
                         </Grid>
                         <Grid item xs={12}>
+                            <FormControl sx={{ minWidth: 300 }}>
+                                <InputLabel id="demo-multiple-field-label">Job Field</InputLabel>
+                                <Select
+                                    labelId="demo-multiple-field-label"
+                                    id="demo-multiple-field"
+                                    value={fields}
+                                    onChange={handleChange3}
+                                    input={<OutlinedInput label="Job_Field" />}
+                                    MenuProps={MenuProps}
+                                >
+                                    {job_fields.map((field) => (
+                                        <MenuItem
+                                            key={field}
+                                            value={field}
+                                            style={getStyles3(field, fields, theme)}
+                                        >
+                                            {field}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
                             <input
                                 type="file"
+                                accept="image/*"
                                 style={{ display: 'none' }}
-                                id="contained-button-file"
-                                required
-                                onChange={businessCardUpload}
+                                id="upload-button-file"
+                                multiple
+                                onChange={onLoadFile}
                             />
-                            <label htmlFor="contained-button-file">
+                            <label htmlFor="upload-button-file">
                                 <Button
                                     variant="outlined"
                                     component="span"
