@@ -8,10 +8,6 @@ class PDFSerializer(serializers.ModelSerializer):
     def get_pdf_name(self, obj):
         return obj.name
     
-    user_id = serializers.SerializerMethodField()
-    def get_user_id(self, obj):
-        return obj.user.id
-    
     user_name = serializers.SerializerMethodField()
     def get_user_name(self, obj):
         return obj.user.username
@@ -22,7 +18,7 @@ class PDFSerializer(serializers.ModelSerializer):
     
     imgs_url = serializers.SerializerMethodField()
     def get_imgs_url(self, obj):
-        return ["https://{0}/pdf/{1}/{2}/{3}.jpg".format(AWS_S3_CUSTOME_DOMAIN, str(obj.user.id), str(obj.id), str(i)) for i in range(obj.img_length)]
+        return ["https://{0}/media/public/pdf/{1}/{2}/images/{3}.jpg".format(AWS_S3_CUSTOME_DOMAIN, obj.user.email, obj.id, i) for i in range(obj.img_length)]
     
     class Meta:
         model = PDFModel
@@ -30,11 +26,10 @@ class PDFSerializer(serializers.ModelSerializer):
             'id',
             'pdf_name',
             'pdf',
-            'user_id',
-            'user_name',
-            'user_email',
             'upload_at',
             'deadline',
+            'user_name',
+            'user_email',
             'views',
             'img_length',
             'imgs_url',

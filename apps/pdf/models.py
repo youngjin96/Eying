@@ -12,7 +12,7 @@ s3r = boto3.resource('s3', aws_access_key_id = AWS_ACCESS_KEY_ID, aws_secret_acc
 
 
 def pdf_path(instance, filename):
-    return "pdfs/{0}/{1}/{2}".format(instance.user.id, instance.id, filename)
+    return "pdf/{0}/{1}/{2}".format(instance.user.email, instance.id, filename)
 
 
 def pdf_to_image(instance):
@@ -26,16 +26,16 @@ def pdf_to_image(instance):
         buffer = BytesIO()
         image.save(buffer, format="JPEG")
         buffer.seek(0)
-        s3r.Bucket(AWS_STORAGE_BUCKET_NAME).put_object(Key='pdf/{0}/{1}/{2}.jpg'.format(str(instance.user.id), str(instance.id), str(i)), 
+        s3r.Bucket(AWS_STORAGE_BUCKET_NAME).put_object(Key="media/public/pdf/{0}/{1}/images/{2}.jpg".format(instance.user.email, instance.id, i), 
                                                     Body=buffer, 
-                                                    ContentType='image/jpeg')
+                                                    ContentType="image/jpeg")
     return len(images)
 
 
 class PDFModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="user", db_column="user", null=True)
-    name = models.CharField(default="unknown", max_length=255)
     pdf = models.FileField(upload_to=pdf_path)
+    name = models.CharField(default="unknown", max_length=255)
     img_length = models.IntegerField(default=0, editable=False)
     upload_at = models.DateField(auto_now_add=True)
     deadline = models.DateField(default=None)
@@ -51,4 +51,4 @@ class PDFModel(models.Model):
             super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return "[%s] %s" % (self.user.email, self.name)

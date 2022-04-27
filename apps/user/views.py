@@ -15,12 +15,17 @@ class UserAPI(APIView):
     @TIME_MEASURE
     def get(self, request):
         try:
-            if not request.GET.get("email") or not request.GET.get("password"):
+            queryDict = {
+                "email": request.GET.get("email"),
+                "password": request.GET.get("password"),
+            }
+            
+            if not queryDict["email"] or not queryDict["password"]:
                 raise Exception("아이디 / 패스워드 입력 오류입니다.")
             
-            user = User.objects.get(Q(email=request.GET.get("email")))
+            user = User.objects.get(Q(email=queryDict["email"]))
             
-            if check_password(request.GET.get("password"), user.password):
+            if check_password(queryDict["password"], user.password):
                 serializer = UserSerializer(user, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
@@ -33,25 +38,38 @@ class UserAPI(APIView):
     @TIME_MEASURE
     def post(self, request):
         try:
+            formData = {
+                "email": request.POST.get("email"),
+                "password": request.POST.get("password"),
+                "username": request.POST.get("username"),
+                "age": request.POST.get("age", 0),
+                "job": request.POST.get("job"),
+                "job_field": request.POST.get("job_field"),
+                "position": request.POST.get("position"),
+                "gender": request.POST.get("gender"),
+                "credit": request.POST.get("credit", 0),
+                "card": request.FILES.get("card"),
+            }
+            
             # 중복 이메일 체크
-            if User.objects.filter(email=request.POST.get("email")):
+            if User.objects.filter(email=formData["email"]):
                 raise Exception("이미 존재하는 이메일입니다.")
             
             # 비밀번호 재검증
-            if not request.POST.get("password"):
+            if not formData["password"]:
                 raise Exception("패스워드가 입력되지 않았습니다.")
                 
             user = User(
-                username=request.POST.get("username"),
-                password=make_password(request.POST.get("password")),
-                email=request.POST.get("email"),
-                age=request.POST.get("age", 0),
-                gender=request.POST.get("gender"),
-                job=request.POST.get("job"),
-                job_field=request.POST.get("job_field"),
-                position=request.POST.get("position"),
-                credit=request.POST.get("credit", 0),
-                card=request.FILES.get("card"),
+                username=formData["username"],
+                password=make_password(formData["password"]),
+                email=formData["email"],
+                age=formData["age"],
+                gender=formData["gender"],
+                job=formData["job"],
+                job_field=formData["job_field"],
+                position=formData["position"],
+                credit=formData["credit"],
+                card=formData["card"],
             )
             user.save()
             
@@ -65,35 +83,47 @@ class UserAPI(APIView):
     @TIME_MEASURE
     def put(self, request):
         try:
+            formData = {
+                "email": request.POST.get("email"),
+                "operator": request.POST.get("operator"),
+                "credit": request.POST.get("credit"),
+                "username": request.POST.get("username"),
+                "age": request.POST.get("age"),
+                "job": request.POST.get("job"),
+                "job_field": request.POST.get("job_field"),
+                "position": request.POST.get("position"),
+                "gender": request.POST.get("gender"),
+            }
+            
             # 사용자 검증
-            if not request.POST.get("email"):
+            if not formData["email"]:
                 raise Exception("이메일이 입력되지 않았습니다.")
             
-            user = User.objects.get(email=request.POST.get("email"))
+            user = User.objects.get(email=formData["email"])
             if not user:
                 raise Exception("해당 이메일의 사용자가 존재하지 않습니다.")
             
             # 업데이트 (개별 업데이트는 user.save(update_fields=['', '', '', ...]))
-            if request.POST.get("operator") in ["+", "-", "="] and request.POST.get("credit"):
-                if request.POST.get("operator") == "+":
-                    user.credit = user.credit + int(request.POST.get("credit"))
-                elif request.POST.get("operator") == "-":
-                    user.credit = user.credit - int(request.POST.get("credit"))
-                elif request.POST.get("operator") == "=":
-                    user.credit = int(request.POST.get("credit"))
+            if formData["operator"] in ["+", "-", "="] and formData["credit"]:
+                if formData["operator"] == "+":
+                    user.credit += int(formData["credit"])
+                elif formData["operator"] == "-":
+                    user.credit -= int(formData["credit"])
+                elif formData["operator"] == "=":
+                    user.credit = int(formData["credit"])
                 
-            if request.POST.get("username"):
-                user.username = request.POST.get("username")
-            if request.POST.get("age"):
-                user.age = request.POST.get("age")
-            if request.POST.get("job"):
-                user.job = request.POST.get("job")
-            if request.POST.get("job_field"):
-                user.job_field = request.POST.get("job_field")
-            if request.POST.get("position"):
-                user.position = request.POST.get("position")
-            if request.POST.get("gender"):
-                user.gender = request.POST.get("gender")
+            if formData["username"]:
+                user.username = formData["username"]
+            if formData["age"]:
+                user.age = formData["age"]
+            if formData["job"]:
+                user.job = formData["job"]
+            if formData["job_field"]:
+                user.job_field = formData["job_field"]
+            if formData["position"]:
+                user.position = formData["position"]
+            if formData["gender"]:
+                user.gender = formData["gender"]
             user.save()
             
             serializer = UserSerializer(user, many=False)
@@ -105,12 +135,16 @@ class UserAPI(APIView):
     @TIME_MEASURE
     def delete(self, request):
         try:
+            formData = {
+                "email": request.POST.get("email"),
+            }
+            
             # 요청 데이터 누락 처리
-            if not request.POST.get("email"):
+            if not formData["email"]:
                 raise Exception("이메일이 입력되지 않았습니다.")
             
             # 사용자 검증
-            user = User.objects.get(email=request.POST.get("email"))
+            user = User.objects.get(email=formData["email"])
             if not user:
                 raise Exception("해당 이메일의 사용자가 존재하지 않습니다.")
             
@@ -126,12 +160,17 @@ class UserSearchAPI(APIView):
     @TIME_MEASURE
     def get(self, request):
         try:
+            queryDict = {
+                "email": request.GET.get("email"),
+                "username": request.GET.get("username"),
+            }
+            
             # 쿼리 적용 (Q() = 조건 없음)
             query = Q()
-            if request.GET.get("email"):
-                query &= Q(email=request.GET.get("email"))
-            if request.GET.get("username"):
-                query &= Q(username=request.GET.get("username"))
+            if queryDict["email"]:
+                query &= Q(email=queryDict["email"])
+            if queryDict["username"]:
+                query &= Q(username=queryDict["username"])
             
             user = User.objects.filter(query)
             
