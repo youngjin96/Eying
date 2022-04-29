@@ -1,4 +1,3 @@
-import email
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -8,48 +7,39 @@ from user.models import User
 from django.db.models import Q
 from .serializers import PDFSerializer
 
-import datetime
-
 from apps.decorator import TIME_MEASURE
+from config.policy import deadline
 
 class PDFAPI(APIView):
     @TIME_MEASURE
     def get(self, request):
-        try:
-            pdf = PDFModel.objects.all().order_by('-pk') # 등록 최신순
-            serializer = PDFSerializer(pdf, many=True)
-            
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            print(e)
-            Response({'error_message': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return PDFSearchAPI.get(self, request)
     
     @TIME_MEASURE
     def post(self, request):
         try:
             formData = {
-                "deadline": request.POST.get("deadline", (datetime.datetime.now()+datetime.timedelta(days=7)).strftime("%Y-%m-%d")),
+                "deadline": request.POST.get("deadline", deadline()),
                 "email": request.POST.get("email"),
+                "job_field": request.POST.get("job_field"),
                 "pdf": request.FILES.get("pdf"),
             }
             
-            if not formData["email"] or not formData["pdf"]:
+            # Email & File Validation
+            if not formData["email"] or not formData["pdf"] or formData["pdf"].content_type != "application/pdf":
                 raise Exception("이메일 또는 PDF 데이터에 문제가 있습니다.")
                 
-            # 파일 확장자 Validation
-            if formData["pdf"].content_type == "application/pdf":
-                pdf = PDFModel(user=User.objects.get(email=formData["email"]),
-                               pdf=formData["pdf"],
-                               name=formData["pdf"].name,
-                               deadline=formData["deadline"],
-                               views=0, 
-                               )
-                pdf.save()
-                
-                serializer = PDFSerializer(pdf, many=False)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                raise Exception("PDF 파일이 아닙니다.")
+            pdf = PDFModel(user=User.objects.get(email=formData["email"]),
+                            pdf=formData["pdf"],
+                            name=formData["pdf"].name,
+                            deadline=formData["deadline"],
+                            views=0,
+                            job_field=formData["job_field"],
+                            )
+            pdf.save()
+            
+            serializer = PDFSerializer(pdf, many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
             return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
@@ -57,7 +47,9 @@ class PDFAPI(APIView):
     @TIME_MEASURE
     def put(self, request):
         try:
-            formData = {}
+            formData = {
+                "deadline": request.POST.get("deadline"),
+            }
             
             print("PUT 요청")
             return Response({}, status=status.HTTP_200_OK)
@@ -95,6 +87,7 @@ class PDFSearchAPI(APIView):
                 "email": request.GET.get("email"),
             }
             
+            # 요청 쿼리 처리
             query = Q()
             if quertDict["pdf_id"]:
                 query &= Q(pk=quertDict["pdf_id"])
@@ -105,12 +98,14 @@ class PDFSearchAPI(APIView):
             if quertDict["email"]:
                 query &= Q(user=User.objects.get(email=quertDict["email"]))
                  
-            queryset = PDFModel.objects.filter(query).order_by('-pk')
-            # for q in queryset:
+            pdf = PDFModel.objects.filter(query).order_by('-pk')
+            
+            # 조회수 증가
+            # for q in pdf:
             #     q.views += 1
-            #     q.save()
+            #     q.save(update_fields=['views'])
                 
-            serializer = PDFSerializer(queryset, many=True)
+            serializer = PDFSerializer(pdf, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)

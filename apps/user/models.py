@@ -16,4 +16,4 @@ class User(AbstractUser):
     card = models.ImageField(default=None, upload_to=card_path)             # 명함 이미지
     
     def __str__(self):
-        return self.email
+        return "%s (%s)" % (self.username, self.email)

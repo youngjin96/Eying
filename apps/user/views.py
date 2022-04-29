@@ -9,6 +9,7 @@ from .serializers import UserSerializer
 from django.contrib.auth.hashers import make_password, check_password
 
 from apps.decorator import TIME_MEASURE
+from config.policy import ENROLL_CREDIT
 
 class UserAPI(APIView):
     # 사용자 유효성 검사 (DB)
@@ -42,12 +43,12 @@ class UserAPI(APIView):
                 "email": request.POST.get("email"),
                 "password": request.POST.get("password"),
                 "username": request.POST.get("username"),
-                "age": request.POST.get("age", 0),
+                "age": request.POST.get("age", ENROLL_CREDIT),
                 "job": request.POST.get("job"),
                 "job_field": request.POST.get("job_field"),
                 "position": request.POST.get("position"),
                 "gender": request.POST.get("gender"),
-                "credit": request.POST.get("credit", 0),
+                "credit": request.POST.get("credit", ),
                 "card": request.FILES.get("card"),
             }
             

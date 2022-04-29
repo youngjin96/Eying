@@ -18,7 +18,7 @@ class PDFSerializer(serializers.ModelSerializer):
     
     imgs_url = serializers.SerializerMethodField()
     def get_imgs_url(self, obj):
-        return ["https://{0}/media/public/pdf/{1}/{2}/images/{3}.jpg".format(AWS_S3_CUSTOME_DOMAIN, obj.user.email, obj.id, i) for i in range(obj.img_length)]
+        return ["%s%d.jpg" % (obj.img_path, i) for i in range(obj.img_length)]
     
     class Meta:
         model = PDFModel
