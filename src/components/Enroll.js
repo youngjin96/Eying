@@ -49,31 +49,33 @@ const Enroll = () => {
 
 
 
-    const onClickEnroll = async (event) => {
-        try {
-            await createUserWithEmailAndPassword(auth, email, password);
-            let enfrm = new FormData();
-            enfrm.append("username", username);
-            enfrm.append("job_field", fields)
-            enfrm.append("email", email);
-            enfrm.append("password", password);
-            enfrm.append("age", age);
-            enfrm.append("gender", sex);
-            enfrm.append("job", personJob);
-            enfrm.append("position", selected);
-            enfrm.append("credit", '0');
-            enfrm.append('card', image);
 
-            for (let key of enfrm.keys()) {
-                console.log(`${key}: $[enfrm.get(key)}]`);
-            }
-            await axios.post('http://54.180.156.83:8000/user/', enfrm);
 
-            alert("정상적으로 회원가입이 완료되었습니다.")
-            window.location.replace("http://localhost:3000/home");
-        } catch (error) {
-            alert(error.message);
+    const onClickEnroll = async () => {
+
+        await createUserWithEmailAndPassword(auth, email, password)
+            .catch((error) => {
+                console.error(error);
+                alert("중복된 이메일 입니다.");
+            });
+
+        let enfrm = new FormData();
+        enfrm.append("username", username);
+        enfrm.append("job_field", fields)
+        enfrm.append("email", email);
+        enfrm.append("password", password);
+        enfrm.append("age", age);
+        enfrm.append("gender", sex);
+        enfrm.append("job", personJob);
+        enfrm.append("position", selected);
+        enfrm.append('card', image);
+
+        for (let key of enfrm.keys()) {
+            console.log(`${key}: $[enfrm.get(key)}]`);
         }
+        await axios.post('http://3.36.95.29:8000/user/', enfrm);
+        alert("정상적으로 회원가입이 완료되었습니다.")
+        window.location.replace("http://localhost:3000/home");
     }
 
     const ITEM_HEIGHT = 48;
@@ -150,6 +152,10 @@ const Enroll = () => {
         const image = event.target.files[0];
         console.log(image);
         setImage(image);
+
+        // if (image.length = 0) {
+        //     alert('test')
+        // }
     }
 
     const handleSubmit = () => {
@@ -181,7 +187,7 @@ const Enroll = () => {
 
     return (
         <Container component="main" maxWidth="xs">
-            <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '79vh' }} >
+            <Box sx={{ marginTop: 5, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '90vh' }} >
                 <ValidatorForm noValidate onSubmit={handleSubmit} component="form" sx={{ mt: 3 }} >
                     <Grid container spacing={2}>
                         <Grid item xs={12}>

@@ -17,7 +17,7 @@ const WebGazer = () => {
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
     var pageNum = 0; // pdf 현재 페이지
     var dimensionArr = []; // webgazer x, y 좌표가 담길 배열
-    
+
     useEffect(async () => {
         try {
             setLoading(true);
@@ -50,18 +50,20 @@ const WebGazer = () => {
             </div>
         </Box>
     )
-    
+
     // error가 있을 때 alert
     if (error) return alert("에러가 발생했습니다");
-    
+
     // webgazer 시작 함수
     const onClickStart = () => {
-        webgazer.setGazeListener(function (data) {
+        webgazer.setRegression('weightedRidge').setTracker('trackingjs').setGazeListener(function (data) {
             if (data == null) {
                 return;
             }
             dimensionArr.push([data.x, data.y]);
         }).begin();
+        //webgazer.applyKalmanFilter(true);
+
     }
 
     // webgazer 종료 함수
@@ -80,7 +82,7 @@ const WebGazer = () => {
         webgazer.showPredictionPoints(false);
         window.location.reload();
     }
-    
+
     // 화살표 오른쪽 함수
     const onClickRightArrow = async () => {
         await axios.post("http://54.180.126.190:8000/eyetracking/", {
@@ -92,9 +94,9 @@ const WebGazer = () => {
             'pdf_id': pdfId
         });
         // TODO post.then(arr = []) arr null 처리 arr boundary 밖 값들 무시
-        if(pageNum === length){
+        if (pageNum === length) {
             pageNum = length;
-        } else{
+        } else {
             pageNum = pageNum + 1;
         }
         dimensionArr = [];
@@ -111,7 +113,7 @@ const WebGazer = () => {
             'pdf_id': pdfId
         });
         // TODO post.then(arr = []) arr null 처리 arr boundary 밖 값들 무시
-        if(pageNum === 0){
+        if (pageNum === 0) {
             pageNum = 0;
         } else {
             pageNum = pageNum - 1;
