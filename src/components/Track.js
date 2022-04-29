@@ -26,10 +26,7 @@ const Track = () => {
     const [pdfs, setPdfs] = useState(() => []); // 전체 pdf
     const [isTracking, setIsTracking] = useState(false);
     const webgazer = window.webgazer; // webgazer instance
-    const [loading, setLoading] = useState(true); // pdf 가져올 때 까지 로딩
-    const [error, setError] = useState(); // pdf 가져올 때 에러
     const [imgsUrl, setImgsUrl] = useState([]); // pdf image url 배열
-    const [length, setLength] = useState(0); // pdf 갯수
     const [userId, setUserId] = useState(0); // 유저 고유 아이디 값
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
     var pageNum = 0; // pdf 현재 페이지
@@ -38,7 +35,7 @@ const Track = () => {
     
     useEffect(async () => {
         var datas = [];
-        const response = await axios.get('http://54.180.156.83:8000/pdf/');
+        const response = await axios.get('http://3.38.250.195:8000/pdf/');
         datas.push(response.data);
         setPdfs(datas[0]);
         onAuthStateChanged(auth, (user) => {
@@ -53,14 +50,13 @@ const Track = () => {
 
     const onClickTrack = async () => {
         setIsTracking(true);
-        const response = await axios.get('http://54.180.156.83:8000/pdf/search', {
+        const response = await axios.get('http://3.38.250.195:8000/pdf/search', {
             params: {
                 pdf_id : selectionModel[0]
             }
         });
         datas.push(response.data[0]);
         setImgsUrl(datas[0].imgs_url);
-        setLength(datas[0].img_length);
         setUserId(datas[0].user_id);
         setPdfId(datas[0].id);
     }
@@ -77,7 +73,7 @@ const Track = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://54.180.156.83:8000/eyetracking/", {
+        await axios.post("http://3.38.250.195:8000/eyetracking/", {
             'user_id': 1,
             'page_number': `${pageNum}`,
             'rating_time': '00:00:00',
@@ -91,64 +87,28 @@ const Track = () => {
         window.location.reload();
         setIsTracking(false);
     }
-    
-    // 화살표 오른쪽 함수
-    const onClickRightArrow = async () => {
-        await axios.post("http://54.180.156.83:8000/eyetracking/", {
-            'user_id': 1,
-            'page_number': `${pageNum}`,
-            'rating_time': '00:00:00',
-            'coordinate': dimensionArr,
-            'owner_id': userId,
-            'pdf_id': pdfId
-        });
-        //TODO post.then(arr = []) arr null 처리 arr boundary 밖 값들 무시
-        if(pageNum === length){
-            pageNum = length;
-        } else{
-            pageNum = pageNum + 1;
-        }
-        dimensionArr = [];
-    }
-
-    // 화살표 왼쪽 함수
-    const onClickLeftArrow = async () => {
-        await axios.post("http://54.180.156.83:8000/eyetracking/", {
-            'user_id': 1,
-            'page_number': `${pageNum}`,
-            'rating_time': '00:00:00',
-            'coordinate': dimensionArr,
-            'owner_id': userId,
-            'pdf_id': pdfId
-        });
-        // TODO post.then(arr = []) arr null 처리 arr boundary 밖 값들 무시
-        if(pageNum === 0){
-            pageNum = 0;
-        } else {
-            pageNum = pageNum - 1;
-        }
-        dimensionArr = [];
-    }
-
-    const nextArrow = () => {
-        return (
-            <Button onClick={onClickRightArrow}>
-                <ArrowForwardOutlinedIcon style={{ justifyContent: "center", right: 0, top: 0, color: "black", fontSize: "50" }} />
-            </Button>
-        )
-
-    }
-
-    const prevArrow = () => {
-        return (
-            <Button onClick={onClickLeftArrow}>
-                <ArrowBackOutlinedIcon style={{ justifyContent: "center", left: 0, top: 0, color: "black", fontSize: "50" }} />
-            </Button>
-        )
-    }
 
     const onClickBack = () => {
         window.location.reload();
+    }
+
+    // Before swipe slide, post data to server
+    const onSlideChange = async () => {
+        await axios.post("http://3.38.250.195:8000/eyetracking/", {
+            'user_id': "kimc980106@naver.com",
+            'owner_id': "kimc980106@naver.com",
+            'rating_time': '00:00:00',
+            'page_number': pageNum,
+            'pdf_id': 42,
+            'coordinate': dimensionArr,
+        });
+        dimensionArr = [];
+    }
+
+    // After swipe silde, pageNum setting
+    const onSlideChanged = (e) => {
+        pageNum = e.item;
+        console.log(pageNum);
     }
 
     if(isTracking) return (
@@ -166,16 +126,17 @@ const Track = () => {
                     <Grid item xs={6}>
                         <AliceCarousel
                             animationDuration={1}
-                            renderNextButton={nextArrow}
-                            renderPrevButton={prevArrow}
-                            
+                            keyboardNavigation={true}
+                            onSlideChange={onSlideChange}
+                            onSlideChanged={onSlideChanged}
+                            disableButtonsControls={true}
                         >
                             {/* <img src="/img/s.png" style={{ width: "100%", height: 500 }}> 
                             </img>
                             <img src="/img/example2.png" style={{ width: "100%", height: 500 }}> 
                             </img> */}
                             {imgsUrl && imgsUrl.map((e, index) => (
-                                <img key={index} src={e} style={{ width: "100%", height: 500 }} />
+                                <img key={index} src={e} style={{ width: "90%", height: 800 }} />
 
                             ))} 
                         </AliceCarousel>

@@ -6,7 +6,6 @@ import AliceCarousel from 'react-alice-carousel';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './Fbase'
 
-
 const WebGazer = () => {
     const webgazer = window.webgazer; // webgazer instance
     const [loading, setLoading] = useState(true); // pdf 가져올 때 까지 로딩
@@ -18,10 +17,10 @@ const WebGazer = () => {
     var pageNum = 0;
     var dimensionArr = []; // webgazer x, y 좌표가 담길 배열
     const datas = []; // get 받아올 배열
-    
+
     useEffect(async () => {
         try {
-            const response = await axios.get('http://54.180.156.83:8000/pdf/'); // get 함수
+            const response = await axios.get('http://3.38.250.195:8000/pdf/'); // get 함수
             datas.push(response.data[0]); // 데이터는 response.data 안에 들어있습니다.
             setImgsUrl(datas[0].imgs_url);
             setUserId(datas[0].user_id);
@@ -34,10 +33,10 @@ const WebGazer = () => {
             if (user) {
                 email = user.email;
             } else {
-              console.log("유저 없음");
+                console.log("유저 없음");
             }
         });
-    }, [imgsUrl]);
+    }, []);
 
     // loadng 중 일 때 보여줄 화면 (loading == true)
     if (loading) return (
@@ -54,31 +53,32 @@ const WebGazer = () => {
             </div>
         </Box>
     )
-    
+
     // error가 있을 때 alert
     if (error) {
         window.location.replace("upload");
     }
-    
+
     // webgazer 시작 함수
     const onClickStart = () => {
-        webgazer.setGazeListener(function (data) {
+        webgazer.setRegression('weightedRidge').setTracker('trackingjs').setGazeListener(function (data) {
             if (data == null) {
                 return;
             }
             dimensionArr.push([Math.floor(data.x), Math.floor(data.y)]);
         }).begin();
+        webgazer.applyKalmanFilter(true);
     }
 
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://54.180.156.83:8000/eyetracking/", {
+        await axios.post("http://3.38.250.195:8000/eyetracking/", {
             'user_id': "kimc980106@naver.com",
             'owner_id': "kimc980106@naver.com",
             'rating_time': '00:00:00',
             'page_number': pageNum,
-            'pdf_id': 42,
+            'pdf_id': pdfId,
             'coordinate': dimensionArr,
         });
         dimensionArr = [];
@@ -87,14 +87,18 @@ const WebGazer = () => {
         window.location.reload();
     }
 
+    const onClickBack = () => {
+        window.location.replace("upload");
+    }
+
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
-        await axios.post("http://54.180.156.83:8000/eyetracking/", {
+        await axios.post("http://3.38.250.195:8000/eyetracking/", {
             'user_id': "kimc980106@naver.com",
             'owner_id': "kimc980106@naver.com",
             'rating_time': '00:00:00',
             'page_number': pageNum,
-            'pdf_id': 42,
+            'pdf_id': pdfId,
             'coordinate': dimensionArr,
         });
         dimensionArr = [];
@@ -117,30 +121,32 @@ const WebGazer = () => {
                     flexGrow: 1,
                 }}
             >
-                <Grid container columns={{ xs: 12, sm: 12, md: 12 }} justifyContent="center" alignItems="center" style={{ height: "100%", width: "100%" }}>
-                    <Grid item xs={6}>
+                <Grid container columns={{ xs: 12, sm: 12, md: 12 }} style={{ textAlign: "center" }}>
+                    <Grid item xs={12}>
                         <AliceCarousel
                             animationDuration={1}
                             keyboardNavigation={true}
                             onSlideChange={onSlideChange}
                             onSlideChanged={onSlideChanged}
                             disableButtonsControls={true}
-                            disableDotsControls={true}
                         >
-                            {/* <img src="/img/s.png" style={{ width: "100%", height: 500 }}> 
+                            {/* <img src="/img/s.png" style={{ width: "90%", height: 800 }}>
                             </img>
-                            <img src="/img/example2.png" style={{ width: "100%", height: 500 }}> 
-                            </img>  */}
+                            <img src="/img/example2.png" style={{ width: "90%", height: 500 }}>
+                            </img> */}
                             {imgsUrl && imgsUrl.map((e, index) => (
-                                <img key={index} src={e} style={{ width: "100%", height: 500 }} />
-
-                            ))} 
+                                <img key={index} src={e} style={{ width: "90%", height: 800 }} />
+                                
+                            ))}
                         </AliceCarousel>
-                        <Button onClick={onClickStart}>
+                        <Button variant="contained" size="large" onClick={onClickStart}>
                             Start
                         </Button>
-                        <Button onClick={onClickEnd}>
+                        <Button variant="contained" size="large" onClick={onClickEnd} style={{marginLeft: 10}}>
                             End
+                        </Button>
+                        <Button variant="contained" size="large" onClick={onClickBack} style={{marginLeft: 10}}>
+                            Back
                         </Button>
                     </Grid>
                 </Grid>

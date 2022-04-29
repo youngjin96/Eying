@@ -31,7 +31,7 @@ const Upload = () => {
         var frm = new FormData();
         frm.append("pdf", e.target.files[0]);
         frm.append("email", email);
-        axios.post('http://54.180.156.83:8000/pdf/', frm);
+        axios.post('http://3.38.250.195:8000/pdf/', frm);
     };
 
     return (
