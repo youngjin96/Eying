@@ -89,7 +89,7 @@ const Enroll = () => {
         },
     };
 
-    const jobs = ["중학생", "고등학생", "대학생", "직장인",];
+    const jobs = ["중학생", "고등학생", "대학생", "직장인", " "];
     const student = ["1학년", "2학년", "3학년", "4학년",];
     const salary = ["인턴", "사원", "대리", "과장", "차장", "부장",];
     const job_fields = ["IT", "ART", "SPORTS", "ETC",];
@@ -98,9 +98,9 @@ const Enroll = () => {
     let type = null;
     let options = null;
 
-    if (personJob === "중학생" || personJob === "고등학생" || personJob === "대학생") {
+    if (personJob === "중학생" || personJob === "고등학생" || personJob === "대학생" || " ") {
         type = student;
-    } else if (personJob === "직장인") {
+    } else if (personJob === "직장인" || " ") {
         type = salary;
     }
 
@@ -272,6 +272,7 @@ const Enroll = () => {
                                     onChange={handleChange}
                                     input={<OutlinedInput label="Job" />}
                                     MenuProps={MenuProps}
+                                    defaultValue={""}
                                 >
                                     {jobs.map((job) => (
                                         <MenuItem
@@ -293,6 +294,7 @@ const Enroll = () => {
                                     onChange={handleChange2}
                                     input={<OutlinedInput label="Sub" />}
                                     MenuProps={MenuProps}
+                                    defaultValue={""}
                                 >
                                     {options}
                                 </Select>
@@ -308,6 +310,7 @@ const Enroll = () => {
                                     onChange={handleChange3}
                                     input={<OutlinedInput label="Job_Field" />}
                                     MenuProps={MenuProps}
+                                    defaultValue={""}
                                 >
                                     {job_fields.map((field) => (
                                         <MenuItem
