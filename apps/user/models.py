@@ -15,5 +15,13 @@ class User(AbstractUser):
     credit = models.IntegerField(default=0, blank=True)                     # 크레딧 (포인트)
     card = models.ImageField(upload_to=card_path)                           # 명함 이미지
     
+    def save(self, *args, **kwargs):
+        if self.id is None:
+            temp_card = self.card
+            self.card = None
+            super().save(*args, **kwargs)
+            self.card = temp_card
+            super().save(*args, **kwargs)
+            
     def __str__(self):
         return "%s (%s)" % (self.username, self.email)
