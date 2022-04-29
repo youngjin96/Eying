@@ -13,7 +13,7 @@ import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./Fbase";
 import axios from 'axios';
-
+import { useNavigate } from "react-router-dom"
 
 
 
@@ -28,7 +28,7 @@ const Enroll = () => {
     const [image, setImage] = useState("");
     const [username, setUsername] = useState("");
     const [fields, setFields] = useState([]);
-
+    const navigate = useNavigate();
 
     const onChange = (event) => {
         const { target: { name, value } } = event;
@@ -64,19 +64,32 @@ const Enroll = () => {
             .then(function (response) {
                 console.log(response);
                 alert("정상적으로 회원가입이 완료되었습니다.")
-                window.location.replace("http://localhost:3000/home");
+                navigate("/home");
             })
             .catch(function (error) {
                 if (error.response) {
                     console.log(error.response.data);
                     console.log(error.response.status);
-                    console.log(error.response.headers);
-                    console.error();
-                }
+                    console.error(error);
 
+                    alert(JSON.stringify(error.response.data.error_message));
+
+
+                }
+                else if (error.request) {
+                    // 요청이 이루어 졌으나 응답을 받지 못했습니다.
+                    // `error.request`는 브라우저의 XMLHttpRequest 인스턴스 또는
+                    // Node.js의 http.ClientRequest 인스턴스입니다.
+                    console.log(error.request);
+                }
+                else {
+                    // 오류를 발생시킨 요청을 설정하는 중에 문제가 발생했습니다.
+                    console.log('Error', error.message);
+                }
+                console.log(error.config);
             })
 
-        return res.data;
+        return res;
     }
 
 
@@ -84,13 +97,13 @@ const Enroll = () => {
     const onClickEnroll = () => {
         createUserWithEmailAndPassword(auth, email, password)
             .then(() => {
-                // Signed in
-                // ...
+
             })
             .catch((error) => {
                 console.error(error);
                 alert("정보를 다시 확인해주세요");
             });
+
         postinfo();
     }
 
