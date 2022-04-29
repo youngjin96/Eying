@@ -5,41 +5,60 @@ import "react-alice-carousel/lib/alice-carousel.css";
 import AliceCarousel from 'react-alice-carousel';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './Fbase'
+import { useNavigate } from "react-router-dom";
 
 const WebGazer = () => {
     const webgazer = window.webgazer; // webgazer instance
-    const [loading, setLoading] = useState(true); // pdf 가져올 때 까지 로딩
+    const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [isLoading, setIsLoading] = useState(true); // pdf 가져올 때 까지 로딩
     const [error, setError] = useState(); // pdf 가져올 때 에러
     const [imgsUrl, setImgsUrl] = useState([]); // pdf image url 배열
     const [userId, setUserId] = useState(0); // 유저 고유 아이디 값
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
-    var email = "";
+    const [email, setEmail] = useState("");
     var pageNum = 0;
     var dimensionArr = []; // webgazer x, y 좌표가 담길 배열
-    const datas = []; // get 받아올 배열
 
-    useEffect(async () => {
-        try {
-            const response = await axios.get('http://3.38.250.195:8000/pdf/'); // get 함수
-            datas.push(response.data[0]); // 데이터는 response.data 안에 들어있습니다.
-            setImgsUrl(datas[0].imgs_url);
-            setUserId(datas[0].user_id);
-            setPdfId(datas[0].id);
-        } catch (e) {
-            setError(e);
-        }
-        setLoading(false);
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                email = user.email;
-            } else {
-                console.log("유저 없음");
+    useEffect(() => {
+        const fetchUser = () => {
+            try {
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        setIsLoggedIn(true);
+                        setEmail(user.email);
+                    } else {
+                        setIsLoggedIn(false);
+                    }
+                });
+            } catch (error) {
+                console.log(error);
             }
-        });
+        };
+
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://3.36.95.29:8000/pdf/').then(res => {
+                    if (res.status === 200){
+                        setImgsUrl(res.data[0].imgs_url);
+                        setUserId(res.data[0].user_id);
+                        setPdfId(res.data[0].id);
+                        setIsLoading(false);
+                    } else {
+                        setIsLoading(true);
+                    }
+                });
+            } catch (e) {
+                setError(e);
+            }
+        }
+        fetchUser();
+        fetchData();
+        
     }, []);
 
     // loadng 중 일 때 보여줄 화면 (loading == true)
-    if (loading) return (
+    if (isLoading) return (
         <Box
             sx={{
                 width: '100vw',
@@ -56,7 +75,7 @@ const WebGazer = () => {
 
     // error가 있을 때 alert
     if (error) {
-        window.location.replace("upload");
+        navigate("/upload");
     }
 
     // webgazer 시작 함수
@@ -73,9 +92,9 @@ const WebGazer = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://3.38.250.195:8000/eyetracking/", {
-            'user_id': "kimc980106@naver.com",
-            'owner_id': "kimc980106@naver.com",
+        await axios.post("http://3.36.95.29:8000/eyetracking/", {
+            'user_email': "kimc980106@naver.com",
+            'owner_email': "kimc980106@naver.com",
             'rating_time': '00:00:00',
             'page_number': pageNum,
             'pdf_id': pdfId,
@@ -93,9 +112,9 @@ const WebGazer = () => {
 
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
-        await axios.post("http://3.38.250.195:8000/eyetracking/", {
-            'user_id': "kimc980106@naver.com",
-            'owner_id': "kimc980106@naver.com",
+        await axios.post("http://3.36.95.29:8000/eyetracking/", {
+            'user_email': "kimc980106@naver.com",
+            'owner_email': "kimc980106@naver.com",
             'rating_time': '00:00:00',
             'page_number': pageNum,
             'pdf_id': pdfId,
@@ -135,7 +154,7 @@ const WebGazer = () => {
                             <img src="/img/example2.png" style={{ width: "90%", height: 500 }}>
                             </img> */}
                             {imgsUrl && imgsUrl.map((e, index) => (
-                                <img key={index} src={e} style={{ width: "90%", height: 800 }} />
+                                <img key={index} src={e} style={{ width: "90%", height: "80vh" }} />
                                 
                             ))}
                         </AliceCarousel>

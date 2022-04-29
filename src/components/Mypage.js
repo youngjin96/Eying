@@ -8,8 +8,8 @@ import Tab from '@mui/material/Tab';
 
 
 const Mypage = () => {
-    var email = "";
     const [value, setValue] = useState(0);
+    const [email, setEmail] = useState("");
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -19,13 +19,13 @@ const Mypage = () => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // TODO email = user.email;
-                email = "kimc980106@naver.com";
-                console.log(email);
+                setEmail(user.email);
             } else {
                 window.location.replace("login");
                 alert("You Need Login To Use This Service.");
             }
         })
+        
     }, []);
 
     function TabPanel(props) {
@@ -82,14 +82,9 @@ const Mypage = () => {
                     >
                         <Tab label="회원정보 변경" {...a11yProps(0)} />
                         <Tab label="내 PDF" {...a11yProps(1)} />
-                        <Tab label="Item Three" {...a11yProps(2)} />
-                        <Tab label="Item Four" {...a11yProps(3)} />
-                        <Tab label="Item Five" {...a11yProps(4)} />
-                        <Tab label="Item Six" {...a11yProps(5)} />
-                        <Tab label="Item Seven" {...a11yProps(6)} />
                     </Tabs>
                     <TabPanel value={value} index={0}>
-                        Item One
+                        {email}
                     </TabPanel>
                     <TabPanel value={value} index={1} style={{textAlign: "center", width: "90%"}}>
                         <img src="/img/s.png" style={{ width: "60%", height: 500, minWidth: 500 }} />

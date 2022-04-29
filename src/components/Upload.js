@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Grid, Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { auth } from './Fbase'
@@ -10,29 +10,87 @@ import PersonSearchOutlinedIcon from '@mui/icons-material/PersonSearchOutlined';
 import DifferenceOutlinedIcon from '@mui/icons-material/DifferenceOutlined';
 import RecommendOutlinedIcon from '@mui/icons-material/RecommendOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import { useNavigate } from "react-router-dom";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 const Upload = () => {
-    var email = "";
+    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [email, setEmail] = useState("");
+    const [jobField, setJobField] = useState("");
+    const [open, setOpen] = useState(true);
+    const navigate = useNavigate();
+
     // 처음 렌더링 후 유저가 로그인이 되어있는지 확인 로그인한 상태가 아니라면 로그인 페이지로 이동
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // TODO email = user.email;
-                email = "kimc980106@naver.com";
+                setEmail(user.email);
+                setIsLoggedIn(true);
             } else {
-                window.location.replace("login");
-                alert("You Need Login To Use This Service.");
+                setIsLoggedIn(false);
             }
         })
     }, []);
+
+    const onClickLogin = () => {
+        setOpen(false);
+        navigate("/login");
+    };
 
     // pdf 업로드 함수
     const handlePdfFileChange = (e) => {
         var frm = new FormData();
         frm.append("pdf", e.target.files[0]);
         frm.append("email", email);
-        axios.post('http://3.38.250.195:8000/pdf/', frm);
+        frm.append("job_field", jobField);
+        axios.post('http://3.36.95.29:8000/pdf/', frm);
     };
+
+    const handleChange = (event) => {
+        setJobField(event.target.value);
+    };
+
+    if (!isLoggedIn) return (
+        <Box
+            sx={{
+                width: '100vw',
+                height: '100vh',
+                display: 'column',
+                background: '#ecebe9',
+                flexGrow: 1,
+            }}
+        >
+            <Dialog
+                open={open}
+                onClose={onClickLogin}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Did You Logged In?"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        이 페이지는 로그인 후 이용이 가능합니다.
+                        로그인 페이지로 가서 로그인해주시기 바랍니다.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={onClickLogin} autoFocus>
+                        로그인
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
+    )
 
     return (
         <>
@@ -126,7 +184,7 @@ const Upload = () => {
                 <Grid container spacing={{ xs: 2, md: 4 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 5 }}>
                     <Grid item xs={3} style={{ textAlign: "center" }}>
                         <Typography variant="subtitle1" style={{ color: "#636261" }}>
-                            1. Click This Button
+                            1. Choose Job Field & Click This Button
                         </Typography>
                         <Typography variant="subtitle1" style={{ color: "#636261" }}>
                             To Upload Your PDF
@@ -138,6 +196,21 @@ const Upload = () => {
                             required
                             onChange={handlePdfFileChange}
                         />
+                        <FormControl style={{ width: "80%" }}>
+                            <InputLabel id="demo-simple-select-label">Job Field</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={jobField}
+                                label="JobField"
+                                onChange={handleChange}
+                            >
+                                <MenuItem value={"IT"}>IT</MenuItem>
+                                <MenuItem value={"ART"}>ART</MenuItem>
+                                <MenuItem value={"SPORTS"}>SPORTS</MenuItem>
+                                <MenuItem value={"ETC"}>ETC</MenuItem>
+                            </Select>
+                        </FormControl>
                         <label htmlFor="contained-button-file">
                             <Button
                                 variant="outlined"

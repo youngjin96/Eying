@@ -9,12 +9,13 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const onChange = (event) => {
         const { target: { name, value } } = event;
@@ -28,7 +29,7 @@ const Login = () => {
     const onClickLogin = () => {
         setPersistence(auth, browserSessionPersistence).then(() => {
             return signInWithEmailAndPassword(auth, email, password).then(() => {
-                window.location.replace("http://localhost:3000/home");
+                navigate("/home");
             });
         }).catch((error) => {
             alert(error.message);
@@ -40,10 +41,16 @@ const Login = () => {
         provider.setCustomParameters({ prompt: 'select_account' });
         signInWithPopup(auth, provider)
             .then((result) => {
-                window.location.replace("http://localhost:3000/home");
+                navigate("/home");
             }).catch((error) => {
                 console.log(error);
             })
+    }
+
+    const onKeyPress = (e) => {
+        if(e.key === 'Enter'){
+            onClickLogin();
+        }
     }
 
     return (
@@ -77,6 +84,7 @@ const Login = () => {
                             autoComplete="new-password"
                             value={password}
                             onChange={onChange}
+                            onKeyPress={onKeyPress}
                         />
                     </Grid>
                 </Grid>

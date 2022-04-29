@@ -15,9 +15,15 @@ import { Link } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from './Fbase'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from "react-router-dom";
 
 
 const NavBar = () => {
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -28,9 +34,6 @@ const NavBar = () => {
     })
   }, []);
 
-  const [anchorElNav, setAnchorElNav] = useState(null);
-  const [anchorElUser, setAnchorElUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -46,7 +49,7 @@ const NavBar = () => {
   };
   const onClickLogout = () => {
     signOut(auth).then(() => {
-      window.location.replace("http://localhost:3000/home");
+      navigate("/home")
     }).catch((error) => {
       alert(error.message);
     });
