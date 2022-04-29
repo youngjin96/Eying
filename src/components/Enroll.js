@@ -47,17 +47,7 @@ const Enroll = () => {
         }
     }
 
-
-
-
-
-    const onClickEnroll = async () => {
-
-        await createUserWithEmailAndPassword(auth, email, password)
-            .catch((error) => {
-                console.error(error);
-                alert("중복된 이메일 입니다.");
-            });
+    async function postinfo() {
 
         let enfrm = new FormData();
         enfrm.append("username", username);
@@ -70,12 +60,38 @@ const Enroll = () => {
         enfrm.append("position", selected);
         enfrm.append('card', image);
 
-        for (let key of enfrm.keys()) {
-            console.log(`${key}: $[enfrm.get(key)}]`);
-        }
-        await axios.post('http://3.36.95.29:8000/user/', enfrm);
-        alert("정상적으로 회원가입이 완료되었습니다.")
-        window.location.replace("http://localhost:3000/home");
+        const res = await axios.post('http://3.36.95.29:8000/user/', enfrm)
+            .then(function (response) {
+                console.log(response);
+                alert("정상적으로 회원가입이 완료되었습니다.")
+                window.location.replace("http://localhost:3000/home");
+            })
+            .catch(function (error) {
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                    console.error();
+                }
+
+            })
+
+        return res.data;
+    }
+
+
+
+    const onClickEnroll = () => {
+        createUserWithEmailAndPassword(auth, email, password)
+            .then(() => {
+                // Signed in
+                // ...
+            })
+            .catch((error) => {
+                console.error(error);
+                alert("정보를 다시 확인해주세요");
+            });
+        postinfo();
     }
 
     const ITEM_HEIGHT = 48;
@@ -89,19 +105,22 @@ const Enroll = () => {
         },
     };
 
-    const jobs = ["중학생", "고등학생", "대학생", "직장인", " "];
-    const student = ["1학년", "2학년", "3학년", "4학년",];
-    const salary = ["인턴", "사원", "대리", "과장", "차장", "부장",];
-    const job_fields = ["IT", "ART", "SPORTS", "ETC",];
+    const jobs = ["중학생", "고등학생", "대학생", "직장인"];
+    const student1 = ["1학년", "2학년", "3학년"];
+    const student2 = ["1학년", "2학년", "3학년", "4학년", "졸업예정자", "취준생"];
+    const salary = ["인턴", "사원", "대리", "과장", "차장", "부장"];
+    const job_fields = ["IT", "ART", "SPORTS", "ETC"];
 
 
     let type = null;
     let options = null;
 
-    if (personJob === "중학생" || personJob === "고등학생" || personJob === "대학생" || " ") {
-        type = student;
-    } else if (personJob === "직장인" || " ") {
+    if (personJob === "중학생" || personJob === "고등학생") {
+        type = student1;
+    } else if (personJob === "직장인") {
         type = salary;
+    } else if (personJob === "대학생") {
+        type = student2;
     }
 
     function getStyles(job, personJob, theme) {
@@ -152,10 +171,6 @@ const Enroll = () => {
         const image = event.target.files[0];
         console.log(image);
         setImage(image);
-
-        // if (image.length = 0) {
-        //     alert('test')
-        // }
     }
 
     const handleSubmit = () => {
