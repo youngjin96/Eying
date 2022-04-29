@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 def card_path(instance, filename):
-    return "user_%d/card/%s".format(instance.id, filename)
+    return "user_%d/card/%s" % (instance.id, filename)
 
 
 class User(AbstractUser):
