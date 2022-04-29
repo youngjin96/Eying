@@ -10,6 +10,8 @@ from .serializers import PDFSerializer
 from apps.decorator import TIME_MEASURE
 from config.policy import deadline
 
+from unicodedata import normalize
+
 class PDFAPI(APIView):
     @TIME_MEASURE
     def get(self, request):
@@ -31,7 +33,7 @@ class PDFAPI(APIView):
                 
             pdf = PDFModel(user=User.objects.get(email=formData["email"]),
                             pdf=formData["pdf"],
-                            name=formData["pdf"].name,
+                            name=normalize("NFC", formData["pdf"].name),
                             deadline=formData["deadline"],
                             views=0,
                             job_field=formData["job_field"],
@@ -86,9 +88,9 @@ class PDFSearchAPI(APIView):
                 "username": request.GET.get("username"),
                 "email": request.GET.get("email"),
             }
-            
+                        
             # 요청 쿼리 처리
-            query = Q()
+            query = Q() 
             if quertDict["pdf_id"]:
                 query &= Q(pk=quertDict["pdf_id"])
             if quertDict["pdf_name"]:
