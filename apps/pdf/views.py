@@ -42,7 +42,7 @@ class PDFAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @TIME_MEASURE
     def put(self, request):
@@ -55,7 +55,7 @@ class PDFAPI(APIView):
             return Response({}, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @TIME_MEASURE
     def delete(self, request):
@@ -73,7 +73,7 @@ class PDFAPI(APIView):
             return Response({}, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 
 class PDFSearchAPI(APIView):
@@ -109,4 +109,4 @@ class PDFSearchAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)

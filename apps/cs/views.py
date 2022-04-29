@@ -19,11 +19,10 @@ class CSAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            Response({"error_message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     @TIME_MEASURE
     def post(self, request):
-        error_message = "알 수 없는 오류가 발생했습니다."
         try:
             data = json.loads(request.body.decode('utf-8'))
             
@@ -38,4 +37,4 @@ class CSAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': error_message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)

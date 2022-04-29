@@ -33,7 +33,7 @@ class UserAPI(APIView):
                 raise Exception("패스워드가 올바르지 않습니다.")
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     # 회원가입
     @TIME_MEASURE
@@ -43,12 +43,12 @@ class UserAPI(APIView):
                 "email": request.POST.get("email"),
                 "password": request.POST.get("password"),
                 "username": request.POST.get("username"),
-                "age": request.POST.get("age", ENROLL_CREDIT),
+                "age": request.POST.get("age", 0),
                 "job": request.POST.get("job"),
                 "job_field": request.POST.get("job_field"),
                 "position": request.POST.get("position"),
                 "gender": request.POST.get("gender"),
-                "credit": request.POST.get("credit", ),
+                "credit": request.POST.get("credit", ENROLL_CREDIT),
                 "card": request.FILES.get("card"),
             }
             
@@ -59,6 +59,10 @@ class UserAPI(APIView):
             # 비밀번호 재검증
             if not formData["password"]:
                 raise Exception("패스워드가 입력되지 않았습니다.")
+            
+            # 명함 이미지 검증
+            if not formData["card"]:
+                raise Exception("이미지 요청이 없습니다.")
                 
             user = User(
                 username=formData["username"],
@@ -78,7 +82,7 @@ class UserAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     # 사용자 수정
     @TIME_MEASURE
@@ -131,7 +135,7 @@ class UserAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @TIME_MEASURE
     def delete(self, request):
@@ -155,7 +159,7 @@ class UserAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 
 class UserSearchAPI(APIView):
     @TIME_MEASURE
@@ -179,4 +183,4 @@ class UserSearchAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error_message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
