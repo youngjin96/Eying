@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom"
 
 
 
+
 const Enroll = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -212,6 +213,13 @@ const Enroll = () => {
         });
     }
 
+    const onKeyUp = (event) => {
+        if (event.keycode === '9') {
+            componentDidMount();
+        }
+
+    }
+
 
     return (
         <Container component="main" maxWidth="xs">
@@ -252,6 +260,7 @@ const Enroll = () => {
                                 errorMessages={['password mismatch', 'this field is required']}
                                 value={confirmpassword}
                                 onClick={componentDidMount}
+                                onKeyUp={onKeyUp}
                             />
                         </Grid>
                         <Grid item xs={12}>
