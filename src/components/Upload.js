@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Grid, Box, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { auth } from './Fbase'
+
 import axios from 'axios';
-import { onAuthStateChanged } from "firebase/auth";
+
+import { Button, Grid, Box, Typography } from '@mui/material';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import PersonSearchOutlinedIcon from '@mui/icons-material/PersonSearchOutlined';
@@ -14,19 +13,25 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { useNavigate } from "react-router-dom";
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
+import { Link, useNavigate } from 'react-router-dom';
+
+import Loading from "./Loading";
+import { auth } from './Fbase'
+import { onAuthStateChanged } from "firebase/auth";
+
 const Upload = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
-    const [email, setEmail] = useState("");
-    const [jobField, setJobField] = useState("");
-    const [open, setOpen] = useState(true);
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(true); // 로그인 판별을 위한 로딩 변수
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 유무 판별 변수
+    const [email, setEmail] = useState(""); // 유저 이메일 변수
+    const [jobField, setJobField] = useState(""); // PDF 올릴 때 종류 변수
+    const [open, setOpen] = useState(true); // 로그인 안 했을 때 다이얼로그 여는 변수
 
     // 처음 렌더링 후 유저가 로그인이 되어있는지 확인 로그인한 상태가 아니라면 로그인 페이지로 이동
     useEffect(() => {
@@ -34,18 +39,18 @@ const Upload = () => {
             if (user) {
                 setEmail(user.email);
                 setIsLoggedIn(true);
-            } else {
-                setIsLoggedIn(false);
             }
+            setIsLoading(false);
         })
     }, []);
 
+    // 다이얼로그 안에 로그인 버튼 눌렀을 때 로그인 화면으로 이동
     const onClickLogin = () => {
         setOpen(false);
         navigate("/login");
     };
 
-    // pdf 업로드 함수
+    // PDF 업로드 함수
     const handlePdfFileChange = (e) => {
         var frm = new FormData();
         frm.append("pdf", e.target.files[0]);
@@ -54,11 +59,18 @@ const Upload = () => {
         axios.post('http://3.36.95.29:8000/pdf/', frm);
     };
 
+    // PDF 종류 골랐을 때
     const handleChange = (event) => {
         setJobField(event.target.value);
     };
 
-    if (!isLoggedIn) return (
+    // 로딩 중일 때 보여줄 화면
+    if (isLoading) return (
+       <Loading />
+    )
+
+    // 로그인이 안 되어 있을 때 보여줄 다이얼로그
+    else if (!isLoggedIn) return (
         <Box
             sx={{
                 width: '100vw',
@@ -75,7 +87,7 @@ const Upload = () => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    {"Did You Logged In?"}
+                    {"로그인을 잊으셨나요?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
@@ -92,7 +104,8 @@ const Upload = () => {
         </Box>
     )
 
-    return (
+    // 본 페이지
+    else return (
         <>
             <Box
                 sx={{

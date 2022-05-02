@@ -1,17 +1,23 @@
 import { useEffect, useState } from 'react';
-import { DataGrid } from '@mui/x-data-grid';
-import { Box, Button, Grid, CircularProgress } from '@mui/material';
+
 import axios from 'axios';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './Fbase'
-import AliceCarousel from 'react-alice-carousel';
-import "react-alice-carousel/lib/alice-carousel.css";
-import { useNavigate } from "react-router-dom";
+
+import { Box, Button, Grid } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+
+import AliceCarousel from 'react-alice-carousel';
+import "react-alice-carousel/lib/alice-carousel.css";
+
+import { useNavigate } from "react-router-dom";
+
+import Loading from "./Loading";
+import { auth } from './Fbase'
+import { onAuthStateChanged } from 'firebase/auth';
 
 const columns = [
     { field: 'pdf_name', headerName: '제목', flex: 1, align: 'center', headerAlign: "center" },
@@ -141,6 +147,7 @@ const Track = () => {
         pageNum = e.item;
     }
     
+    // 로그인 안 됐을 때 보여줄 화면
     if (!isLoggedIn) return (
         <Box
             sx={{
@@ -158,7 +165,7 @@ const Track = () => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    {"Did You Logged In?"}
+                    {"로그인을 잊으셨나요?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
@@ -175,21 +182,12 @@ const Track = () => {
         </Box>
     )
 
+    // 로딩 중일 때 보여줄 화면
     if(isLoading) return (
-        <Box
-            sx={{
-                width: '100vw',
-                height: '100vh',
-                background: '#ecebe9',
-                flexGrow: 1,
-            }}
-        >
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <CircularProgress size={300} style={{ marginTop: "15%" }} />
-            </div>
-        </Box>
+        <Loading />
     )
-
+    
+    // Track 버튼 눌렀을 때 보여줄 화면
     if(isTracking) return (
         <>
             <Box
@@ -234,6 +232,7 @@ const Track = () => {
         </>
     )
 
+    // 전체 PDF 데이터
     else return (
         <>
             <Button style={{marginTop: 100, marginLeft: 100}} onClick={onClickTrack}>
