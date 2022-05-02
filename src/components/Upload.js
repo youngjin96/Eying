@@ -13,25 +13,20 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import Loading from "./Loading";
-import { auth } from './Fbase'
+import IsLoggedIn from "./IsLoggedIn";
+import { auth } from './Fbase';
 import { onAuthStateChanged } from "firebase/auth";
 
 const Upload = () => {
-    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true); // 로그인 판별을 위한 로딩 변수
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 유무 판별 변수
+
     const [email, setEmail] = useState(""); // 유저 이메일 변수
     const [jobField, setJobField] = useState(""); // PDF 올릴 때 종류 변수
-    const [open, setOpen] = useState(true); // 로그인 안 했을 때 다이얼로그 여는 변수
 
     // 처음 렌더링 후 유저가 로그인이 되어있는지 확인 로그인한 상태가 아니라면 로그인 페이지로 이동
     useEffect(() => {
@@ -41,14 +36,8 @@ const Upload = () => {
                 setIsLoggedIn(true);
             }
             setIsLoading(false);
-        })
+        });
     }, []);
-
-    // 다이얼로그 안에 로그인 버튼 눌렀을 때 로그인 화면으로 이동
-    const onClickLogin = () => {
-        setOpen(false);
-        navigate("/login");
-    };
 
     // PDF 업로드 함수
     const handlePdfFileChange = (e) => {
@@ -71,37 +60,7 @@ const Upload = () => {
 
     // 로그인이 안 되어 있을 때 보여줄 다이얼로그
     else if (!isLoggedIn) return (
-        <Box
-            sx={{
-                width: '100vw',
-                height: '100vh',
-                display: 'column',
-                background: '#ecebe9',
-                flexGrow: 1,
-            }}
-        >
-            <Dialog
-                open={open}
-                onClose={onClickLogin}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"로그인을 잊으셨나요?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        이 페이지는 로그인 후 이용이 가능합니다.
-                        로그인 페이지로 가서 로그인해주시기 바랍니다.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={onClickLogin} autoFocus>
-                        로그인
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </Box>
+        <IsLoggedIn />
     )
 
     // 본 페이지
