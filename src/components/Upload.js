@@ -30,13 +30,18 @@ const Upload = () => {
 
     // 처음 렌더링 후 유저가 로그인이 되어있는지 확인 로그인한 상태가 아니라면 로그인 페이지로 이동
     useEffect(() => {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setEmail(user.email);
-                setIsLoggedIn(true);
-            }
-            setIsLoading(false);
-        });
+        // 유저 정보 가져오는 함수
+        try {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    setEmail(user.email);
+                    setIsLoggedIn(true);
+                }
+                setIsLoading(false);
+            });
+        } catch (error) {
+            console.log(error);
+        }
     }, []);
 
     // PDF 업로드 함수

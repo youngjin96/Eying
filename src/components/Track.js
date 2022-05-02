@@ -4,18 +4,12 @@ import axios from 'axios';
 
 import { Box, Button, Grid } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 
 import AliceCarousel from 'react-alice-carousel';
 import "react-alice-carousel/lib/alice-carousel.css";
 
-import { useNavigate } from "react-router-dom";
-
 import Loading from "./Loading";
+import IsLoggedIn from "./IsLoggedIn";
 import { auth } from './Fbase'
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -30,73 +24,59 @@ const columns = [
 
 const Track = () => {
     const webgazer = window.webgazer; // webgazer instance
-    const [open, setOpen] = useState(true);
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isTracking, setIsTracking] = useState(false);
+
     const [selectionModel, setSelectionModel] = useState();
     const [email, setEmail] = useState(""); // 유저 이메일
-    const [pdfs, setPdfs] = useState(() => []); // 전체 pdf
-    const [isTracking, setIsTracking] = useState(false);
+    const [ownerEmail, setOwnerEmail] = useState("");
+    const [pdfs, setPdfs] = useState([]); // 전체 pdf
     const [imgsUrl, setImgsUrl] = useState([]); // pdf image url 배열
-    const [userId, setUserId] = useState(0); // 유저 고유 아이디 값
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
-    var pageNum = 0; // pdf 현재 페이지
+    const [pageNum, setPageNum] = useState(0); // pdf 현재 페이지
     var dimensionArr = []; // webgazer x, y 좌표가 담길 배열
-    const datas = []; // get 받아올 배열
-    const navigate = useNavigate();
-    
-    useEffect(() => {
-        const fetchUser = () => {
-            try {
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        setIsLoggedIn(true);
-                        setEmail(user.email);
-                    } else {
-                        setIsLoggedIn(false);
-                    }
-                });
-            } catch (error) {
-                console.log(error);
-            }
-        };
 
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('http://3.36.95.29:8000/pdf/').then(res => {
-                    if (res.status === 200){
-                        setPdfs(res.data);
-                        setIsLoading(false);
-                    } else {
-                        setIsLoading(true);
-                    }
-                });
-            } catch (error) {
-                console.log(error);
-            }
+    useEffect(() => {
+        // 유저 정보 가져오는 함수
+        try {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    setEmail(user.email);
+                    setIsLoggedIn(true);
+                    // 유저가 로그인했을 때 서버에서 데이터를 가져온다.
+                    axios.get('http://3.36.95.29:8000/pdf/').then(res => {
+                        if (res.status === 200) {
+                            console.log(res.status);
+                            setPdfs(res.data);
+                        }
+                    })
+                }
+                setIsLoading(false);
+            });
+        } catch (error) {
+            console.log(error);
         }
-        
-        fetchUser();
-        fetchData();
     }, []);
 
+    // PDF를 고르고 Track 버튼 누른 경우
     const onClickTrack = async () => {
         setIsTracking(true);
-        const response = await axios.get('http://3.36.95.29:8000/pdf/search', {
+        setIsLoading(true);
+        await axios.get('http://3.36.95.29:8000/pdf/search', {
             params: {
-                pdf_id : selectionModel[0]
+                pdf_id: selectionModel[0]
             }
+        }).then(res => {
+            if (res.status === 200){
+                console.log(res.data[0]);
+                setImgsUrl(res.data[0].imgs_url);
+                setPdfId(res.data[0].id);
+                setOwnerEmail(res.data[0].user_email);
+            }
+            setIsLoading(false);
         });
-        datas.push(response.data[0]);
-        setImgsUrl(datas[0].imgs_url);
-        setUserId(datas[0].user_id);
-        setPdfId(datas[0].id);
     }
-
-    const onClickLogin = () => {
-        setOpen(false);
-        navigate("/login");
-    };
 
     const onClickStart = () => {
         webgazer.setGazeListener(function (data) {
@@ -111,84 +91,56 @@ const Track = () => {
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
         await axios.post("http://3.36.95.29:8000/eyetracking/", {
-            'user_id': "kimc980106@naver.com",
-            'owner_id': "kimc980106@naver.com",
+            'user_email': email,
+            'owner_email': ownerEmail,
             'rating_time': '00:00:00',
             'page_number': pageNum,
             'pdf_id': pdfId,
             'coordinate': dimensionArr
+        }).then(() => {
+            webgazer.end();
+            webgazer.showPredictionPoints(false);
+            dimensionArr = [];
+            setIsTracking(false);
+            window.location.reload();
         });
-        dimensionArr = [];
-        webgazer.end();
-        webgazer.showPredictionPoints(false);
-        window.location.reload();
-        setIsTracking(false);
     }
 
     const onClickBack = () => {
-        window.location.replace("upload");
+        window.location.replace("track");
     }
 
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
         await axios.post("http://3.36.95.29:8000/eyetracking/", {
-            'user_id': "kimc980106@naver.com",
-            'owner_id': "kimc980106@naver.com",
+            'user_email': email,
+            'owner_email': ownerEmail,
             'rating_time': '00:00:00',
             'page_number': pageNum,
             'pdf_id': pdfId,
             'coordinate': dimensionArr,
-        }).then();
-        dimensionArr = [];
+        }).then(() => {
+            dimensionArr = [];
+        });
     }
 
     // After swipe silde, update pageNum
     const onSlideChanged = (e) => {
-        pageNum = e.item;
+        setPageNum(e.item);
     }
-    
-    // 로그인 안 됐을 때 보여줄 화면
-    if (!isLoggedIn) return (
-        <Box
-            sx={{
-                width: '100vw',
-                height: '100vh',
-                display: 'column',
-                background: '#ecebe9',
-                flexGrow: 1,
-            }}
-        >
-            <Dialog
-                open={open}
-                onClose={onClickLogin}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"로그인을 잊으셨나요?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        이 페이지는 로그인 후 이용이 가능합니다.
-                        로그인 페이지로 가서 로그인해주시기 바랍니다.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={onClickLogin} autoFocus>
-                        로그인
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </Box>
-    )
 
     // 로딩 중일 때 보여줄 화면
-    if(isLoading) return (
+    if (isLoading) return (
         <Loading />
     )
-    
+
+    // 로그인 안 됐을 때 보여줄 화면
+    else if (!isLoggedIn) return (
+        <IsLoggedIn />
+    )
+
     // Track 버튼 눌렀을 때 보여줄 화면
-    if(isTracking) return (
+    else if (isTracking) return (
         <>
             <Box
                 sx={{
@@ -215,7 +167,7 @@ const Track = () => {
                             {imgsUrl && imgsUrl.map((e, index) => (
                                 <img key={index} src={e} style={{ width: "90%", height: "80vh" }} />
 
-                            ))} 
+                            ))}
                         </AliceCarousel>
                         <Button onClick={onClickStart}>
                             Start
@@ -235,7 +187,7 @@ const Track = () => {
     // 전체 PDF 데이터
     else return (
         <>
-            <Button style={{marginTop: 100, marginLeft: 100}} onClick={onClickTrack}>
+            <Button style={{ marginTop: 100, marginLeft: 100 }} onClick={onClickTrack}>
                 CONTINUE
             </Button>
             <div style={{ height: 400, width: '80%', margin: "auto" }}>
@@ -249,7 +201,7 @@ const Track = () => {
                         console.log(newSelectionModel)
                     }}
                     selectionModel={selectionModel}
-                    style={{align: "center"}}
+                    style={{ align: "center" }}
                 />
             </div>
         </>

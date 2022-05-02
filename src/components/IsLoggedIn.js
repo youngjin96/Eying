@@ -9,7 +9,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 import { useNavigate } from 'react-router-dom';
 
-
 const IsLoggedIn = () => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(true); // 로그인 안 했을 때 다이얼로그 여는 변수

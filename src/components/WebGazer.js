@@ -1,11 +1,18 @@
-import { Box, Button, CircularProgress, Grid } from "@mui/material";
-import axios from 'axios';
 import { useEffect, useState } from "react";
+
+import axios from 'axios';
+
+import { Box, Button, CircularProgress, Grid } from "@mui/material";
+
 import "react-alice-carousel/lib/alice-carousel.css";
 import AliceCarousel from 'react-alice-carousel';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './Fbase'
+
 import { useNavigate } from "react-router-dom";
+
+import Loading from "./Loading";
+import IsLoggedIn from "./IsLoggedIn";
+import { auth } from './Fbase'
+import { onAuthStateChanged } from 'firebase/auth';
 
 const WebGazer = () => {
     const webgazer = window.webgazer; // webgazer instance
@@ -14,7 +21,6 @@ const WebGazer = () => {
     const [isLoading, setIsLoading] = useState(true); // pdf 가져올 때 까지 로딩
     const [error, setError] = useState(); // pdf 가져올 때 에러
     const [imgsUrl, setImgsUrl] = useState([]); // pdf image url 배열
-    const [userId, setUserId] = useState(0); // 유저 고유 아이디 값
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
     const [email, setEmail] = useState("");
     var pageNum = 0;
@@ -38,10 +44,9 @@ const WebGazer = () => {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://3.36.95.29:8000/pdf/').then(res => {
+                await axios.get('http://3.36.95.29:8000/pdf/').then(res => {
                     if (res.status === 200){
                         setImgsUrl(res.data[0].imgs_url);
-                        setUserId(res.data[0].user_id);
                         setPdfId(res.data[0].id);
                         setIsLoading(false);
                     } else {
@@ -59,18 +64,7 @@ const WebGazer = () => {
 
     // loadng 중 일 때 보여줄 화면 (loading == true)
     if (isLoading) return (
-        <Box
-            sx={{
-                width: '100vw',
-                height: '100vh',
-                background: '#ecebe9',
-                flexGrow: 1,
-            }}
-        >
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <CircularProgress size={300} style={{ marginTop: "15%" }} />
-            </div>
-        </Box>
+        <Loading />
     )
 
     // error가 있을 때 alert

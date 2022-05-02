@@ -20,7 +20,7 @@ const Router = () => {
             <Route path="about_us" element={<AboutUs />} />
             <Route path="FAQ" element={<FAQ />} />
             <Route path="login" element={<Login />} />
-            <Route path="login/enroll" element={<Enroll />} />
+            <Route path="enroll" element={<Enroll />} />
             <Route path="/webgazer" element={<WebGazer />} />
             <Route path="/track" element={<Track />} />
             <Route path="/mypage" element={<Mypage />} />

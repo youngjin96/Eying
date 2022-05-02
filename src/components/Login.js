@@ -9,7 +9,7 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 const Login = () => {
@@ -45,6 +45,10 @@ const Login = () => {
             }).catch((error) => {
                 console.log(error);
             })
+    }
+
+    const onClickEnroll = () => {
+        navigate("/enroll");
     }
 
     const onKeyPress = (e) => {
@@ -108,10 +112,9 @@ const Login = () => {
                     fullWidth
                     variant="contained"
                     sx={{ mt: 3, mb: 2 }}
+                    onClick={onClickEnroll}
                 >
-                    <Link to="enroll" style={{ textDecoration: 'none', textTransform: 'none', color: "white" }}>
-                        회원가입
-                            </Link>
+                    회원가입
                 </Button>
             </Box>
         </Box>
