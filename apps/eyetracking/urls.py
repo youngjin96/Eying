@@ -1,8 +1,10 @@
 from django.urls import path
-from . import views
-from .views import EyetrackList 
+# from .views import EyetrackList,EyetrackVisualization,EyetrackPdf,EyetrackUser
+from .views import EyetrackList,EyetrackPdf,EyetrackUser
 
 urlpatterns = [
     path('', EyetrackList.as_view()),
-    # path('',views.index)
+    path('pdf/',EyetrackPdf.as_view()),
+    # path('visualization/',EyetrackVisualization.as_view()),
+    path('user/',EyetrackUser.as_view()),
 ]

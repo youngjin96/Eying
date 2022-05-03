@@ -37,22 +37,21 @@ class PDFAPI(APIView):
                 raise Exception("이메일 또는 PDF 데이터에 문제가 있습니다.")
                 
             # 파일 확장자 Validation
-            if formData["pdf"].content_type == "application/pdf":
-                pdf = PDFModel(user=User.objects.get(email=formData["email"]),
-                               pdf=formData["pdf"],
-                               name=formData["pdf"].name,
-                               deadline=formData["deadline"],
-                               views=0, 
+            if pdf.content_type == "application/pdf":
+                pdf = PDFModel(user=User.objects.get(email=email),
+                               name=request.data['data'].name, 
+                               pdf=request.data['data'],
+                               deadline=deadline,
+                               views=0,
                                )
                 pdf.save()
                 
                 serializer = PDFSerializer(pdf, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
-                raise Exception("PDF 파일이 아닙니다.")
-        except Exception as e:
-            print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+                raise
+        except:
+            return Response({'error_message': "이메일 또는 PDF 데이터에 문제가 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
         
     @TIME_MEASURE
     def put(self, request):
