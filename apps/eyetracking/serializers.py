@@ -31,43 +31,43 @@ class Userlist(serializers.ModelSerializer):
         )
 class EyetrackingUserList(serializers.ModelSerializer):
     
-    # user_email = serializers.SerializerMethodField()
-    # def get_user_email(self, obj):
-    #     return obj['email']
+    user_email = serializers.SerializerMethodField()
+    def get_user_email(self, obj):
+        return obj['email']
     
-    # job = serializers.SerializerMethodField()
-    # def get_job(self,obj):
-    #     return obj['job']
+    job = serializers.SerializerMethodField()
+    def get_job(self,obj):
+        return obj['job']
 
-    # job_field = serializers.SerializerMethodField()
-    # def get_job_field(self,obj):
-    #     return obj['job_field']
+    job_field = serializers.SerializerMethodField()
+    def get_job_field(self,obj):
+        return obj['job_field']
 
-    # age = serializers.SerializerMethodField()
-    # def get_age(self,obj):
-    #     return obj['age']
+    age = serializers.SerializerMethodField()
+    def get_age(self,obj):
+        return obj['age']
 
-    # position = serializers.SerializerMethodField()
-    # def get_position(self,obj):
-    #     return obj['position']
+    position = serializers.SerializerMethodField()
+    def get_position(self,obj):
+        return obj['position']
     
-    # gender = serializers.SerializerMethodField()
-    # def get_gender(self,obj):
-    #     return obj['gender']
+    gender = serializers.SerializerMethodField()
+    def get_gender(self,obj):
+        return obj['gender']
     
-    # create_date = serializers.SerializerMethodField()
-    # def get_create_date(self,obj):
-    #     return 
+    create_date = serializers.SerializerMethodField()
+    def get_create_date(self,obj):
+        return obj['create_date']
     class Meta:
         model = Eyetracking
-        fields = '__all__'
-        # fields= (
-        #     'user_email',
-        #     'job',
-        #     'job_field',
-        #     'age',
-        #     'position',
-        #     'gender',
-        #     'create_date',
-        #     'pk',
-        # )
+        # fields = '__all__'
+        fields= (
+            'user_email',
+            'job',
+            'job_field',
+            'age',
+            'position',
+            'gender',
+            'create_date',
+            'pk',
+        )

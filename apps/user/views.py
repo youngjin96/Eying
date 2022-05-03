@@ -9,6 +9,7 @@ from .serializers import UserSerializer
 from django.contrib.auth.hashers import make_password, check_password
 
 from apps.decorator import TIME_MEASURE
+import config.policy as POLICY
 
 class UserAPI(APIView):
     # 사용자 유효성 검사 (DB)
@@ -32,7 +33,7 @@ class UserAPI(APIView):
                 raise Exception("패스워드가 올바르지 않습니다.")
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     # 회원가입
     @TIME_MEASURE
@@ -47,17 +48,18 @@ class UserAPI(APIView):
                 "job_field": request.POST.get("job_field"),
                 "position": request.POST.get("position"),
                 "gender": request.POST.get("gender"),
-                "credit": request.POST.get("credit", 0),
+                "credit": request.POST.get("credit", POLICY.ENROLL_CREDIT),
                 "card": request.FILES.get("card"),
             }
+            
+            # 필수 항목 누락 검증
+            for key in formData.keys():
+                if not formData[key]:
+                    raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key])
             
             # 중복 이메일 체크
             if User.objects.filter(email=formData["email"]):
                 raise Exception("이미 존재하는 이메일입니다.")
-            
-            # 비밀번호 재검증
-            if not formData["password"]:
-                raise Exception("패스워드가 입력되지 않았습니다.")
                 
             user = User(
                 username=formData["username"],
@@ -77,7 +79,7 @@ class UserAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     # 사용자 수정
     @TIME_MEASURE
@@ -95,9 +97,9 @@ class UserAPI(APIView):
                 "gender": request.POST.get("gender"),
             }
             
-            # 사용자 검증
+            # 필수 항목 누락 검증
             if not formData["email"]:
-                raise Exception("이메일이 입력되지 않았습니다.")
+                raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH['email'])
             
             user = User.objects.get(email=formData["email"])
             if not user:
@@ -130,7 +132,7 @@ class UserAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @TIME_MEASURE
     def delete(self, request):
@@ -141,7 +143,7 @@ class UserAPI(APIView):
             
             # 요청 데이터 누락 처리
             if not formData["email"]:
-                raise Exception("이메일이 입력되지 않았습니다.")
+                raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH['email'])
             
             # 사용자 검증
             user = User.objects.get(email=formData["email"])
@@ -154,7 +156,7 @@ class UserAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 
 class UserSearchAPI(APIView):
     @TIME_MEASURE
@@ -178,4 +180,4 @@ class UserSearchAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error_message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

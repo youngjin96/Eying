@@ -9,33 +9,43 @@ from .serializers import CSSerializer
 import json
 
 from apps.decorator import TIME_MEASURE
+import config.policy as POLICY
 
 class CSAPI(APIView):
     @TIME_MEASURE
     def get(self, request):
         try:
-            queryset = CS.objects.all().order_by('-pk')
+            queryset = POLICY.ORDER_BY_RECENT(CS.objects.all())
             serializer = CSSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            Response({"error_message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     @TIME_MEASURE
     def post(self, request):
-        error_message = "알 수 없는 오류가 발생했습니다."
         try:
-            data = json.loads(request.body.decode('utf-8'))
+            formData = {
+                "email": request.POST.get("email"),
+                "phoneNumber": request.POST.get("phoneNumber"),
+                "name": request.POST.get("name"),
+                "content": request.POST.get("content"),
+            }
+            
+            # 필수 항목 누락 검증
+            for key in formData.keys():
+                if not formData[key]:
+                    raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key])
             
             cs = CS(
-                name=data["name"],
-                email=data["email"],
-                phoneNumber=data["phoneNumber"],
-                content=data["content"],
+                name=formData["name"],
+                email=formData["email"],
+                phoneNumber=formData["phoneNumber"],
+                content=formData["content"],
             )
             cs.save()
             serializer = CSSerializer(cs, many=False)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': error_message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)

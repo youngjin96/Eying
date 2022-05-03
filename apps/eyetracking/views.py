@@ -7,16 +7,12 @@ from user.models import User
 from pdf.models import PDFModel
 from .models import Eyetracking
 from .serializers import EyetrackingSerializer,EyetrackingUserList,Userlist
-from user.serializers import UserSerializer
-from django.db.models import Count,Min
+from django.db.models import F
+
 from .heatmap import Heatmapper
 from PIL import Image
 from PIL import ImageDraw
 import matplotlib.pyplot as plt
-
-from apps.settings import AWS_S3_CUSTOME_DOMAIN
-import boto3
-from apps.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, AWS_STORAGE_BUCKET_NAME
 
 
 from pdf.serializers import PDFSerializer
@@ -66,23 +62,25 @@ class EyetrackPdf(APIView):
         
 class EyetrackUser(APIView):
     def get(self,request):
-        pdf_id = request.data['pdf_id']
-        page_num = request.data['page_number']
-        queryset = Eyetracking.objects.filter(pdf_fk = pdf_id).values_list('user_id','create_date').annotate(first=Min('create_date'))
-        print("queryset",queryset)
-        # a_post = Eyetracking.objects.get()
-        # print(queryset.rater_set.all())
-        # rows = Eyetracking.objects.prefetch_related('user.rater').filter(pdf_fk = pdf_id)
-        # print("rows",rows)
-        # user = User.objects.get(pk=queryset.user_id)
-        # user = User.objects.filter(id__in=queryset)
-        # print(user)
-        # serializer = Userlist(user,many = True)
-        # print("user_serail",serializer.data)
-        # serializer = EyetrackingUserList(queryset,many = True)
-        # serializerr = EyetrackingUserList(serializer.data,many = True)
-        # print(serializer)
-        # return Response(serializer.data,status=status.HTTP_200_OK)
+        try:
+            pdf_id = request.data['pdf_id']
+            page_num = request.data['page_number']
+            queryset = Eyetracking.objects.filter(pdf_fk = pdf_id,page_num=page_num).annotate(
+                age=F('user_id__age'),
+                job = F("user_id__job"),
+                job_field=F('user_id__job_field'),
+                position=F('user_id__position'),
+                gender=F('user_id__gender'),
+                email=F('user_id__email')
+            ).values('user_id','create_date','pk','age','job','job_field','position','gender','email')
+
+            # print("query",queryset)
+            serializer = EyetrackingUserList(queryset,many = True)
+            print(serializer)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except:
+            return Response({'error_message': "user list 오류"})
+    
         
 # class EyetrackVisualization(APIView):
 #     global heatmapper
@@ -98,6 +96,7 @@ class EyetrackUser(APIView):
 #         }
 
 #         # 이미지 url
+
 #         img_path = "media/public/pdf/{0}/{1}/images/{2}.jpg".format(queryset.owner_email,queryset.pdf_id, queryset.page_num)
 #         _img = Image.open(img_path)
 

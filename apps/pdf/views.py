@@ -1,4 +1,3 @@
-import email
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -8,79 +7,110 @@ from user.models import User
 from django.db.models import Q
 from .serializers import PDFSerializer
 
-import datetime
-
 from apps.decorator import TIME_MEASURE
+import config.policy as POLICY
+
+from unicodedata import normalize
 
 class PDFAPI(APIView):
     @TIME_MEASURE
     def get(self, request):
-        try:
-            pdf = PDFModel.objects.all().order_by('-pk') # 등록 최신순
-            serializer = PDFSerializer(pdf, many=True)
-            
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            print(e)
-            Response({'error_message': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return PDFSearchAPI.get(self, request)
     
     @TIME_MEASURE
     def post(self, request):
         try:
             formData = {
-                "deadline": request.POST.get("deadline", (datetime.datetime.now()+datetime.timedelta(days=7)).strftime("%Y-%m-%d")),
+                "deadline": request.POST.get("deadline", POLICY.DEADLINE()),
                 "email": request.POST.get("email"),
+                "job_field": request.POST.get("job_field"),
                 "pdf": request.FILES.get("pdf"),
             }
             
-            if not formData["email"] or not formData["pdf"]:
-                raise Exception("이메일 또는 PDF 데이터에 문제가 있습니다.")
+            # 필수 항목 누락 검증
+            for key in ['email', 'job_field', 'pdf']:
+                if not formData[key]:
+                    raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key])
+            
+            # 파일 포맷 검증
+            if formData["pdf"].content_type != "application/pdf":
+                raise Exception("파일 확장자가 올바르지 않습니다.")
+            
+            # 이메일 검증
+            if not User.objects.get(email=formData["email"]):
+                raise Exception("존재하지 않는 이메일 입니다.")
                 
-            # 파일 확장자 Validation
-            if pdf.content_type == "application/pdf":
-                pdf = PDFModel(user=User.objects.get(email=email),
-                               name=request.data['data'].name, 
-                               pdf=request.data['data'],
-                               deadline=deadline,
-                               views=0,
-                               )
-                pdf.save()
-                
-                serializer = PDFSerializer(pdf, many=False)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                raise
-        except:
-            return Response({'error_message': "이메일 또는 PDF 데이터에 문제가 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
+            pdf = PDFModel(user=User.objects.get(email=formData["email"]),
+                            pdf=formData["pdf"],
+                            name=normalize("NFC", formData["pdf"].name),
+                            deadline=formData["deadline"],
+                            views=0,
+                            job_field=formData["job_field"],
+                            )
+            pdf.save()
+            
+            serializer = PDFSerializer(pdf, many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response({'error_message': str(e)})
         
     @TIME_MEASURE
     def put(self, request):
         try:
-            formData = {}
+            formData = {
+                "id": request.POST.get("id"),
+                "deadline": request.POST.get("deadline"),
+                "views": request.POST.get("views"),
+            }
+
+            # 필수 항목 누락 검증
+            if not formData["id"]:
+                raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH["id"])
             
-            print("PUT 요청")
-            return Response({}, status=status.HTTP_200_OK)
+            # 데이터 유효성 검증
+            pdf = PDFModel.objects.get(pk=formData["id"])
+            if not pdf:
+                raise Exception("존재하지 않는 PDF 입니다.")
+            
+            # PDF 보관 기간 변경
+            if formData["deadline"]:
+                pdf.deadline = formData["deadline"]
+                
+            # PDF 조회수 증가
+            if formData["views"]:
+                pdf.views += 1
+                
+            pdf.save()
+            
+            serializer = PDFSerializer(pdf, many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @TIME_MEASURE
     def delete(self, request):
         try:
             formData = {
-                "pdf_id": request.POST.get("pdf_id"),
+                "id": request.POST.get("id"),
             }
             
-            if not formData["pdf_id"]:
-                raise Exception("PDF ID가 필요합니다.")
+            # 필수 항목 누락 검증
+            if not formData["id"]:
+                raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH["id"])
             
-            pdf = PDFModel.objects.get(pk=formData["pdf_id"])
+            # 데이터 유효성 검증
+            pdf = PDFModel.objects.get(pk=formData["id"])
+            if not pdf:
+                raise Exception("존재하지 않는 PDF 입니다.")
+            
             pdf.delete()
             
-            return Response({}, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 
 class PDFSearchAPI(APIView):
@@ -88,29 +118,27 @@ class PDFSearchAPI(APIView):
     def get(self, request):
         try:
             quertDict = {
-                "pdf_id": request.GET.get("pdf_id"),
-                "pdf_name": request.GET.get("pdf_name"),
+                "id": request.GET.get("id"),
+                "name": request.GET.get("name"),
                 "username": request.GET.get("username"),
                 "email": request.GET.get("email"),
             }
-            
-            query = Q()
-            if quertDict["pdf_id"]:
-                query &= Q(pk=quertDict["pdf_id"])
-            if quertDict["pdf_name"]:
-                query &= Q(name__contains=quertDict["pdf_name"])
+                        
+            # 요청 쿼리 처리
+            query = Q() 
+            if quertDict["id"]:
+                query &= Q(pk=quertDict["id"])
+            if quertDict["name"]:
+                query &= Q(name__contains=quertDict["name"])
             if quertDict["username"]:
                 query &= Q(user=User.objects.get(username=quertDict["username"]))
             if quertDict["email"]:
                 query &= Q(user=User.objects.get(email=quertDict["email"]))
                  
-            queryset = PDFModel.objects.filter(query).order_by('-pk')
-            # for q in queryset:
-            #     q.views += 1
-            #     q.save()
-                
-            serializer = PDFSerializer(queryset, many=True)
+            pdf = POLICY.ORDER_BY_RECENT(PDFModel.objects.filter(query))
+            
+            serializer = PDFSerializer(pdf, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error_message': e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
