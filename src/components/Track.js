@@ -8,10 +8,11 @@ import { DataGrid } from '@mui/x-data-grid';
 import AliceCarousel from 'react-alice-carousel';
 import "react-alice-carousel/lib/alice-carousel.css";
 
+import { onAuthStateChanged } from 'firebase/auth';
+
 import Loading from "./Loading";
 import IsLoggedIn from "./IsLoggedIn";
-import { auth } from './Fbase'
-import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './Fbase';
 
 const columns = [
     { field: 'pdf_name', headerName: '제목', flex: 1, align: 'center', headerAlign: "center" },
@@ -29,7 +30,7 @@ const Track = () => {
     const [isTracking, setIsTracking] = useState(false);
 
     const [selectionModel, setSelectionModel] = useState();
-    const [email, setEmail] = useState(""); // 유저 이메일
+    const [userEmail, setUserEmail] = useState(""); // 유저 이메일
     const [ownerEmail, setOwnerEmail] = useState("");
     const [pdfs, setPdfs] = useState([]); // 전체 pdf
     const [imgsUrl, setImgsUrl] = useState([]); // pdf image url 배열
@@ -42,7 +43,7 @@ const Track = () => {
         try {
             onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    setEmail(user.email);
+                    setUserEmail(user.email);
                     setIsLoggedIn(true);
                     // 유저가 로그인했을 때 서버에서 데이터를 가져온다.
                     axios.get('http://3.36.95.29:8000/pdf/').then(res => {
@@ -68,7 +69,7 @@ const Track = () => {
                 pdf_id: selectionModel[0]
             }
         }).then(res => {
-            if (res.status === 200){
+            if (res.status === 200) {
                 console.log(res.data[0]);
                 setImgsUrl(res.data[0].imgs_url);
                 setPdfId(res.data[0].id);
@@ -76,7 +77,7 @@ const Track = () => {
             }
             setIsLoading(false);
         });
-    }
+    };
 
     const onClickStart = () => {
         webgazer.setGazeListener(function (data) {
@@ -85,13 +86,13 @@ const Track = () => {
             }
             dimensionArr.push([Math.floor(data.x), Math.floor(data.y)]);
         }).begin();
-    }
+    };
 
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
         await axios.post("http://3.36.95.29:8000/eyetracking/", {
-            'user_email': email,
+            'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
             'page_number': pageNum,
@@ -104,16 +105,16 @@ const Track = () => {
             setIsTracking(false);
             window.location.reload();
         });
-    }
+    };
 
     const onClickBack = () => {
         window.location.replace("track");
-    }
+    };
 
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
         await axios.post("http://3.36.95.29:8000/eyetracking/", {
-            'user_email': email,
+            'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
             'page_number': pageNum,
@@ -122,12 +123,12 @@ const Track = () => {
         }).then(() => {
             dimensionArr = [];
         });
-    }
+    };
 
     // After swipe silde, update pageNum
     const onSlideChanged = (e) => {
         setPageNum(e.item);
-    }
+    };
 
     // 로딩 중일 때 보여줄 화면
     if (isLoading) return (
@@ -141,47 +142,45 @@ const Track = () => {
 
     // Track 버튼 눌렀을 때 보여줄 화면
     else if (isTracking) return (
-        <>
-            <Box
-                sx={{
-                    width: '100vw',
-                    height: '100vh',
-                    display: 'column',
-                    background: '#ecebe9',
-                    flexGrow: 1,
-                }}
-            >
-                <Grid container columns={{ xs: 12, sm: 12, md: 12 }} style={{ textAlign: "center" }}>
-                    <Grid item xs={12}>
-                        <AliceCarousel
-                            animationDuration={1}
-                            keyboardNavigation={true}
-                            onSlideChange={onSlideChange}
-                            onSlideChanged={onSlideChanged}
-                            disableButtonsControls={true}
-                        >
-                            {/* <img src="/img/s.png" style={{ width: "100%", height: 500 }}> 
+        <Box
+            sx={{
+                width: '100vw',
+                height: '100vh',
+                display: 'column',
+                background: '#ecebe9',
+                flexGrow: 1,
+            }}
+        >
+            <Grid container columns={{ xs: 12, sm: 12, md: 12 }} style={{ textAlign: "center" }}>
+                <Grid item xs={12}>
+                    <AliceCarousel
+                        animationDuration={1}
+                        keyboardNavigation={true}
+                        onSlideChange={onSlideChange}
+                        onSlideChanged={onSlideChanged}
+                        disableButtonsControls={true}
+                    >
+                        {/* <img src="/img/s.png" style={{ width: "100%", height: 500 }}> 
                             </img>
                             <img src="/img/example2.png" style={{ width: "100%", height: 500 }}> 
                             </img> */}
-                            {imgsUrl && imgsUrl.map((e, index) => (
-                                <img key={index} src={e} style={{ width: "90%", height: "80vh" }} />
+                        {imgsUrl && imgsUrl.map((e, index) => (
+                            <img key={index} src={e} style={{ width: "90%", height: "80vh" }} />
 
-                            ))}
-                        </AliceCarousel>
-                        <Button onClick={onClickStart}>
-                            Start
+                        ))}
+                    </AliceCarousel>
+                    <Button onClick={onClickStart}>
+                        Start
                         </Button>
-                        <Button onClick={onClickEnd}>
-                            End
+                    <Button onClick={onClickEnd}>
+                        End
                         </Button>
-                        <Button onClick={onClickBack}>
-                            Back
+                    <Button onClick={onClickBack}>
+                        Back
                         </Button>
-                    </Grid>
                 </Grid>
-            </Box>
-        </>
+            </Grid>
+        </Box>
     )
 
     // 전체 PDF 데이터
