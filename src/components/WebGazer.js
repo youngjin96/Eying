@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 
 import axios from 'axios';
 
-import { Box, Button, CircularProgress, Grid } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 
 import "react-alice-carousel/lib/alice-carousel.css";
 import AliceCarousel from 'react-alice-carousel';
-
-import { useNavigate } from "react-router-dom";
 
 import Loading from "./Loading";
 import IsLoggedIn from "./IsLoggedIn";
@@ -16,61 +14,37 @@ import { onAuthStateChanged } from 'firebase/auth';
 
 const WebGazer = () => {
     const webgazer = window.webgazer; // webgazer instance
-    const navigate = useNavigate();
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
     const [isLoading, setIsLoading] = useState(true); // pdf 가져올 때 까지 로딩
-    const [error, setError] = useState(); // pdf 가져올 때 에러
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
     const [imgsUrl, setImgsUrl] = useState([]); // pdf image url 배열
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
-    const [email, setEmail] = useState("");
-    var pageNum = 0;
+    const [userEmail, setUserEmail] = useState("");
+    const [ownerEmail, setOwnerEmail] = useState("");
+    const [pageNum, setPageNum] = useState(0);
     var dimensionArr = []; // webgazer x, y 좌표가 담길 배열
 
     useEffect(() => {
-        const fetchUser = () => {
-            try {
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        setIsLoggedIn(true);
-                        setEmail(user.email);
-                    } else {
-                        setIsLoggedIn(false);
-                    }
-                });
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        const fetchData = async () => {
-            try {
-                await axios.get('http://3.36.95.29:8000/pdf/').then(res => {
-                    if (res.status === 200){
-                        setImgsUrl(res.data[0].imgs_url);
-                        setPdfId(res.data[0].id);
-                        setIsLoading(false);
-                    } else {
-                        setIsLoading(true);
-                    }
-                });
-            } catch (e) {
-                setError(e);
-            }
+        // 유저 정보 가져오는 함수
+        try {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    setUserEmail(user.email);
+                    setIsLoggedIn(true);
+                    axios.get('http://3.36.95.29:8000/pdf/').then(res => {
+                        if (res.status === 200) {
+                            setImgsUrl(res.data[0].imgs_url);
+                            setPdfId(res.data[0].id);
+                            setOwnerEmail(res.data[0].user_email);
+                            setIsLoading(false);
+                        }
+                    });
+                }
+            });
+        } catch (error) {
+            console.log(error);
         }
-        fetchUser();
-        fetchData();
-        
     }, []);
-
-    // loadng 중 일 때 보여줄 화면 (loading == true)
-    if (isLoading) return (
-        <Loading />
-    )
-
-    // error가 있을 때 alert
-    if (error) {
-        navigate("/upload");
-    }
 
     // webgazer 시작 함수
     const onClickStart = () => {
@@ -87,17 +61,18 @@ const WebGazer = () => {
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
         await axios.post("http://3.36.95.29:8000/eyetracking/", {
-            'user_email': "kimc980106@naver.com",
-            'owner_email': "kimc980106@naver.com",
+            'user_email': userEmail,
+            'owner_email': ownerEmail,
             'rating_time': '00:00:00',
             'page_number': pageNum,
             'pdf_id': pdfId,
             'coordinate': dimensionArr,
+        }).then(() => {
+            webgazer.end();
+            webgazer.showPredictionPoints(false);
+            dimensionArr = [];
+            window.location.reload();
         });
-        dimensionArr = [];
-        webgazer.end();
-        webgazer.showPredictionPoints(false);
-        window.location.reload();
     }
 
     const onClickBack = () => {
@@ -107,23 +82,32 @@ const WebGazer = () => {
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
         await axios.post("http://3.36.95.29:8000/eyetracking/", {
-            'user_email': "kimc980106@naver.com",
-            'owner_email': "kimc980106@naver.com",
+            'user_email': userEmail,
+            'owner_email': ownerEmail,
             'rating_time': '00:00:00',
             'page_number': pageNum,
             'pdf_id': pdfId,
             'coordinate': dimensionArr,
+        }).then(() => {
+            dimensionArr = [];
         });
-        dimensionArr = [];
     }
 
     // After swipe silde, pageNum setting
     const onSlideChanged = (e) => {
-        pageNum = e.item;
-        console.log(pageNum);
+        setPageNum(e.item);
     }
 
-    return (
+    // loadng 중 일 때 보여줄 화면 (loading == true)
+    if (isLoading) return (
+        <Loading />
+    )
+
+    else if (!isLoggedIn) return (
+        <IsLoggedIn />
+    )
+
+    else return (
         <>
             <Box
                 sx={{
@@ -149,16 +133,16 @@ const WebGazer = () => {
                             </img> */}
                             {imgsUrl && imgsUrl.map((e, index) => (
                                 <img key={index} src={e} style={{ width: "90%", height: "80vh" }} />
-                                
+
                             ))}
                         </AliceCarousel>
                         <Button variant="contained" size="large" onClick={onClickStart}>
                             Start
                         </Button>
-                        <Button variant="contained" size="large" onClick={onClickEnd} style={{marginLeft: 10}}>
+                        <Button variant="contained" size="large" onClick={onClickEnd} style={{ marginLeft: 10 }}>
                             End
                         </Button>
-                        <Button variant="contained" size="large" onClick={onClickBack} style={{marginLeft: 10}}>
+                        <Button variant="contained" size="large" onClick={onClickBack} style={{ marginLeft: 10 }}>
                             Back
                         </Button>
                     </Grid>

@@ -50,10 +50,10 @@ const Track = () => {
                         if (res.status === 200) {
                             console.log(res.status);
                             setPdfs(res.data);
+                            setIsLoading(false);
                         }
                     })
                 }
-                setIsLoading(false);
             });
         } catch (error) {
             console.log(error);
@@ -70,22 +70,22 @@ const Track = () => {
             }
         }).then(res => {
             if (res.status === 200) {
-                console.log(res.data[0]);
                 setImgsUrl(res.data[0].imgs_url);
                 setPdfId(res.data[0].id);
                 setOwnerEmail(res.data[0].user_email);
+                setIsLoading(false);
             }
-            setIsLoading(false);
         });
     };
 
     const onClickStart = () => {
-        webgazer.setGazeListener(function (data) {
+        webgazer.setRegression('weightedRidge').setTracker('trackingjs').setGazeListener(function (data) {
             if (data == null) {
                 return;
             }
             dimensionArr.push([Math.floor(data.x), Math.floor(data.y)]);
         }).begin();
+        webgazer.applyKalmanFilter(true);
     };
 
     // webgazer 종료 함수
