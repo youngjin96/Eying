@@ -30,7 +30,6 @@ class Userlist(serializers.ModelSerializer):
             'pk',
         )
 class EyetrackingUserList(serializers.ModelSerializer):
-    
     user_email = serializers.SerializerMethodField()
     def get_user_email(self, obj):
         return obj['email']

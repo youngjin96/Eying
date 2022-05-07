@@ -54,8 +54,11 @@ class EyetrackList(APIView):
 class EyetrackPdf(APIView):
     # 해당 유저가 올린 pdf 리스트
     def get(self,request):
-        print(User.objects.get(email=request.data['user_email']).pk)
-        queryset = PDFModel.objects.filter(user = User.objects.get(email=request.data['user_email']).pk).order_by('-pk')
+        quertDict = {
+                "email": request.GET.get("user_email"),
+            }
+        query = User.objects.get(email=quertDict["email"])
+        queryset = PDFModel.objects.filter(user = query)
         # query 
         serializer = PDFSerializer(queryset,many =True)
         return Response(serializer.data,status=status.HTTP_200_OK)
@@ -63,9 +66,13 @@ class EyetrackPdf(APIView):
 class EyetrackUser(APIView):
     def get(self,request):
         try:
-            pdf_id = request.data['pdf_id']
-            page_num = request.data['page_number']
-            queryset = Eyetracking.objects.filter(pdf_fk = pdf_id,page_num=page_num).annotate(
+            queryDict = {
+                "email" : request.GET.get("user_email"),
+                'pdf_id' : request.GET.get('pdf_id'),
+                'page_num' : request.GET.get('page_number')
+            }
+            
+            queryset = Eyetracking.objects.filter(pdf_fk = queryDict['pdf_id'],page_num=queryDict['page_num']).annotate(
                 age=F('user_id__age'),
                 job = F("user_id__job"),
                 job_field=F('user_id__job_field'),
@@ -73,7 +80,7 @@ class EyetrackUser(APIView):
                 gender=F('user_id__gender'),
                 email=F('user_id__email')
             ).values('user_id','create_date','pk','age','job','job_field','position','gender','email')
-
+     
             # print("query",queryset)
             serializer = EyetrackingUserList(queryset,many = True)
             print(serializer)
@@ -82,49 +89,54 @@ class EyetrackUser(APIView):
             return Response({'error_message': "user list 오류"})
     
         
-# class EyetrackVisualization(APIView):
-#     global heatmapper
-#     def get(self,request): 
+class EyetrackVisualization(APIView):
+    global heatmapper
+    def get(self,request): 
 
-#         # 해당 유저들에 대한 좌표 선택
-#         queryset : {
-#             'owner_email' : User.objects.get(email=request.data['owner_email']),
-#             'pdf_id' : PDFModel.objects.get(pk=request.data['pdf_id']),
-#             'page_num' : request.data['page_number'],
-#             'visual_type' : request.data['visual_type'],
-#             'visual_img' : 'img'
-#         }
+        # 해당 유저들에 대한 좌표 선택
+        queryset : {
+            'owner_email' : User.objects.get(email=request.data['owner_email']),
+            'owner_id' : User.objects.get(email=request.data['owner_email']).pk,
+            'user_id' : User.objects.get(email=request.data['user_eamil']).pk,
+            'pdf_id' : PDFModel.objects.get(pk=request.data['pdf_id']),
+            'page_num' : request.data['page_number'],
+            'visual_type' : request.data['visual_type'],
+            'visual_img' : 'img'
+        }
+        # owner_pk = User.objects.get(email=request.data['owner_email']).pk
+        # 이미지 url
+        print("owner_pk",queryset.owner_pk)
+        img_path = "media/public/user_{0}/pdf/{1}/images/{2}.jpg".format(queryset.owner_id, queryset.pdf_id, queryset.page_num)
+        print("img_path",img_path)
+        _img = Image.open(img_path)
 
-#         # 이미지 url
+        # Mysql 쿼리 - eyetracking data 가져오기
+        coordinate = []
+        query = Eyetracking.objects.get(user_id=queryset.user_id,owner_id=queryset.owner_id,page_num=queryset.page_num,pdf_fk=queryset.pdf_id)
+        print(query)
+        coordinate = query.coordinate
+        if queryset.visual_type == 'flow':
+        # 이미지 위에 히트맵 그리기
+            heatmap = heatmapper.heatmap_on_img(coordinate,_img)
+            heatmap.save('image/'+img_path+'png')
+            queryset['visual_img'] = heatmap
+            serializer = EyetrakcingSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-#         img_path = "media/public/pdf/{0}/{1}/images/{2}.jpg".format(queryset.owner_email,queryset.pdf_id, queryset.page_num)
-#         _img = Image.open(img_path)
-
-#         # Mysql 쿼리 - eyetracking data 가져오기
-#         coordinate = []
-
-#         if queryset.visual_type == 'flow':
-#         # 이미지 위에 히트맵 그리기
-#             heatmap = heatmapper.heatmap_on_img(coordinate,_img)
-#             heatmap.save('image/ex1heatmap.png')
-#             queryset['visual_img'] = heatmap
-#             serializer = EyetrakcingSerializer(queryset, many=True)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-
-#         elif queryset.visual_type == 'distribution':
-#         # 시각흐름
-#             draw = ImageDraw.Draw(_img)
-#             color = ["#FF0000", "#FF5E00", "#FFBB00", "#FFE400", "#ABF200", "#1DDB16", "#00D8FF", "#0054FF", "#0100FF", "#5F00FF"]
-#             for i in range(len(coordinate)-1):
-#                 x,y = coordinate[i]
-#                 x2,y2 = coordinate[i+1]
-#                 draw.line((x,y,x2,y2),fill = color[i//10%10] ,width = 5)
-#             _img.save("image/ex1heatmap"+'flow.png')
-#             queryset['visual_img'] = _img
+        elif queryset.visual_type == 'distribution':
+        # 시각흐름
+            draw = ImageDraw.Draw(_img)
+            color = ["#FF0000", "#FF5E00", "#FFBB00", "#FFE400", "#ABF200", "#1DDB16", "#00D8FF", "#0054FF", "#0100FF", "#5F00FF"]
+            for i in range(len(coordinate)-1):
+                x,y = coordinate[i]
+                x2,y2 = coordinate[i+1]
+                draw.line((x,y,x2,y2),fill = color[i//10%10] ,width = 5)
+            _img.save("image/ex1heatmap"+'flow.png')
+            queryset['visual_img'] = _img
             
-#             serializer = PDFSerializer(queryset, many=True)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = PDFSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-#         else:
-#             return Response({'error_message': "visual type error"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error_message': "visual type error"}, status=status.HTTP_400_BAD_REQUEST)
 
