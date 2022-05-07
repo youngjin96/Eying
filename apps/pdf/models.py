@@ -23,7 +23,7 @@ DPI = 100
 FMT = "jpeg"
 
 def pdf_path(instance, filename):
-    return "user_%d/pdf/pdf_%d/%s" % (instance.user.id, instance.id, filename)
+    return "user_%d/pdf/%d/%s" % (instance.user.id, instance.id, filename)
 
 
 def pdf_to_image(instance):
@@ -38,7 +38,7 @@ def pdf_to_image(instance):
         image.save(buffer, format=BUFFER_IMAGE_TYPE)
         buffer.seek(0)
         s3r.Bucket(AWS_STORAGE_BUCKET_NAME).put_object(
-            Key="%s/%s/user_%d/pdf/pdf_%d/images/%d.jpg" % (STORAGE_TYPE, STORAGE_ACCESS, instance.user.id, instance.id, i), 
+            Key="%s/%s/user_%d/pdf/%d/images/%d.jpg" % (STORAGE_TYPE, STORAGE_ACCESS, instance.user.id, instance.id, i), 
             Body=buffer, 
             ContentType=CONTENT_TYPE)
     return len(images)
@@ -62,7 +62,7 @@ class PDFModel(models.Model):
             super().save(*args, **kwargs)
             self.pdf = temp_pdf
             self.img_length = pdf_to_image(self)
-            self.img_path = "https://%s/%s/%s/user_%d/pdf/pdf_%d/images/" % (AWS_S3_CUSTOME_DOMAIN, STORAGE_TYPE, STORAGE_ACCESS, self.user.id, self.id)
+            self.img_path = "https://%s/%s/%s/user_%d/pdf/%d/images/" % (AWS_S3_CUSTOME_DOMAIN, STORAGE_TYPE, STORAGE_ACCESS, self.user.id, self.id)
             super().save(*args, **kwargs)
 
     def __str__(self):

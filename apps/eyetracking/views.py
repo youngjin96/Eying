@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from numpy import eye
 from rest_framework.views import APIView
 from django.http import HttpResponse, JsonResponse
 from rest_framework.response import Response
@@ -13,6 +14,7 @@ from .heatmap import Heatmapper
 from PIL import Image
 from PIL import ImageDraw
 import matplotlib.pyplot as plt
+import datetime
 
 
 from pdf.serializers import PDFSerializer
@@ -33,12 +35,25 @@ class EyetrackList(APIView):
     def post(self,request):
         print(request.data)
         # try :
+        user_email = request.data['user_email']
+        owner_email = request.data['owner_email']
         coordinate = request.data['coordinate']
         page_num = request.data['page_number']
         pdf_id = request.data['pdf_id']
+        rating_time = request.data['rating_time']
+        
+        # 트래킹 데이터 이어쓰기
+        if Eyetracking.objects.get(pdf_fk=PDFModel.objects.get(pk=pdf_id),
+                                    user_id=User.objects.get(email=user_email),
+                                    page_num=page_num):
+            return self.put(request)
 
-        eyetrackdatas = Eyetracking(user_id = User.objects.get(email=request.data['user_email']), owner_id = User.objects.get(email=request.data['owner_email']), page_num = page_num, 
-                                    pdf_fk = PDFModel.objects.get(pk=pdf_id), rating_time= request.data['rating_time'],coordinate= coordinate)
+        eyetrackdatas = Eyetracking(user_id = User.objects.get(email=user_email),
+                                    owner_id = User.objects.get(email=owner_email),
+                                    page_num = page_num, 
+                                    pdf_fk = PDFModel.objects.get(pk=pdf_id),
+                                    rating_time= rating_time,
+                                    coordinate= coordinate)
         eyetrackdatas.save()
 
 
@@ -47,9 +62,32 @@ class EyetrackList(APIView):
         # except:
         #     return Response({'error_message': "post 오류"}, status=status.HTTP_400_BAD_REQUEST)
     
-    def put(self,request):
-        pass
+    def put(self, request):
+        eyetrackdatas = Eyetracking.objects.get(pdf_fk=PDFModel.objects.get(pk=request.data['pdf_id']),
+                                                user_id=User.objects.get(email=request.data['user_email']),
+                                                page_num=request.data['page_number'])
+        
+        delta_time = datetime.time.fromisoformat(request.data['rating_time'])
+        
+        # 시, 분, 초 업데이트
+        previous_time = datetime.datetime(year=1900, month=1, day=1,
+                                          hour=eyetrackdatas.rating_time.hour,
+                                          minute=eyetrackdatas.rating_time.minute,
+                                          second=eyetrackdatas.rating_time.second)
+        
+        delta_time = datetime.timedelta(hours=delta_time.hour,
+                                        minutes=delta_time.minute,
+                                        seconds=delta_time.second)
+        
+        eyetrackdatas.rating_time = (previous_time + delta_time).time()
 
+        # 시선 추적 데이터 이어쓰기
+        eyetrackdatas.coordinate = eyetrackdatas.coordinate[:-1] + ", " + request.data['coordinate'][1:-1] + "]"
+        
+        eyetrackdatas.save()
+        
+        serializer = EyetrackingSerializer(eyetrackdatas, many=False)
+        return Response(serializer.data)
 
 class EyetrackPdf(APIView):
     # 해당 유저가 올린 pdf 리스트
@@ -94,7 +132,7 @@ class EyetrackVisualization(APIView):
     def get(self,request): 
 
         # 해당 유저들에 대한 좌표 선택
-        queryset : {
+        queryset = {
             'owner_email' : User.objects.get(email=request.data['owner_email']),
             'owner_id' : User.objects.get(email=request.data['owner_email']).pk,
             'user_id' : User.objects.get(email=request.data['user_eamil']).pk,

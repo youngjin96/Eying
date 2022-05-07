@@ -17,10 +17,10 @@ class CSAPI(APIView):
         try:
             queryset = POLICY.ORDER_BY_RECENT(CS.objects.all())
             serializer = CSSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
         except Exception as e:
             print(e)
-            Response({"error_message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            Response({"error_message": str(e)})
     
     @TIME_MEASURE
     def post(self, request):
@@ -45,7 +45,7 @@ class CSAPI(APIView):
             )
             cs.save()
             serializer = CSSerializer(cs, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)})

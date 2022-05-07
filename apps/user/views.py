@@ -28,12 +28,12 @@ class UserAPI(APIView):
             
             if check_password(queryDict["password"], user.password):
                 serializer = UserSerializer(user, many=False)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(serializer.data)
             else:
                 raise Exception("패스워드가 올바르지 않습니다.")
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)})
 
     # 회원가입
     @TIME_MEASURE
@@ -76,10 +76,10 @@ class UserAPI(APIView):
             user.save()
             
             serializer = UserSerializer(user, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)})
         
     # 사용자 수정
     @TIME_MEASURE
@@ -95,6 +95,7 @@ class UserAPI(APIView):
                 "job_field": request.POST.get("job_field"),
                 "position": request.POST.get("position"),
                 "gender": request.POST.get("gender"),
+                "password": request.POST.get("password"),
             }
             
             # 필수 항목 누락 검증
@@ -126,13 +127,17 @@ class UserAPI(APIView):
                 user.position = formData["position"]
             if formData["gender"]:
                 user.gender = formData["gender"]
+            if formData["gender"]:
+                user.gender = formData["gender"]
+            if formData["password"]:
+                user.password = make_password(formData["password"])
             user.save()
             
             serializer = UserSerializer(user, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)})
         
     @TIME_MEASURE
     def delete(self, request):
@@ -153,22 +158,25 @@ class UserAPI(APIView):
             user.delete()
             
             serializer = UserSerializer(user, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)})
                 
 class UserSearchAPI(APIView):
     @TIME_MEASURE
     def get(self, request):
         try:
             queryDict = {
+                "id": request.GET.get("id"),
                 "email": request.GET.get("email"),
                 "username": request.GET.get("username"),
             }
             
             # 쿼리 적용 (Q() = 조건 없음)
             query = Q()
+            if queryDict["id"]:
+                query &= Q(id=queryDict["id"])
             if queryDict["email"]:
                 query &= Q(email=queryDict["email"])
             if queryDict["username"]:
@@ -177,7 +185,7 @@ class UserSearchAPI(APIView):
             user = User.objects.filter(query)
             
             serializer = UserSerializer(user, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error_message': str(e)})
