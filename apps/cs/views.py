@@ -6,10 +6,9 @@ from .models import CS
 from django.db.models import Q
 from .serializers import CSSerializer
 
-import json
-
 from apps.decorator import TIME_MEASURE
 import config.policy as POLICY
+
 
 class CSAPI(APIView):
     @TIME_MEASURE
