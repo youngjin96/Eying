@@ -126,8 +126,9 @@ class EyetrackUser(APIView):
                 job_field=F('user_id__job_field'),
                 position=F('user_id__position'),
                 gender=F('user_id__gender'),
-                email=F('user_id__email')
-            ).values('id','user_id','create_date','age','job','job_field','position','gender','email','pdf_id')
+                username=F('user_id__username'),
+                email=F('user_id__email'),
+            ).values('id','user_id','create_date','age','job','job_field','position','gender','username','email','pdf_id')
      
             # print("query",queryset)
             serializer = EyetrackingUserList(queryset,many = True)
