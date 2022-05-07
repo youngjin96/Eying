@@ -152,7 +152,7 @@ class EyetrackVisualization(APIView):
             owner_pk = User.objects.get(email=queryDict['owner_email']).pk
             
             # 이미지 url
-            img_path = STATIC_URL+"media/public/user_{0}/pdf/pdf_{1}/images/{2}.jpg".format(owner_pk, queryDict['pdf_id'], queryDict['page_num'])
+            img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/images/{2}.jpg".format(owner_pk, queryDict['pdf_id'], queryDict['page_num'])
             print("img_path",img_path)
             
             res = HttpResponse(content_type="image/png")
