@@ -50,7 +50,7 @@ class PDFAPI(APIView):
             pdf.save()
             
             serializer = PDFSerializer(pdf, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
         except Exception as e:
             print(e)
             return Response({'error_message': str(e)})
@@ -84,10 +84,10 @@ class PDFAPI(APIView):
             pdf.save()
             
             serializer = PDFSerializer(pdf, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)})
         
     @TIME_MEASURE
     def delete(self, request):
@@ -107,10 +107,10 @@ class PDFAPI(APIView):
             
             pdf.delete()
             
-            return Response(status=status.HTTP_200_OK)
+            return Response()
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)})
         
 
 class PDFSearchAPI(APIView):
@@ -138,7 +138,7 @@ class PDFSearchAPI(APIView):
             pdf = POLICY.ORDER_BY_RECENT(PDFModel.objects.filter(query))
             
             serializer = PDFSerializer(pdf, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error_message': str(e)})

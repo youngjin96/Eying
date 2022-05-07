@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from numpy import eye
 from rest_framework.views import APIView
 from django.http import HttpResponse, JsonResponse
 from rest_framework.response import Response
@@ -13,11 +14,17 @@ from .heatmap import Heatmapper
 from PIL import Image
 from PIL import ImageDraw
 import matplotlib.pyplot as plt
+<<<<<<< HEAD
 # import urllib.request # 웹 상의 이미지를 다운로드 없이 사용
 from io import BytesIO
 from urllib import request
 import urllib.request
 import ast
+=======
+import datetime
+
+
+>>>>>>> bf1d840c055ed00c69f82dd7fd73840183238a7e
 from pdf.serializers import PDFSerializer
 
         # if queryDict['visual_type'] == 'flow':
@@ -42,12 +49,25 @@ class EyetrackList(APIView):
     def post(self,request):
         print(request.data)
         # try :
+        user_email = request.data['user_email']
+        owner_email = request.data['owner_email']
         coordinate = request.data['coordinate']
         page_num = request.data['page_number']
         pdf_id = request.data['pdf_id']
+        rating_time = request.data['rating_time']
+        
+        # 트래킹 데이터 이어쓰기
+        if Eyetracking.objects.get(pdf_fk=PDFModel.objects.get(pk=pdf_id),
+                                    user_id=User.objects.get(email=user_email),
+                                    page_num=page_num):
+            return self.put(request)
 
-        eyetrackdatas = Eyetracking(user_id = User.objects.get(email=request.data['user_email']), owner_id = User.objects.get(email=request.data['owner_email']), page_num = page_num, 
-                                    pdf_fk = PDFModel.objects.get(pk=pdf_id), rating_time= request.data['rating_time'],coordinate= coordinate)
+        eyetrackdatas = Eyetracking(user_id = User.objects.get(email=user_email),
+                                    owner_id = User.objects.get(email=owner_email),
+                                    page_num = page_num, 
+                                    pdf_fk = PDFModel.objects.get(pk=pdf_id),
+                                    rating_time= rating_time,
+                                    coordinate= coordinate)
         eyetrackdatas.save()
 
 
@@ -56,9 +76,32 @@ class EyetrackList(APIView):
         # except:
         #     return Response({'error_message': "post 오류"}, status=status.HTTP_400_BAD_REQUEST)
     
-    def put(self,request):
-        pass
+    def put(self, request):
+        eyetrackdatas = Eyetracking.objects.get(pdf_fk=PDFModel.objects.get(pk=request.data['pdf_id']),
+                                                user_id=User.objects.get(email=request.data['user_email']),
+                                                page_num=request.data['page_number'])
+        
+        delta_time = datetime.time.fromisoformat(request.data['rating_time'])
+        
+        # 시, 분, 초 업데이트
+        previous_time = datetime.datetime(year=1900, month=1, day=1,
+                                          hour=eyetrackdatas.rating_time.hour,
+                                          minute=eyetrackdatas.rating_time.minute,
+                                          second=eyetrackdatas.rating_time.second)
+        
+        delta_time = datetime.timedelta(hours=delta_time.hour,
+                                        minutes=delta_time.minute,
+                                        seconds=delta_time.second)
+        
+        eyetrackdatas.rating_time = (previous_time + delta_time).time()
 
+        # 시선 추적 데이터 이어쓰기
+        eyetrackdatas.coordinate = eyetrackdatas.coordinate[:-1] + ", " + request.data['coordinate'][1:-1] + "]"
+        
+        eyetrackdatas.save()
+        
+        serializer = EyetrackingSerializer(eyetrackdatas, many=False)
+        return Response(serializer.data)
 
 class EyetrackPdf(APIView):
     # 해당 유저가 올린 pdf 리스트
@@ -101,6 +144,7 @@ class EyetrackUser(APIView):
 class EyetrackVisualization(APIView):    
     global heatmapper
     def get(self,request): 
+<<<<<<< HEAD
         try:
             # 해당 유저들에 대한 좌표 선택
             queryDict = {
@@ -164,5 +208,48 @@ class EyetrackVisualization(APIView):
 
             # coordinate = query.coordinate
             # return Response(serializer.data, status=status.HTTP_200_OK)
+=======
+
+        # 해당 유저들에 대한 좌표 선택
+        queryset = {
+            'owner_email' : User.objects.get(email=request.data['owner_email']),
+            'owner_id' : User.objects.get(email=request.data['owner_email']).pk,
+            'user_id' : User.objects.get(email=request.data['user_eamil']).pk,
+            'pdf_id' : PDFModel.objects.get(pk=request.data['pdf_id']),
+            'page_num' : request.data['page_number'],
+            'visual_type' : request.data['visual_type'],
+            'visual_img' : 'img'
+        }
+        # owner_pk = User.objects.get(email=request.data['owner_email']).pk
+        # 이미지 url
+        print("owner_pk",queryset.owner_pk)
+        img_path = "media/public/user_{0}/pdf/{1}/images/{2}.jpg".format(queryset.owner_id, queryset.pdf_id, queryset.page_num)
+        print("img_path",img_path)
+        _img = Image.open(img_path)
+
+        # Mysql 쿼리 - eyetracking data 가져오기
+        coordinate = []
+        query = Eyetracking.objects.get(user_id=queryset.user_id,owner_id=queryset.owner_id,page_num=queryset.page_num,pdf_fk=queryset.pdf_id)
+        print(query)
+        coordinate = query.coordinate
+        if queryset.visual_type == 'flow':
+        # 이미지 위에 히트맵 그리기
+            heatmap = heatmapper.heatmap_on_img(coordinate,_img)
+            heatmap.save('image/'+img_path+'png')
+            queryset['visual_img'] = heatmap
+            serializer = EyetrakcingSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        elif queryset.visual_type == 'distribution':
+        # 시각흐름
+            draw = ImageDraw.Draw(_img)
+            color = ["#FF0000", "#FF5E00", "#FFBB00", "#FFE400", "#ABF200", "#1DDB16", "#00D8FF", "#0054FF", "#0100FF", "#5F00FF"]
+            for i in range(len(coordinate)-1):
+                x,y = coordinate[i]
+                x2,y2 = coordinate[i+1]
+                draw.line((x,y,x2,y2),fill = color[i//10%10] ,width = 5)
+            _img.save("image/ex1heatmap"+'flow.png')
+            queryset['visual_img'] = _img
+>>>>>>> bf1d840c055ed00c69f82dd7fd73840183238a7e
             
 

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'storages',
     'eyetracking.apps.EyetrackingConfig',
     'cs.apps.CsConfig',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
