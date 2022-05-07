@@ -15,7 +15,10 @@ class EyetrackingSerializer(serializers.ModelSerializer):
     class Meta :
         model = Eyetracking     # product 모델 사용
         fields = '__all__'
-
+class CoordinateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Eyetracking
+        fields = 'coordinate'
 class Userlist(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -57,10 +60,15 @@ class EyetrackingUserList(serializers.ModelSerializer):
     create_date = serializers.SerializerMethodField()
     def get_create_date(self,obj):
         return obj['create_date']
+
+    id = serializers.SerializerMethodField(source='pdf_fk')
+    def get_id(self,obj):
+        return obj['id']
     class Meta:
         model = Eyetracking
         # fields = '__all__'
         fields= (
+            'id',
             'user_email',
             'job',
             'job_field',

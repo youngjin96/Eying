@@ -6,17 +6,26 @@ from rest_framework import status
 from user.models import User
 from pdf.models import PDFModel
 from .models import Eyetracking
-from .serializers import EyetrackingSerializer,EyetrackingUserList,Userlist
+from .serializers import EyetrackingSerializer,EyetrackingUserList,Userlist,CoordinateSerializer
 from django.db.models import F
-
+from apps.settings import STATIC_URL
 from .heatmap import Heatmapper
 from PIL import Image
 from PIL import ImageDraw
 import matplotlib.pyplot as plt
-
-
+# import urllib.request # 웹 상의 이미지를 다운로드 없이 사용
+from io import BytesIO
+from urllib import request
+import urllib.request
+import ast
 from pdf.serializers import PDFSerializer
 
+        # if queryDict['visual_type'] == 'flow':
+        # # 이미지 위에 히트맵 그리기
+        #     heatmap = heatmapper.heatmap_on_img(coordinate,_img)
+        #     heatmap.save('image/'+img_path+'png')
+        #     queryDict['visual_img'] = heatmap
+        #     serializer = EyetrakcingSerializer(queryset, many=True)
 heatmapper = Heatmapper(
     point_diameter=100,  # the size of each point to be drawn
     point_strength=1,  # the strength, between 0 and 1, of each point to be drawn
@@ -89,54 +98,71 @@ class EyetrackUser(APIView):
             return Response({'error_message': "user list 오류"})
     
         
-class EyetrackVisualization(APIView):
+class EyetrackVisualization(APIView):    
     global heatmapper
     def get(self,request): 
+        try:
+            # 해당 유저들에 대한 좌표 선택
+            queryDict = {
+                'user_id' : request.GET.get("user_email"), 
+                'pdf_id' : request.GET.get("pdf_id"), 
+                'page_num' : request.GET.get('page_number'),
+                'visual_type' : request.GET.get('visual_type'),
+                'owner_email' : request.GET.get('owner_email')
+            }
+            owner_pk = User.objects.get(email=queryDict['owner_email']).pk
+            # 이미지 url
+            img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/images/{2}.jpg".format(owner_pk, queryDict['pdf_id'], queryDict['page_num'])
+            print("img_path",img_path)
+            try:
+                web_img = urllib.request.urlopen(img_path).read()
+                # print("web_img",web_img)
+                # _img = Image.open((img_path))
+                _img = Image.open(BytesIO(web_img))
+            except Exception as e:
+                print("이미지 에러",e)
+                return Response({'error_message': "이미지 에러"})
+            # Mysql 쿼리 - eyetracking data 가져오기
+            query = Eyetracking.objects.filter(owner_id=owner_pk,page_num=queryDict['page_num'],pdf_fk=queryDict['pdf_id'])[0]
+            print(query)
+            coordinate = ast.literal_eval(query.coordinate)
+            try:
+                if queryDict['visual_type'] == 'distribution':
+                # 이미지 위에 히트맵 그리기
+                    try:
+                        heatmap = heatmapper.heatmap_on_img(coordinate,_img)
+                        print(heatmap)                      
+                        heatmap.save('image/ex1heatmfffffap.png')
+                    except Exception as e:
+                        print("히트맵 오류",e)
+                        return Response({'error_message': "히트맵 에러"})
+                    # return Response({'hh':heatmap}, status=status.HTTP_200_OK)
+            except Exception as e:
+                print("에러명",e)
+                return Response(e, status=status.HTTP_200_OK)
+            # elif queryDict['visual_type'] == 'flow':
+            # # 시각흐름
+            #     draw = ImageDraw.Draw(_img)
+            #     color = ["#FF0000", "#FF5E00", "#FFBB00", "#FFE400", "#ABF200", "#1DDB16", "#00D8FF", "#0054FF", "#0100FF", "#5F00FF"]
+            #     for i in range(len(coordinate)-1):
+            #         x,y = coordinate[i]
+            #         x2,y2 = coordinate[i+1]
+            #         draw.line((x,y,x2,y2),fill = color[i//10%10] ,width = 5)
+            #     _img.save("image/ex1heatmap"+'flow.png')
+            #     queryDict['visual_img'] = _img
+                
+            #     serializer = PDFSerializer(queryset, many=True)
+            #     return Response(serializer.data, status=status.HTTP_200_OK)
 
-        # 해당 유저들에 대한 좌표 선택
-        queryset : {
-            'owner_email' : User.objects.get(email=request.data['owner_email']),
-            'owner_id' : User.objects.get(email=request.data['owner_email']).pk,
-            'user_id' : User.objects.get(email=request.data['user_eamil']).pk,
-            'pdf_id' : PDFModel.objects.get(pk=request.data['pdf_id']),
-            'page_num' : request.data['page_number'],
-            'visual_type' : request.data['visual_type'],
-            'visual_img' : 'img'
-        }
-        # owner_pk = User.objects.get(email=request.data['owner_email']).pk
-        # 이미지 url
-        print("owner_pk",queryset.owner_pk)
-        img_path = "media/public/user_{0}/pdf/{1}/images/{2}.jpg".format(queryset.owner_id, queryset.pdf_id, queryset.page_num)
-        print("img_path",img_path)
-        _img = Image.open(img_path)
+            # else:
+            #     return Response({'error_message': "visual type error"}, status=status.HTTP_400_BAD_REQUEST)
+            # return Response({'query_corr':query.coordinate})
+        except Exception as e: 
+        #     # print("해당하는 eyetrakcing 객체가 없습니다.")
+            print(e)
+            return Response({'error_message': "해당하는 eyetracking 객체가 없습니다."})
 
-        # Mysql 쿼리 - eyetracking data 가져오기
-        coordinate = []
-        query = Eyetracking.objects.get(user_id=queryset.user_id,owner_id=queryset.owner_id,page_num=queryset.page_num,pdf_fk=queryset.pdf_id)
-        print(query)
-        coordinate = query.coordinate
-        if queryset.visual_type == 'flow':
-        # 이미지 위에 히트맵 그리기
-            heatmap = heatmapper.heatmap_on_img(coordinate,_img)
-            heatmap.save('image/'+img_path+'png')
-            queryset['visual_img'] = heatmap
-            serializer = EyetrakcingSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        elif queryset.visual_type == 'distribution':
-        # 시각흐름
-            draw = ImageDraw.Draw(_img)
-            color = ["#FF0000", "#FF5E00", "#FFBB00", "#FFE400", "#ABF200", "#1DDB16", "#00D8FF", "#0054FF", "#0100FF", "#5F00FF"]
-            for i in range(len(coordinate)-1):
-                x,y = coordinate[i]
-                x2,y2 = coordinate[i+1]
-                draw.line((x,y,x2,y2),fill = color[i//10%10] ,width = 5)
-            _img.save("image/ex1heatmap"+'flow.png')
-            queryset['visual_img'] = _img
+            # coordinate = query.coordinate
+            # return Response(serializer.data, status=status.HTTP_200_OK)
             
-            serializer = PDFSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        else:
-            return Response({'error_message': "visual type error"}, status=status.HTTP_400_BAD_REQUEST)
 
