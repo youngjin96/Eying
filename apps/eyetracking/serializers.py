@@ -61,9 +61,10 @@ class EyetrackingUserList(serializers.ModelSerializer):
     def get_create_date(self,obj):
         return obj['create_date']
 
-    id = serializers.SerializerMethodField(source='pdf_fk')
+    id = serializers.SerializerMethodField()
     def get_id(self,obj):
-        return obj['id']
+        return obj['pdf_id']
+    
     class Meta:
         model = Eyetracking
         # fields = '__all__'
@@ -76,5 +77,4 @@ class EyetrackingUserList(serializers.ModelSerializer):
             'position',
             'gender',
             'create_date',
-            'pk',
         )
