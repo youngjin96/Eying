@@ -64,7 +64,7 @@ const Enroll = () => {
             for (let key of enfrm.keys()) {
                 console.log(`${key}: $[enfrm.get(key)}]`);
             }
-            await axios.post('http://3.38.250.195:8000/user/', enfrm);
+            await axios.post('http://3.36.117.66:8000/user/', enfrm);
 
             alert("정상적으로 회원가입이 완료되었습니다.")
             window.location.replace("http://localhost:3000/home");

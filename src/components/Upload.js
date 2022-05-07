@@ -50,7 +50,9 @@ const Upload = () => {
         frm.append("pdf", e.target.files[0]);
         frm.append("email", email);
         frm.append("job_field", jobField);
-        axios.post('http://3.36.95.29:8000/pdf/', frm);
+        axios.post('http://3.36.117.66:8000/pdf/', frm).then(() => {
+            console.log("success");
+        });
     };
 
     // PDF 종류 골랐을 때

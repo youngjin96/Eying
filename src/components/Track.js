@@ -23,6 +23,8 @@ const columns = [
     { field: 'views', headerName: '조회수', width: 90, align: 'right', headerAlign: "center" },
 ];
 
+var dimensionArr = []; // webgazer x, y 좌표가 담길 배열
+
 const Track = () => {
     const webgazer = window.webgazer; // webgazer instance
     const [isLoading, setIsLoading] = useState(true);
@@ -35,8 +37,8 @@ const Track = () => {
     const [pdfs, setPdfs] = useState([]); // 전체 pdf
     const [imgsUrl, setImgsUrl] = useState([]); // pdf image url 배열
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
-    const [pageNum, setPageNum] = useState(0); // pdf 현재 페이지
-    var dimensionArr = []; // webgazer x, y 좌표가 담길 배열
+    const [pageNumber, setpageNumber] = useState(0); // pdf 현재 페이지
+    
 
     useEffect(() => {
         // 유저 정보 가져오는 함수
@@ -46,13 +48,15 @@ const Track = () => {
                     setUserEmail(user.email);
                     setIsLoggedIn(true);
                     // 유저가 로그인했을 때 서버에서 데이터를 가져온다.
-                    axios.get('http://3.36.95.29:8000/pdf/').then(res => {
+                    axios.get('http://3.36.117.66:8000/pdf/').then(res => {
                         if (res.status === 200) {
                             console.log(res.status);
                             setPdfs(res.data);
                             setIsLoading(false);
                         }
                     })
+                } else {
+                    setIsLoading(false);
                 }
             });
         } catch (error) {
@@ -64,7 +68,7 @@ const Track = () => {
     const onClickTrack = async () => {
         setIsTracking(true);
         setIsLoading(true);
-        await axios.get('http://3.36.95.29:8000/pdf/search', {
+        await axios.get('http://3.36.117.66:8000/pdf/search', {
             params: {
                 pdf_id: selectionModel[0]
             }
@@ -91,11 +95,11 @@ const Track = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://3.36.95.29:8000/eyetracking/", {
+        await axios.post("http://3.36.117.66:8000/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
-            'page_number': pageNum,
+            'page_number': pageNumber,
             'pdf_id': pdfId,
             'coordinate': dimensionArr
         }).then(() => {
@@ -113,11 +117,11 @@ const Track = () => {
 
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
-        await axios.post("http://3.36.95.29:8000/eyetracking/", {
+        await axios.post("http://3.36.117.66:8000/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
-            'page_number': pageNum,
+            'page_number': pageNumber,
             'pdf_id': pdfId,
             'coordinate': dimensionArr,
         }).then(() => {
@@ -125,9 +129,9 @@ const Track = () => {
         });
     };
 
-    // After swipe silde, update pageNum
+    // After swipe silde, update pageNumber
     const onSlideChanged = (e) => {
-        setPageNum(e.item);
+        setpageNumber(e.item);
     };
 
     // 로딩 중일 때 보여줄 화면
@@ -166,7 +170,6 @@ const Track = () => {
                             </img> */}
                         {imgsUrl && imgsUrl.map((e, index) => (
                             <img key={index} src={e} style={{ width: "90%", height: "80vh" }} />
-
                         ))}
                     </AliceCarousel>
                     <Button onClick={onClickStart}>
