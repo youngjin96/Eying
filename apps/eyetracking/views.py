@@ -52,15 +52,12 @@ class EyetrackList(APIView):
                 print("이미지 에러",e)
                 return Response({'error_message': "이미지 에러"})
             
-            coordinate = ast.literal_eval(coordinate)
+            # coordinate = ast.literal_eval(coordinate)
 
             try:
                 heatmap = heatmapper.heatmap_on_img(coordinate, _img)
                 heatmap = heatmap.convert("RGB")
 
-            except Exception as e:
-                print("히트맵 오류",e)
-                return Response({'error_message': "히트맵 에러"})
                 buffer = BytesIO()
                 heatmap.save(buffer,format='jpeg')
                 buffer.seek(0)
@@ -70,6 +67,9 @@ class EyetrackList(APIView):
                                     Body=buffer,  
                                     ContentType='image/jpeg')
                 print("시선분산 처리 완료")
+            except Exception as e:
+                print("히트맵 오류",e)
+                return Response({'error_message': "히트맵 에러"})
                  
             try:   
                 draw = ImageDraw.Draw(_img)
