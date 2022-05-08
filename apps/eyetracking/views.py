@@ -97,12 +97,12 @@ class EyetrackList(APIView):
             return Response({'error_message': "시각화 오류"})
 
     def post(self,request):
-        user_email = request.data['user_email']
-        owner_email = request.data['owner_email']
-        coordinate = request.data['coordinate']
-        page_num = request.data['page_number']
-        pdf_id = request.data['pdf_id']
-        rating_time = request.data['rating_time']
+        user_email = request.POST.get('user_email')
+        owner_email = request.POST.get('owner_email')
+        coordinate = request.POST.get('coordinate')
+        page_num = request.POST.get('page_number')
+        pdf_id = request.POST.get('pdf_id')
+        rating_time = request.POST.get('rating_time')
         
         user_id =  User.objects.get(email=user_email).pk
         owner_id = User.objects.get(email=owner_email).pk
