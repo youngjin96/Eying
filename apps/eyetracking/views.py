@@ -23,7 +23,7 @@ import asyncio # 비동기 처리
 heatmapper = Heatmapper(
     point_diameter=100,  # the size of each point to be drawn
     point_strength=1,  # the strength, between 0 and 1, of each point to be drawn
-    opacity=0.5,  # the opacity of the heatmap layer
+    opacity=0.6,  # the opacity of the heatmap layer
     colours='default',  # 'default' or 'reveal'
                         # OR a matplotlib LinearSegmentedColorMap object 
                         # OR the path to a horizontal scale image
@@ -34,7 +34,7 @@ heatmapper = Heatmapper(
 s3r = boto3.resource('s3', aws_access_key_id = AWS_ACCESS_KEY_ID, aws_secret_access_key= AWS_SECRET_ACCESS_KEY)
 
 class EyetrackList(APIView):
-    async def visualization(self,user_id,pdf_id,page_num,owner_id,coordinate):
+    def visualization(self,user_id,pdf_id,page_num,owner_id,coordinate):
         global heatmapper
         global s3r
         print("시각화 처리")
@@ -215,9 +215,12 @@ class EyetrackVisualization(APIView):
         owner_id =  User.objects.get(email=queryDict['owner_email']).pk
         image_len = PDFModel.objects.get(pk=queryDict['pdf_id']).img_length
         img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/{2}/images/".format(owner_id,queryDict['pdf_id'],queryDict['visual_type'])
+        visual_img = []
         # img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/{2}/images/{3}.jpg".format(owner_id,queryDict['pdf_id'],queryDict['visual_type'],queryDict['page_n"  
-        # 
-        return Response({'visual_img': img_path,'img_len' : image_len},status = status.HTTP_200_OK)
+        for i in range(image_len):
+            visual_img.append(img_path +str(i)+".jpg")
+        print(visual_img)
+        return Response({'visual_img': visual_img},status = status.HTTP_200_OK)
 
             
 
