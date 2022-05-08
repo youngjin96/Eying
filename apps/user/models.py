@@ -2,10 +2,12 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
+# Card Image Path Customizing
 def card_path(instance, filename):
     return "user_%d/card/%s" % (instance.id, filename)
 
 
+# 사용자 모델
 class User(AbstractUser):
     age = models.IntegerField(default=0)                                    # 나이
     gender = models.CharField(default=None, null=True, max_length=10)       # 성별

@@ -1,5 +1,4 @@
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.views import APIView
 
 from .models import User
@@ -168,21 +167,25 @@ class UserSearchAPI(APIView):
     def get(self, request):
         try:
             queryDict = {
-                "id": request.GET.get("id"),
+                "user_id": request.GET.get("user_id"),
                 "email": request.GET.get("email"),
                 "username": request.GET.get("username"),
             }
             
             # 쿼리 적용 (Q() = 조건 없음)
             query = Q()
-            if queryDict["id"]:
-                query &= Q(id=queryDict["id"])
+            if queryDict["user_id"]:
+                query &= Q(id=queryDict["user_id"])
             if queryDict["email"]:
                 query &= Q(email=queryDict["email"])
             if queryDict["username"]:
                 query &= Q(username=queryDict["username"])
             
             user = User.objects.filter(query)
+            
+            # 일치하는 데이터가 없는 경우
+            if not user:
+                raise Exception("일치하는 데이터가 없습니다.")
             
             serializer = UserSerializer(user, many=True)
             return Response(serializer.data)
