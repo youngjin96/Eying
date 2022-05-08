@@ -1,9 +1,7 @@
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.views import APIView
 
 from .models import CS
-from django.db.models import Q
 from .serializers import CSSerializer
 
 from apps.decorator import TIME_MEASURE
@@ -43,6 +41,7 @@ class CSAPI(APIView):
                 content=formData["content"],
             )
             cs.save()
+            
             serializer = CSSerializer(cs, many=False)
             return Response(serializer.data)
         except Exception as e:

@@ -1,16 +1,16 @@
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.views import APIView
 
 from .models import PDFModel
 from user.models import User
-from django.db.models import Q
+from django.db.models import Q, F
 from .serializers import PDFSerializer
 
 from apps.decorator import TIME_MEASURE
 import config.policy as POLICY
 
 from unicodedata import normalize
+from datetime import datetime
 
 class PDFAPI(APIView):
     @TIME_MEASURE
@@ -59,27 +59,22 @@ class PDFAPI(APIView):
     def put(self, request):
         try:
             formData = {
-                "id": request.POST.get("id"),
+                "pdf_id": request.POST.get("pdf_id"),
                 "deadline": request.POST.get("deadline"),
-                "views": request.POST.get("views"),
             }
 
             # 필수 항목 누락 검증
-            if not formData["id"]:
-                raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH["id"])
+            if not formData["pdf_id"]:
+                raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH["pdf_id"])
             
             # 데이터 유효성 검증
-            pdf = PDFModel.objects.get(pk=formData["id"])
+            pdf = PDFModel.objects.get(pk=formData["pdf_id"])
             if not pdf:
                 raise Exception("존재하지 않는 PDF 입니다.")
             
             # PDF 보관 기간 변경
             if formData["deadline"]:
                 pdf.deadline = formData["deadline"]
-                
-            # PDF 조회수 증가
-            if formData["views"]:
-                pdf.views += 1
                 
             pdf.save()
             
@@ -93,15 +88,15 @@ class PDFAPI(APIView):
     def delete(self, request):
         try:
             formData = {
-                "id": request.POST.get("id"),
+                "pdf_id": request.POST.get("pdf_id"),
             }
             
             # 필수 항목 누락 검증
-            if not formData["id"]:
-                raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH["id"])
+            if not formData["pdf_id"]:
+                raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH["pdf_id"])
             
             # 데이터 유효성 검증
-            pdf = PDFModel.objects.get(pk=formData["id"])
+            pdf = PDFModel.objects.get(pk=formData["pdf_id"])
             if not pdf:
                 raise Exception("존재하지 않는 PDF 입니다.")
             
@@ -118,16 +113,17 @@ class PDFSearchAPI(APIView):
     def get(self, request):
         try:
             quertDict = {
-                "id": request.GET.get("id"),
+                "pdf_id": request.GET.get("pdf_id"),
                 "name": request.GET.get("name"),
                 "username": request.GET.get("username"),
                 "email": request.GET.get("email"),
+                "view": request.GET.get("view"),
             }
                         
             # 요청 쿼리 처리
             query = Q() 
-            if quertDict["id"]:
-                query &= Q(pk=quertDict["id"])
+            if quertDict["pdf_id"]:
+                query &= Q(pk=quertDict["pdf_id"])
             if quertDict["name"]:
                 query &= Q(name__contains=quertDict["name"])
             if quertDict["username"]:
@@ -136,6 +132,20 @@ class PDFSearchAPI(APIView):
                 query &= Q(user=User.objects.get(email=quertDict["email"]))
                  
             pdf = POLICY.ORDER_BY_RECENT(PDFModel.objects.filter(query))
+            
+            # Track을 위한 요청시 조회수 증가 처리
+            if quertDict["view"]:
+                # 반복문은 데이터가 많을 경우 비효율적 (update 함수를 통해 일괄 실행)
+                pdf.update(views=F("views")+1)
+                
+                # 보관 기간 정책 처리
+                if not POLICY.OVERDUE_ACCESS:
+                    if pdf.filter(deadline__lt=datetime.now().date()):
+                        raise Exception("보관 기간이 끝난 데이터에 접근했습니다.")
+                    
+            # 일치하는 데이터가 없는 경우
+            if not pdf:
+                raise Exception("일치하는 데이터가 없습니다.")
             
             serializer = PDFSerializer(pdf, many=True)
             return Response(serializer.data)
