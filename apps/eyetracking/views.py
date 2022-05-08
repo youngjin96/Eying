@@ -58,6 +58,9 @@ class EyetrackList(APIView):
                 heatmap = heatmapper.heatmap_on_img(coordinate, _img)
                 heatmap = heatmap.convert("RGB")
 
+            except Exception as e:
+                print("히트맵 오류",e)
+                return Response({'error_message': "히트맵 에러"})
                 buffer = BytesIO()
                 heatmap.save(buffer,format='jpeg')
                 buffer.seek(0)
@@ -67,9 +70,6 @@ class EyetrackList(APIView):
                                     Body=buffer,  
                                     ContentType='image/jpeg')
                 print("시선분산 처리 완료")
-            except Exception as e:
-                print("히트맵 오류",e)
-                return Response({'error_message': "히트맵 에러"})
                  
             try:   
                 draw = ImageDraw.Draw(_img)
@@ -121,7 +121,7 @@ class EyetrackList(APIView):
                                     
         eyetrackdatas.save()
         try:
-            self.visualization(user_id,pdf_id,page_num,owner_id,coordinate)
+            self.visualization(str(user_id),str(pdf_id),str(page_num),str(owner_id),coordinate)
             print("post 시각화 처리")
         except Exception as e:
             print(e)
@@ -159,7 +159,7 @@ class EyetrackList(APIView):
         eyetrackdatas.save()
         
         #async 비동기 처리 
-        self.visualization(user_id,pdf_id,page_num,owner_id,coordinate)
+        self.visualization(str(user_id),str(pdf_id),str(page_num),str(owner_id),coordinate)
 
         serializer = EyetrackingSerializer(eyetrackdatas, many=False)
         return Response(serializer.data)
