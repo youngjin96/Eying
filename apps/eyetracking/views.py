@@ -34,7 +34,7 @@ heatmapper = Heatmapper(
 s3r = boto3.resource('s3', aws_access_key_id = AWS_ACCESS_KEY_ID, aws_secret_access_key= AWS_SECRET_ACCESS_KEY)
 
 class EyetrackList(APIView):
-    def visualization(self,user_id,pdf_id,page_num,owner_id,coordinate):
+    def visualization(self, user_id, pdf_id, page_num, owner_id, coordinate):
         global heatmapper
         global s3r
         print("시각화 처리")
@@ -42,7 +42,7 @@ class EyetrackList(APIView):
             save_flow_path = "media/public/user_{0}/pdf/{1}/{2}/images/{3}.jpg".format(owner_id,pdf_id,"flow",page_num)
             save_distribution_path = "media/public/user_{0}/pdf/{1}/{2}/images/{3}.jpg".format(owner_id,pdf_id,"distribution",page_num)
             # 이미지 url
-            img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/images/{2}.jpg".format(owner_id,pdf_id,page_num)
+            img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/images/{2}.jpg".format(owner_id, pdf_id, page_num)
             
             
             try:
@@ -52,7 +52,8 @@ class EyetrackList(APIView):
                 print("이미지 에러",e)
                 return Response({'error_message': "이미지 에러"})
             
-            # coordinate = ast.literal_eval(coordinate)
+            if type(coordinate) == str:
+                coordinate = ast.literal_eval(coordinate)
 
             try:
                 heatmap = heatmapper.heatmap_on_img(coordinate, _img)
@@ -97,20 +98,21 @@ class EyetrackList(APIView):
             return Response({'error_message': "시각화 오류"})
 
     def post(self,request):
-        user_email = request.POST.get('user_email')
-        owner_email = request.POST.get('owner_email')
-        coordinate = request.POST.get('coordinate')
-        page_num = request.POST.get('page_number')
-        pdf_id = request.POST.get('pdf_id')
-        rating_time = request.POST.get('rating_time')
+        user_email = request.data.get('user_email')
+        owner_email = request.data.get('owner_email')
+        coordinate = request.data.get('coordinate')
+        page_num = request.data.get('page_number')
+        pdf_id = request.data.get('pdf_id')
+        rating_time = request.data.get('rating_time')
         
         user_id =  User.objects.get(email=user_email).pk
         owner_id = User.objects.get(email=owner_email).pk
+        
         # 트래킹 데이터 이어쓰기
-        # if Eyetracking.objects.get(pdf_fk=PDFModel.objects.get(pk=pdf_id),
-        #                             user_id=User.objects.get(email=user_email),
-        #                             page_num=page_num):
-        #     return self.put(request)
+        if Eyetracking.objects.get(pdf_fk=PDFModel.objects.get(pk=pdf_id),
+                                    user_id=User.objects.get(email=user_email),
+                                    page_num=page_num):
+            return self.put(request)
 
         eyetrackdatas = Eyetracking(user_id = User.objects.get(email=user_email),
                                     owner_id = User.objects.get(email=owner_email),
@@ -121,7 +123,7 @@ class EyetrackList(APIView):
                                     
         eyetrackdatas.save()
         try:
-            self.visualization(str(user_id),str(pdf_id),str(page_num),str(owner_id),coordinate)
+            self.visualization(user_id, pdf_id, page_num, owner_id, coordinate)
             print("post 시각화 처리")
         except Exception as e:
             print(e)
@@ -154,12 +156,16 @@ class EyetrackList(APIView):
         eyetrackdatas.rating_time = (previous_time + delta_time).time()
 
         # 시선 추적 데이터 이어쓰기
-        eyetrackdatas.coordinate = eyetrackdatas.coordinate[:-1] + ", " + request.data['coordinate'][1:-1] + "]"
         coordinate = eyetrackdatas.coordinate
+        if type(coordinate) == str:
+            coordinate = ast.literal_eval(coordinate)
+        
+        coordinate.extend(request.data['coordinate'])
+        eyetrackdatas.coordinate = coordinate
         eyetrackdatas.save()
         
-        #async 비동기 처리 
-        self.visualization(str(user_id),str(pdf_id),str(page_num),str(owner_id),coordinate)
+        # async 비동기 처리 
+        self.visualization(user_id, pdf_id, page_num, owner_id, coordinate)
 
         serializer = EyetrackingSerializer(eyetrackdatas, many=False)
         return Response(serializer.data)

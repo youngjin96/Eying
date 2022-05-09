@@ -41,7 +41,7 @@ class PDFAPI(APIView):
             if not user:
                 raise Exception("존재하지 않는 사용자 입니다.")
                 
-            pdf = PDFModel(user=user,
+            pdf = PDFModel(user=User.objects.get(email=dataDict["email"]),
                             pdf=dataDict["pdf"],
                             name=normalize("NFC", dataDict["pdf"].name),
                             deadline=dataDict["deadline"],
