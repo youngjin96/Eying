@@ -232,7 +232,7 @@ class EyetrackVisualization(APIView):
             
         except Exception as e:
             print("visual error", e)
-            return Response({'visual_err': e},status)
+            return Response({'visual_err': e})
 
             
 
