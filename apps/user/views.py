@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
-from django.db.models import Q
+from django.db.models import Q, F
 from .serializers import UserSerializer
 
 from django.contrib.auth.hashers import make_password, check_password
@@ -38,39 +38,39 @@ class UserAPI(APIView):
     @TIME_MEASURE
     def post(self, request):
         try:
-            formData = {
-                "email": request.POST.get("email"),
-                "password": request.POST.get("password"),
-                "username": request.POST.get("username"),
-                "age": request.POST.get("age", 0),
-                "job": request.POST.get("job"),
-                "job_field": request.POST.get("job_field"),
-                "position": request.POST.get("position"),
-                "gender": request.POST.get("gender"),
-                "credit": request.POST.get("credit", POLICY.ENROLL_CREDIT),
-                "card": request.FILES.get("card"),
+            dataDict = {
+                "email": request.data.get("email"),
+                "password": request.data.get("password"),
+                "username": request.data.get("username"),
+                "age": request.data.get("age", 0),
+                "job": request.data.get("job"),
+                "job_field": request.data.get("job_field"),
+                "position": request.data.get("position"),
+                "gender": request.data.get("gender"),
+                "credit": request.data.get("credit", POLICY.ENROLL_CREDIT),
+                "card": request.data.get("card"),
             }
             
             # 필수 항목 누락 검증
-            for key in formData.keys():
-                if not formData[key]:
+            for key in dataDict.keys():
+                if not dataDict[key]:
                     raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key])
             
             # 중복 이메일 체크
-            if User.objects.filter(email=formData["email"]):
+            if User.objects.filter(email=dataDict["email"]):
                 raise Exception("이미 존재하는 이메일입니다.")
                 
             user = User(
-                username=formData["username"],
-                password=make_password(formData["password"]),
-                email=formData["email"],
-                age=formData["age"],
-                gender=formData["gender"],
-                job=formData["job"],
-                job_field=formData["job_field"],
-                position=formData["position"],
-                credit=formData["credit"],
-                card=formData["card"],
+                username=dataDict["username"],
+                password=make_password(dataDict["password"]),
+                email=dataDict["email"],
+                age=dataDict["age"],
+                gender=dataDict["gender"],
+                job=dataDict["job"],
+                job_field=dataDict["job_field"],
+                position=dataDict["position"],
+                credit=dataDict["credit"],
+                card=dataDict["card"],
             )
             user.save()
             
@@ -84,55 +84,52 @@ class UserAPI(APIView):
     @TIME_MEASURE
     def put(self, request):
         try:
-            formData = {
-                "email": request.POST.get("email"),
-                "operator": request.POST.get("operator"),
-                "credit": request.POST.get("credit"),
-                "username": request.POST.get("username"),
-                "age": request.POST.get("age"),
-                "job": request.POST.get("job"),
-                "job_field": request.POST.get("job_field"),
-                "position": request.POST.get("position"),
-                "gender": request.POST.get("gender"),
-                "password": request.POST.get("password"),
+            dataDict = {
+                "email": request.data.get("email"),
+                "operator": request.data.get("operator"),
+                "credit": request.data.get("credit"),
+                "username": request.data.get("username"),
+                "age": request.data.get("age"),
+                "job": request.data.get("job"),
+                "job_field": request.data.get("job_field"),
+                "position": request.data.get("position"),
+                "gender": request.data.get("gender"),
+                "password": request.data.get("password"),
             }
             
             # 필수 항목 누락 검증
-            if not formData["email"]:
+            if not dataDict["email"]:
                 raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH['email'])
             
-            user = User.objects.get(email=formData["email"])
+            user = User.objects.filter(email=dataDict["email"])
             if not user:
                 raise Exception("해당 이메일의 사용자가 존재하지 않습니다.")
             
             # 업데이트 (개별 업데이트는 user.save(update_fields=['', '', '', ...]))
-            if formData["operator"] in ["+", "-", "="] and formData["credit"]:
-                if formData["operator"] == "+":
-                    user.credit += int(formData["credit"])
-                elif formData["operator"] == "-":
-                    user.credit -= int(formData["credit"])
-                elif formData["operator"] == "=":
-                    user.credit = int(formData["credit"])
+            if dataDict["operator"] in ["+", "-", "="] and dataDict["credit"]:
+                if dataDict["operator"] == "+":
+                    user.update(credit=F("credit")+int(dataDict["credit"]))
+                elif dataDict["operator"] == "-":
+                    user.update(credit=F("credit")-int(dataDict["credit"]))
+                elif dataDict["operator"] == "=":
+                    user.update(credit=int(dataDict["credit"]))
                 
-            if formData["username"]:
-                user.username = formData["username"]
-            if formData["age"]:
-                user.age = formData["age"]
-            if formData["job"]:
-                user.job = formData["job"]
-            if formData["job_field"]:
-                user.job_field = formData["job_field"]
-            if formData["position"]:
-                user.position = formData["position"]
-            if formData["gender"]:
-                user.gender = formData["gender"]
-            if formData["gender"]:
-                user.gender = formData["gender"]
-            if formData["password"]:
-                user.password = make_password(formData["password"])
-            user.save()
+            if dataDict["username"]:
+                user.update(username=dataDict["username"])
+            if dataDict["age"]:
+                user.update(age=dataDict["age"])
+            if dataDict["job"]:
+                user.update(job=dataDict["job"])
+            if dataDict["job_field"]:
+                user.update(job_field=dataDict["job_field"])
+            if dataDict["position"]:
+                user.update(position=dataDict["position"])
+            if dataDict["gender"]:
+                user.update(gender=dataDict["gender"])
+            if dataDict["password"]:
+                user.update(password=make_password(dataDict["password"]))
             
-            serializer = UserSerializer(user, many=False)
+            serializer = UserSerializer(user, many=True)
             return Response(serializer.data)
         except Exception as e:
             print(e)
@@ -141,22 +138,22 @@ class UserAPI(APIView):
     @TIME_MEASURE
     def delete(self, request):
         try:
-            formData = {
-                "email": request.POST.get("email"),
+            dataDict = {
+                "email": request.data.get("email"),
             }
             
             # 요청 데이터 누락 처리
-            if not formData["email"]:
+            if not dataDict["email"]:
                 raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH['email'])
             
             # 사용자 검증
-            user = User.objects.get(email=formData["email"])
+            user = User.objects.filter(email=dataDict["email"])
             if not user:
                 raise Exception("해당 이메일의 사용자가 존재하지 않습니다.")
             
             user.delete()
             
-            serializer = UserSerializer(user, many=False)
+            serializer = UserSerializer(user, many=True)
             return Response(serializer.data)
         except Exception as e:
             print(e)

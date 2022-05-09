@@ -41,4 +41,6 @@ QUERY_NAME_MATCH = {
     "name": "이름",
     "phoneNumber": "연락처",
     "content": "내용",
+    "pdf": "PDF",
+    "pdf_id": "PDF 고유번호",
 }

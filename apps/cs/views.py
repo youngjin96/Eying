@@ -22,23 +22,23 @@ class CSAPI(APIView):
     @TIME_MEASURE
     def post(self, request):
         try:
-            formData = {
-                "email": request.POST.get("email"),
-                "phoneNumber": request.POST.get("phoneNumber"),
-                "name": request.POST.get("name"),
-                "content": request.POST.get("content"),
+            dataDict = {
+                "email": request.data.get("email"),
+                "phoneNumber": request.data.get("phoneNumber"),
+                "name": request.data.get("name"),
+                "content": request.data.get("content"),
             }
             
             # 필수 항목 누락 검증
-            for key in formData.keys():
-                if not formData[key]:
+            for key in dataDict.keys():
+                if not dataDict[key]:
                     raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key])
             
             cs = CS(
-                name=formData["name"],
-                email=formData["email"],
-                phoneNumber=formData["phoneNumber"],
-                content=formData["content"],
+                name=dataDict["name"],
+                email=dataDict["email"],
+                phoneNumber=dataDict["phoneNumber"],
+                content=dataDict["content"],
             )
             cs.save()
             
