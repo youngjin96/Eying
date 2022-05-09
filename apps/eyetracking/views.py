@@ -64,7 +64,7 @@ class EyetrackList(APIView):
                 buffer.seek(0)
 
                 s3r.Bucket(AWS_STORAGE_BUCKET_NAME).put_object(
-                                    Key=save_flow_path, 
+                                    Key=save_distribution_path, 
                                     Body=buffer,  
                                     ContentType='image/jpeg')
                 print("시선분산 처리 완료")
@@ -85,7 +85,7 @@ class EyetrackList(APIView):
                 buffer.seek(0) # 대기
 
                 s3r.Bucket(AWS_STORAGE_BUCKET_NAME).put_object(
-                                    Key=save_distribution_path, 
+                                    Key=save_flow_path, 
                                     Body=buffer,  
                                     ContentType='image/jpeg')
                 print("flow 처리 완료")
@@ -109,7 +109,7 @@ class EyetrackList(APIView):
         owner_id = User.objects.get(email=owner_email).pk
         
         # 트래킹 데이터 이어쓰기
-        if Eyetracking.objects.get(pdf_fk=PDFModel.objects.get(pk=pdf_id),
+        if Eyetracking.objects.filter(pdf_fk=PDFModel.objects.get(pk=pdf_id),
                                     user_id=User.objects.get(email=user_email),
                                     page_num=page_num):
             return self.put(request)
@@ -221,8 +221,8 @@ class EyetrackVisualization(APIView):
         owner_id =  User.objects.get(email=queryDict['owner_email']).pk
         image_len = PDFModel.objects.get(pk=queryDict['pdf_id']).img_length
         img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/{2}/images/".format(owner_id,queryDict['pdf_id'],queryDict['visual_type'])
+
         visual_img = []
-        # img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/{2}/images/{3}.jpg".format(owner_id,queryDict['pdf_id'],queryDict['visual_type'],queryDict['page_n"  
         for i in range(image_len):
             visual_img.append(img_path +str(i)+".jpg")
         print(visual_img)
