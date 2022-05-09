@@ -13,6 +13,10 @@ import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./Fbase";
 import axios from 'axios';
+import { useNavigate } from "react-router-dom"
+
+
+
 
 const Enroll = () => {
     const [email, setEmail] = useState("");
@@ -25,7 +29,7 @@ const Enroll = () => {
     const [image, setImage] = useState("");
     const [username, setUsername] = useState("");
     const [fields, setFields] = useState([]);
-
+    const navigate = useNavigate();
 
     const onChange = (event) => {
         const { target: { name, value } } = event;
@@ -44,33 +48,63 @@ const Enroll = () => {
         }
     }
 
+    async function postinfo() {
+
+        let enfrm = new FormData();
+        enfrm.append("username", username);
+        enfrm.append("job_field", fields)
+        enfrm.append("email", email);
+        enfrm.append("password", password);
+        enfrm.append("age", age);
+        enfrm.append("gender", sex);
+        enfrm.append("job", personJob);
+        enfrm.append("position", selected);
+        enfrm.append('card', image);
+
+        const res = await axios.post('http://3.36.117.66:8000/user/', enfrm)
+            .then(function (response) {
+                console.log(response);
+                alert("정상적으로 회원가입이 완료되었습니다.")
+                navigate("/home");
+            })
+            .catch(function (error) {
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.error(error);
+
+                    alert(JSON.stringify(error.response.data.error_message));
 
 
-    const onClickEnroll = async (event) => {
-        try {
-            await createUserWithEmailAndPassword(auth, email, password);
-            let enfrm = new FormData();
-            enfrm.append("username", username);
-            enfrm.append("job_field", fields)
-            enfrm.append("email", email);
-            enfrm.append("password", password);
-            enfrm.append("age", age);
-            enfrm.append("gender", sex);
-            enfrm.append("job", personJob);
-            enfrm.append("position", selected);
-            enfrm.append("credit", '0');
-            enfrm.append('card', image);
+                }
+                else if (error.request) {
+                    // 요청이 이루어 졌으나 응답을 받지 못했습니다.
+                    // `error.request`는 브라우저의 XMLHttpRequest 인스턴스 또는
+                    // Node.js의 http.ClientRequest 인스턴스입니다.
+                    console.log(error.request);
+                }
+                else {
+                    // 오류를 발생시킨 요청을 설정하는 중에 문제가 발생했습니다.
+                    console.log('Error', error.message);
+                }
+                console.log(error.config);
+            })
 
-            for (let key of enfrm.keys()) {
-                console.log(`${key}: $[enfrm.get(key)}]`);
-            }
-            await axios.post('http://3.36.117.66:8000/user/', enfrm);
+        return res;
+    }
 
-            alert("정상적으로 회원가입이 완료되었습니다.")
-            window.location.replace("http://localhost:3000/home");
-        } catch (error) {
-            alert(error.message);
-        }
+
+
+    const onClickEnroll = () => {
+        postinfo();
+        createUserWithEmailAndPassword(auth, email, password).then(() => {
+
+            })
+            .catch((error) => {
+                console.error(error);
+                alert("정보를 다시 확인해주세요");
+            });
+
     }
 
     const ITEM_HEIGHT = 48;
@@ -84,19 +118,22 @@ const Enroll = () => {
         },
     };
 
-    const jobs = ["중학생", "고등학생", "대학생", "직장인",];
-    const student = ["1학년", "2학년", "3학년", "4학년",];
-    const salary = ["인턴", "사원", "대리", "과장", "차장", "부장",];
-    const job_fields = ["IT", "ART", "SPORTS", "ETC",];
+    const jobs = ["중학생", "고등학생", "대학생", "직장인"];
+    const student1 = ["1학년", "2학년", "3학년"];
+    const student2 = ["1학년", "2학년", "3학년", "4학년", "졸업예정자", "취준생"];
+    const salary = ["인턴", "사원", "대리", "과장", "차장", "부장"];
+    const job_fields = ["IT", "ART", "SPORTS", "ETC"];
 
 
     let type = null;
     let options = null;
 
-    if (personJob === "중학생" || personJob === "고등학생" || personJob === "대학생") {
-        type = student;
+    if (personJob === "중학생" || personJob === "고등학생") {
+        type = student1;
     } else if (personJob === "직장인") {
         type = salary;
+    } else if (personJob === "대학생") {
+        type = student2;
     }
 
     function getStyles(job, personJob, theme) {
@@ -175,18 +212,17 @@ const Enroll = () => {
         });
     }
 
+    const onKeyUp = (event) => {
+        if (event.keycode === '9') {
+            componentDidMount();
+        }
+
+    }
+
 
     return (
         <Container component="main" maxWidth="xs">
-            <Box 
-                sx={{ 
-                    marginTop: 5, 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    height: '90vh' 
-                }} 
-            >
+            <Box sx={{ marginTop: 5, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '90vh' }} >
                 <ValidatorForm noValidate onSubmit={handleSubmit} component="form" sx={{ mt: 3 }} >
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
@@ -223,6 +259,7 @@ const Enroll = () => {
                                 errorMessages={['password mismatch', 'this field is required']}
                                 value={confirmpassword}
                                 onClick={componentDidMount}
+                                onKeyUp={onKeyUp}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -271,6 +308,7 @@ const Enroll = () => {
                                     onChange={handleChange}
                                     input={<OutlinedInput label="Job" />}
                                     MenuProps={MenuProps}
+                                    defaultValue={""}
                                 >
                                     {jobs.map((job) => (
                                         <MenuItem
@@ -292,6 +330,7 @@ const Enroll = () => {
                                     onChange={handleChange2}
                                     input={<OutlinedInput label="Sub" />}
                                     MenuProps={MenuProps}
+                                    defaultValue={""}
                                 >
                                     {options}
                                 </Select>
@@ -307,6 +346,7 @@ const Enroll = () => {
                                     onChange={handleChange3}
                                     input={<OutlinedInput label="Job_Field" />}
                                     MenuProps={MenuProps}
+                                    defaultValue={""}
                                 >
                                     {job_fields.map((field) => (
                                         <MenuItem

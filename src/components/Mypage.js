@@ -8,6 +8,9 @@ import Tab from '@mui/material/Tab';
 
 import axios from 'axios';
 
+import AliceCarousel from 'react-alice-carousel';
+import "react-alice-carousel/lib/alice-carousel.css";
+
 import { onAuthStateChanged, deleteUser } from "firebase/auth";
 
 import Loading from "./Loading";
@@ -21,6 +24,15 @@ const columns = [
     { field: 'upload_at', headerName: '등록일', width: 160, align: 'right', headerAlign: "center" },
     { field: 'deadline', headerName: '마감일', width: 160, align: 'right', headerAlign: "center" },
     { field: 'views', headerName: '조회수', width: 90, align: 'right', headerAlign: "center" },
+]
+    ;
+const stepTwoColumns = [
+    { field: 'user_name', headerName: '평가자', flex: 1, width: 150, align: 'center', headerAlign: "center" },
+    { field: 'job_field', headerName: '업종', width: 150, align: 'center', headerAlign: "center" },
+    { field: 'job', headerName: '직업', width: 150, align: 'center', headerAlign: "center" },
+    { field: 'position', headerName: '계급', width: 150, align: 'center', headerAlign: "center" },
+    { field: 'gender', headerName: '성별', width: 160, align: 'center', headerAlign: "center" },
+    { field: 'create_date', headerName: '날짜', width: 160, align: 'center', headerAlign: "center" },
 ];
 
 const Mypage = () => {
@@ -36,6 +48,7 @@ const Mypage = () => {
     const [firstPdfs, setFirstPdfs] = useState([]); // 첫 번째 pdfs
     const [secondPdfs, setSecondPdfs] = useState([]); // 두 번째 pdfs
     const [showedPdfs, setShowedPdfs] = useState([]); // 테이블에 보여줄 pdfs
+    const [trackedImages, setTrackedImages] = useState("");
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
     const [selectionModel, setSelectionModel] = useState();
 
@@ -58,7 +71,8 @@ const Mypage = () => {
         setValue(newValue);
         if (newValue === 1) {
             setIsLoading(true);
-            axios.get('http://3.36.117.66:8000/eyetracking/pdf/', {
+            setStep(1);
+            axios.get('http://3.34.43.189:8000/eyetracking/pdf/', {
                 params: {
                     user_email: userEmail
                 }
@@ -88,7 +102,7 @@ const Mypage = () => {
             >
                 {value === index && (
                     <Box sx={{ p: 3 }}>
-                        <Typography>{children}</Typography>
+                        <Typography component={'div'}>{children}</Typography>
                     </Box>
                 )}
             </div>
@@ -109,15 +123,17 @@ const Mypage = () => {
     }
 
     const onClickContinue = () => {
-        if (selectionModel === undefined) {
+        // PDF를 선택하지 않고 continue 버튼 눌렀을 때
+        if (selectionModel === undefined || selectionModel.length === 0) {
             return alert("PDF를 선택해주세요");
-        } else if (selectionModel.length === 0) {
-            return alert("PDF를 선택해주세요");
-        } else {
+        }
+        // PDF 선택 후 continue 버튼 눌렀을 때
+        else {
+            // 첫 번째 step에서 continue 눌렀을 때
             if (step === 1) {
                 setIsLoading(true);
                 setStep(step + 1);
-                axios.get('http://3.36.117.66:8000/eyetracking/user/', {
+                axios.get('http://3.34.43.189:8000/eyetracking/user/', {
                     params: {
                         pdf_id: pdfId,
                         page_number: 1
@@ -125,27 +141,28 @@ const Mypage = () => {
                 }).then(res => {
                     if (res.status === 200) {
                         console.log(res.status);
-                        console.log(res.data.user_email);
+                        setTrackedEmail(res.data.user_email);
                         setSecondPdfs(res.data);
                         setShowedPdfs(res.data);
                         setIsLoading(false);
                     }
                 })
-            } else {
+            }
+            // 두 번째 step에서 continue 눌렀을 때 
+            else {
                 setIsLoading(true);
                 setStep(step + 1);
-                axios.get('http://3.36.117.66:8000/eyetracking/visualization/', {
+                axios.get('http://3.34.43.189:8000/eyetracking/visualization/', {
                     params: {
                         user_email: trackedEmail,
                         owner_email: userEmail,
                         pdf_id: pdfId,
-                        visual_type: visualType
+                        visual_type: "distribution"
                     }
                 }).then(res => {
                     if (res.status === 200) {
                         console.log(res.status);
-                        setSecondPdfs(res.data);
-                        setShowedPdfs(res.data);
+                        setTrackedImages(res.data.visual_img);
                         setIsLoading(false);
                     }
                 })
@@ -171,6 +188,11 @@ const Mypage = () => {
             setStep(step - 1);
             setShowedPdfs(secondPdfs);
         }
+    }
+
+    const onClickMyPdf = () => {
+        setStep(1);
+        setShowedPdfs(firstPdfs);
     }
     // 로딩 중일 때 보여줄 화면
     if (isLoading) return (
@@ -203,14 +225,14 @@ const Mypage = () => {
                         sx={{ borderRight: 1, borderColor: 'divider' }}
                     >
                         <Tab label="회원정보 변경" {...a11yProps(0)} />
-                        <Tab label="내 PDF" {...a11yProps(1)} />
+                        <Tab label="내 PDF" {...a11yProps(1)} onClick={onClickMyPdf}/>
                         <Tab label="회원 탈퇴" {...a11yProps(2)} />
                     </Tabs>
                     <TabPanel value={value} index={0}>
                         {userEmail}
                     </TabPanel>
                     <TabPanel value={value} index={1} style={{ textAlign: "center", width: "90%" }}>
-                        {step < 3 ? (
+                        {step === 1 ? (
                             <>
                                 <div style={{ height: 400, width: '80%', margin: "auto" }}>
                                     <DataGrid
@@ -230,21 +252,57 @@ const Mypage = () => {
                                     />
                                 </div>
                                 <Button onClick={onClickContinue} style={{ color: "black" }}>
-                                    CONTINUE
+                                    NEXT
                                 </Button>
-                                {step === 1 ? (
-                                    <>
-                                    </>
-                                ) : (
-                                    <Button onClick={onClickBack} style={{ color: "black" }}>
-                                        BACK
-                                    </Button>
-                                )}
                             </>
                         ) : (
-                            <>
-                            </>
-                        )}
+                                step === 2 ? (
+                                    <>
+                                        <div style={{ height: 400, width: '80%', margin: "auto" }}>
+                                            <DataGrid
+                                                rows={showedPdfs}
+                                                columns={stepTwoColumns}
+                                                pageSize={5}
+                                                rowsPerPageOptions={[5]}
+                                                onSelectionModelChange={(newSelectionModel) => {
+                                                    setSelectionModel(newSelectionModel);
+                                                }}
+                                                onCellClick={(params) => {
+                                                    console.log(params);
+                                                    setPdfId(params.row.id);
+                                                }}
+                                                selectionModel={selectionModel}
+                                                style={{ align: "center" }}
+                                            />
+                                        </div>
+                                        <Button onClick={onClickContinue} style={{ color: "black" }}>
+                                            NEXT
+                                        </Button>
+                                        <Button onClick={onClickBack} style={{ color: "black" }}>
+                                            BACK
+                                        </Button>
+                                    </>
+                                ) : (
+                                        <>
+                                            <AliceCarousel
+                                                animationDuration={1}
+                                                keyboardNavigation={true}
+                                                disableButtonsControls={true}
+                                            >
+                                                {trackedImages && trackedImages.map((e, index) => (
+                                                    <img 
+                                                        key={index}
+                                                        src={e}
+                                                        style={{ width: "80%", height: 500 }}
+                                                    />
+                                                ))}
+                                            </AliceCarousel>
+                                            <Button onClick={onClickBack}>
+                                                BACK
+                                            </Button>
+                                        </>
+                                    )
+                            )}
                     </TabPanel>
                     <TabPanel value={value} index={2}>
                         <Button onClick={onClickDeleteUser}>

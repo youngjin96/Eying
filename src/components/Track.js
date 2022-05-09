@@ -48,7 +48,7 @@ const Track = () => {
                     setUserEmail(user.email);
                     setIsLoggedIn(true);
                     // 유저가 로그인했을 때 서버에서 데이터를 가져온다.
-                    axios.get('http://3.36.117.66:8000/pdf/').then(res => {
+                    axios.get('http://3.34.43.189:8000/pdf/').then(res => {
                         if (res.status === 200) {
                             console.log(res.status);
                             setPdfs(res.data);
@@ -68,7 +68,7 @@ const Track = () => {
     const onClickTrack = async () => {
         setIsTracking(true);
         setIsLoading(true);
-        await axios.get('http://3.36.117.66:8000/pdf/search', {
+        await axios.get('http://3.34.43.189:8000/pdf/search', {
             params: {
                 pdf_id: selectionModel[0]
             }
@@ -95,7 +95,7 @@ const Track = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://3.36.117.66:8000/eyetracking/", {
+        await axios.post("http://3.34.43.189:8000/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
@@ -113,11 +113,12 @@ const Track = () => {
 
     const onClickBack = () => {
         window.location.replace("track");
+        alert("저장되었습니다.");
     };
 
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
-        await axios.post("http://3.36.117.66:8000/eyetracking/", {
+        await axios.post("http://3.34.43.189:8000/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
@@ -155,7 +156,11 @@ const Track = () => {
                 flexGrow: 1,
             }}
         >
-            <Grid container columns={{ xs: 12, sm: 12, md: 12 }} style={{ textAlign: "center" }}>
+            <Grid 
+                container
+                columns={{ xs: 12, sm: 12, md: 12 }}
+                style={{ textAlign: "center" }}
+            >
                 <Grid item xs={12}>
                     <AliceCarousel
                         animationDuration={1}
@@ -169,18 +174,16 @@ const Track = () => {
                             <img src="/img/example2.png" style={{ width: "100%", height: 500 }}> 
                             </img> */}
                         {imgsUrl && imgsUrl.map((e, index) => (
-                            <img key={index} src={e} style={{ width: "90%", height: "80vh" }} />
+                            <img 
+                                key={index}
+                                src={e}
+                                style={{ width: "100%", height: "80vh" }}
+                            />
                         ))}
                     </AliceCarousel>
-                    <Button onClick={onClickStart}>
-                        Start
-                        </Button>
-                    <Button onClick={onClickEnd}>
-                        End
-                        </Button>
-                    <Button onClick={onClickBack}>
-                        Back
-                        </Button>
+                    <Button onClick={onClickStart}>Start</Button>
+                    <Button onClick={onClickEnd}>End</Button>
+                    <Button onClick={onClickBack}>Back</Button>
                 </Grid>
             </Grid>
         </Box>
@@ -189,23 +192,30 @@ const Track = () => {
     // 전체 PDF 데이터
     else return (
         <>
-            <Button style={{ marginTop: 100, marginLeft: 100 }} onClick={onClickTrack}>
-                CONTINUE
-            </Button>
-            <div style={{ height: 400, width: '80%', margin: "auto" }}>
+            <div style={{ height: 630, width: '80%', margin: "auto", marginTop: 50 }}>
                 <DataGrid
                     rows={pdfs}
                     columns={columns}
-                    pageSize={5}
-                    rowsPerPageOptions={[5]}
+                    pageSize={10}
+                    rowsPerPageOptions={[10]}
                     onSelectionModelChange={(newSelectionModel) => {
                         setSelectionModel(newSelectionModel);
-                        console.log(newSelectionModel)
                     }}
                     selectionModel={selectionModel}
+                    
                     style={{ align: "center" }}
                 />
             </div>
+            <div style={{ marginTop: 10, textAlign: "center" }}>
+                <Button 
+                    variant="contained"
+                    size="large"
+                    onClick={onClickTrack}
+                >
+                    TRACK
+                </Button>
+            </div>
+
         </>
     )
 }

@@ -50,7 +50,7 @@ const Upload = () => {
         frm.append("pdf", e.target.files[0]);
         frm.append("email", email);
         frm.append("job_field", jobField);
-        axios.post('http://3.36.117.66:8000/pdf/', frm).then(() => {
+        axios.post('http://3.39.227.158:8000/pdf/', frm).then(() => {
             console.log("success");
         });
     };
