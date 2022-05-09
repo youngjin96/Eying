@@ -212,21 +212,27 @@ class EyetrackUser(APIView):
         
 class EyetrackVisualization(APIView):   
     def get(self,request): 
-        queryDict = {
-            "owner_email" : request.GET.get("owner_email"),
-            'pdf_id' : request.GET.get('pdf_id'),
-            'user_email' : request.GET.get('user_email'),
-            'visual_type' : request.GET.get('visual_type'),
-        }
-        owner_id =  User.objects.get(email=queryDict['owner_email']).pk
-        image_len = PDFModel.objects.get(pk=queryDict['pdf_id']).img_length
-        img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/{2}/images/".format(owner_id,queryDict['pdf_id'],queryDict['visual_type'])
+        try:
+            queryDict = {
+                "owner_email" : request.GET.get("owner_email"),
+                'pdf_id' : request.GET.get('pdf_id'),
+                'user_email' : request.GET.get('user_email'),
+                'visual_type' : request.GET.get('visual_type'),
+            }
+            owner_id =  User.objects.get(email=queryDict['owner_email']).pk
+            user_id =  User.objects.get(email=queryDict['user_email']).pk
 
-        visual_img = []
-        for i in range(image_len):
-            visual_img.append(img_path +str(i)+".jpg")
-        print(visual_img)
-        return Response({'visual_img': visual_img},status = status.HTTP_200_OK)
+            img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/{2}/images/".format(owner_id,queryDict['pdf_id'],queryDict['visual_type'])
+            image_page = Eyetracking.objects.filter(user_id=user_id,owner_id=owner_id,pdf_fk=queryDict['pdf_id']).values_list('page_num',flat=True).distinct()
+            
+            visual_img = []
+            for i in list(image_page):
+                visual_img.append(img_path +str(i)+".jpg")
+            return Response({'visual_img': visual_img},status = status.HTTP_200_OK)
+            
+        except Exception as e:
+            print("visual error", e)
+            return Response({'visual_err': e},status)
 
             
 
