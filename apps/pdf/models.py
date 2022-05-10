@@ -21,6 +21,7 @@ BUFFER_IMAGE_TYPE = "JPEG"
 # PDF Convertion OPTION
 DPI = 100
 FMT = "jpeg"
+SIZE = (1920, None)         # FHD 기준 최대 사이즈로 설정
 
 
 # PDF File Path Customizing
@@ -34,9 +35,9 @@ def pdf_to_image(instance):
     pdf_bytes = instance.pdf.open('rb').read()
     
     try:    # Linux Ubuntu / Mac
-        images = convert_from_bytes(pdf_bytes, fmt=FMT, dpi=DPI)
+        images = convert_from_bytes(pdf_bytes, fmt=FMT, size=SIZE)
     except: # MS Windows
-        images = convert_from_bytes(pdf_bytes, fmt=FMT, poppler_path="pdf/poppler/Library/bin/", dpi=DPI)
+        images = convert_from_bytes(pdf_bytes, fmt=FMT, poppler_path="pdf/poppler/Library/bin/", size=SIZE)
         
     if DEBUG:
         print("파일을 이미지로 변환 중 입니다.")
