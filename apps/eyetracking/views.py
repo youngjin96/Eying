@@ -98,38 +98,42 @@ class EyetrackList(APIView):
             return Response({'error_message': "시각화 오류"})
 
     def post(self,request):
-        user_email = request.data.get('user_email')
-        owner_email = request.data.get('owner_email')
-        coordinate = request.data.get('coordinate')
-        page_num = request.data.get('page_number')
-        pdf_id = request.data.get('pdf_id')
-        rating_time = request.data.get('rating_time')
-        
-        user_id =  User.objects.get(email=user_email).pk
-        owner_id = User.objects.get(email=owner_email).pk
-        
-        # 트래킹 데이터 이어쓰기
-        if Eyetracking.objects.filter(pdf_fk=PDFModel.objects.get(pk=pdf_id),
-                                    user_id=User.objects.get(email=user_email),
-                                    page_num=page_num):
-            return self.put(request)
-
-        eyetrackdatas = Eyetracking(user_id = User.objects.get(email=user_email),
-                                    owner_id = User.objects.get(email=owner_email),
-                                    page_num = page_num, 
-                                    pdf_fk = PDFModel.objects.get(pk=pdf_id),
-                                    rating_time= rating_time,
-                                    coordinate= coordinate)
-                                    
-        eyetrackdatas.save()
         try:
-            self.visualization(user_id, pdf_id, page_num, owner_id, coordinate)
-            print("post 시각화 처리")
+            user_email = request.data.get('user_email')
+            owner_email = request.data.get('owner_email')
+            coordinate = request.data.get('coordinate')
+            page_num = request.data.get('page_number')
+            pdf_id = request.data.get('pdf_id')
+            rating_time = request.data.get('rating_time')
+            
+            user_id =  User.objects.get(email=user_email).pk
+            owner_id = User.objects.get(email=owner_email).pk
+            
+            # 트래킹 데이터 이어쓰기
+            if Eyetracking.objects.filter(pdf_fk=PDFModel.objects.get(pk=pdf_id),
+                                        user_id=User.objects.get(pk=user_id),
+                                        owner_id=User.objects.get(pk=owner_id),
+                                        page_num=page_num):
+                return self.put(request)
+
+            eyetrackdatas = Eyetracking(user_id = User.objects.get(email=user_email),
+                                        owner_id = User.objects.get(email=owner_email),
+                                        page_num = page_num, 
+                                        pdf_fk = PDFModel.objects.get(pk=pdf_id),
+                                        rating_time= rating_time,
+                                        coordinate= coordinate)
+                                        
+            eyetrackdatas.save()
+            try:
+                self.visualization(user_id, pdf_id, page_num, owner_id, coordinate)
+                print("post 시각화 처리")
+            except Exception as e:
+                print(e)
+
+            serializer = EyetrackingSerializer(eyetrackdatas, many=False)
+            return Response(serializer.data, status = status.HTTP_200_OK)
         except Exception as e:
             print(e)
-
-        serializer = EyetrackingSerializer(eyetrackdatas, many=False)
-        return Response(serializer.data, status = status.HTTP_200_OK)
     
     def put(self, request):
         user_id =  User.objects.get(email=request.data['user_email']).pk
@@ -138,7 +142,8 @@ class EyetrackList(APIView):
         page_num = request.data['page_number']
 
         eyetrackdatas = Eyetracking.objects.get(pdf_fk=PDFModel.objects.get(pk=request.data['pdf_id']),
-                                                user_id=User.objects.get(email=request.data['user_email']),
+                                                user_id=User.objects.get(pk=user_id),
+                                                owner_id=User.objects.get(pk=owner_id),
                                                 page_num=page_num)
         
         delta_time = datetime.time.fromisoformat(request.data['rating_time'])
@@ -159,8 +164,12 @@ class EyetrackList(APIView):
         coordinate = eyetrackdatas.coordinate
         if type(coordinate) == str:
             coordinate = ast.literal_eval(coordinate)
+            
+        request_coordinate = request.data['coordinate']
+        if type(request_coordinate) == str:
+            request_coordinate = ast.literal_eval(request_coordinate)
         
-        coordinate.extend(request.data['coordinate'])
+        coordinate.extend(request_coordinate)
         eyetrackdatas.coordinate = coordinate
         eyetrackdatas.save()
         
