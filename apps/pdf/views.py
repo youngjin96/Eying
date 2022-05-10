@@ -8,6 +8,7 @@ from .serializers import PDFSerializer
 
 from apps.decorator import TIME_MEASURE
 import config.policy as POLICY
+from apps.settings import DEBUG
 
 from unicodedata import normalize
 from datetime import datetime
@@ -41,7 +42,15 @@ class PDFAPI(APIView):
             if not user:
                 raise Exception("존재하지 않는 사용자 입니다.")
                 
-            pdf = PDFModel(user=User.objects.get(email=dataDict["email"]),
+            uploader = User.objects.get(email=dataDict["email"])
+                
+            # 크레딧 검증
+            if not DEBUG:
+                if uploader.credit < POLICY.UPLOAD_CREDIT:
+                    raise Exception("사용자의 크레딧이 부족합니다.")
+                
+            # PDF 저장
+            pdf = PDFModel(user=uploader,
                             pdf=dataDict["pdf"],
                             name=normalize("NFC", dataDict["pdf"].name),
                             deadline=dataDict["deadline"],
@@ -49,6 +58,10 @@ class PDFAPI(APIView):
                             job_field=dataDict["job_field"],
                             )
             pdf.save()
+            
+            # 크레딧 차감
+            uploader.credit -= POLICY.UPLOAD_CREDIT
+            uploader.save()
             
             serializer = PDFSerializer(pdf, many=False)
             return Response(serializer.data)

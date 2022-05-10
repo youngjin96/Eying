@@ -17,6 +17,12 @@ OVERDUE_ACCESS = True
 # 가입 크레딧
 ENROLL_CREDIT = 100
 
+# 업로드 크레딧
+UPLOAD_CREDIT = 100
+
+# 평가 크레딧
+REWARD_CREDIT = 50
+
 
 '''
 REST API 설정 관련
