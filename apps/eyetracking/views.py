@@ -228,6 +228,9 @@ class EyetrackVisualization(APIView):
             visual_img = []
             for i in list(image_page):
                 visual_img.append(img_path +str(i)+".jpg")
+            if not visual_img:
+                print("해당 pdf_id 및 이메일을 확인해주세요.")
+                return Response({'visual_img': visual_img},status = status.HTTP_200_OK)
             return Response({'visual_img': visual_img},status = status.HTTP_200_OK)
             
         except Exception as e:
