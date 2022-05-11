@@ -22,7 +22,7 @@ class UserAPI(APIView):
             }
             
             if not queryDict["email"] or not queryDict["password"]:
-                raise Exception("아이디 / 패스워드 입력 오류입니다.")
+                return Response({"error_message": "아이디 / 패스워드 입력 오류입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
             
             user = User.objects.get(Q(email=queryDict["email"]))
             
@@ -30,7 +30,7 @@ class UserAPI(APIView):
                 serializer = UserSerializer(user, many=False)
                 return Response(serializer.data)
             else:
-                raise Exception("패스워드가 올바르지 않습니다.")
+                return Response({"error_message": "패스워드가 올바르지 않습니다."}, status=HTTP_406_NOT_ACCEPTABLE)
         except Exception as e:
             print(e)
             return Response({'error_message': str(e)})
@@ -55,15 +55,15 @@ class UserAPI(APIView):
             # 필수 항목 누락 검증
             for key in dataDict.keys():
                 if not dataDict[key]:
-                    return Response({"status": 406, "error_id": 1, "error_message": "%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key]})
+                    return Response({"error_message": "%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key]}, status=HTTP_406_NOT_ACCEPTABLE)
             
             # 중복 이메일 체크
             if User.objects.filter(email=dataDict["email"]):
-                return Response({"status": 406, "error_id": 2, "error_message": "중복된 이메일입니다."})
+                return Response({"error_message": "중복된 이메일입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
                 
             # 중복 닉네임 체크
             if User.objects.filter(username=dataDict["username"]):
-                return Response({"status": 406, "error_id": 3, "error_message": "중복된 닉네임입니다."})
+                return Response({"error_message": "중복된 닉네임입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
             
             user = User(
                 username=dataDict["username"],
@@ -104,11 +104,11 @@ class UserAPI(APIView):
             
             # 필수 항목 누락 검증
             if not dataDict["email"]:
-                raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH['email'])
+                return Response({"error_message": "%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH['email']}, status=HTTP_406_NOT_ACCEPTABLE)
             
             user = User.objects.filter(email=dataDict["email"])
             if not user:
-                raise Exception("해당 이메일의 사용자가 존재하지 않습니다.")
+                return Response({"error_message": "해당 이메일의 사용자가 존재하지 않습니다."}, status=HTTP_406_NOT_ACCEPTABLE)
             
             # 업데이트 (개별 업데이트는 user.save(update_fields=['', '', '', ...]))
             if dataDict["operator"] in ["+", "-", "="] and dataDict["credit"]:
@@ -149,12 +149,12 @@ class UserAPI(APIView):
             
             # 요청 데이터 누락 처리
             if not dataDict["email"]:
-                raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH['email'])
+                return Response({"error_message": "%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH['email']}, status=HTTP_406_NOT_ACCEPTABLE)
             
             # 사용자 검증
             user = User.objects.filter(email=dataDict["email"])
             if not user:
-                raise Exception("해당 이메일의 사용자가 존재하지 않습니다.")
+                return Response({"error_message": "해당 이메일의 사용자가 존재하지 않습니다."}, status=HTTP_406_NOT_ACCEPTABLE)
             
             user.delete()
             
@@ -187,7 +187,7 @@ class UserSearchAPI(APIView):
             
             # 일치하는 데이터가 없는 경우
             if not user:
-                raise Exception("일치하는 데이터가 없습니다.")
+                return Response({"error_message": "일치하는 데이터가 없습니다."}, status=HTTP_406_NOT_ACCEPTABLE)
             
             serializer = UserSerializer(user, many=True)
             return Response(serializer.data)
