@@ -223,16 +223,14 @@ class EyetrackVisualization(APIView):
     def get(self,request): 
         try:
             queryDict = {
-                "owner_email" : request.GET.get("owner_email"),
                 'pdf_id' : request.GET.get('pdf_id'),
-                'user_email' : request.GET.get('user_email'),
                 'visual_type' : request.GET.get('visual_type'),
             }
-            owner_id =  User.objects.get(email=queryDict['owner_email']).pk
-            user_id =  User.objects.get(email=queryDict['user_email']).pk
 
-            img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/{2}/images/".format(owner_id,queryDict['pdf_id'],queryDict['visual_type'])
-            image_page = Eyetracking.objects.filter(user_id=user_id,owner_id=owner_id,pdf_fk=queryDict['pdf_id']).values_list('page_num',flat=True).distinct()
+            owner_id = PDFModel.objects.get(pk=queryDict["pdf_id"]).user.pk
+            
+            img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/{2}/images/".format(owner_id, queryDict['pdf_id'], queryDict['visual_type'])
+            image_page = Eyetracking.objects.filter(owner_id=owner_id, pdf_fk=queryDict['pdf_id']).values_list('page_num',flat=True).distinct()
             
             visual_img = []
             for i in list(image_page):
