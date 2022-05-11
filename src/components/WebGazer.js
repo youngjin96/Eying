@@ -88,7 +88,13 @@ const WebGazer = () => {
             'page_number': pageNum,
             'pdf_id': pdfId,
             'coordinate': dimensionArr,
-        }).then(() => {
+        }).then(res => {
+            if (res.status === 200) {
+                console.log("Success");
+            }
+            else {
+                console.log("Fail");
+            }
             dimensionArr = [];
         });
     }

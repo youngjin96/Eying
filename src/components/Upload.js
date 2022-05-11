@@ -50,8 +50,13 @@ const Upload = () => {
         frm.append("pdf", e.target.files[0]);
         frm.append("email", email);
         frm.append("job_field", jobField);
-        axios.post('http://3.39.227.158:8000/pdf/', frm).then(() => {
-            console.log("success");
+        axios.post('http://52.78.246.65:8000/pdf/', frm).then(res => {
+            if (res.status === 200) {
+                alert("PDF 업로드에 성공했습니다.");
+            }
+            else {
+                alert("PDF 업로드에 실패했습니다. 다시 시도해주세요.");
+            }
         });
     };
 

@@ -38,7 +38,7 @@ const Track = () => {
     const [imgsUrl, setImgsUrl] = useState([]); // pdf image url 배열
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
     const [pageNumber, setpageNumber] = useState(0); // pdf 현재 페이지
-    
+
 
     useEffect(() => {
         // 유저 정보 가져오는 함수
@@ -48,7 +48,7 @@ const Track = () => {
                     setUserEmail(user.email);
                     setIsLoggedIn(true);
                     // 유저가 로그인했을 때 서버에서 데이터를 가져온다.
-                    axios.get('http://3.34.43.189:8000/pdf/').then(res => {
+                    axios.get('http://52.78.246.65:8000/pdf/').then(res => {
                         if (res.status === 200) {
                             console.log(res.status);
                             setPdfs(res.data);
@@ -68,7 +68,7 @@ const Track = () => {
     const onClickTrack = async () => {
         setIsTracking(true);
         setIsLoading(true);
-        await axios.get('http://3.34.43.189:8000/pdf/search', {
+        await axios.get('http://52.78.246.65:8000/pdf/search', {
             params: {
                 pdf_id: selectionModel[0]
             }
@@ -95,18 +95,24 @@ const Track = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://3.34.43.189:8000/eyetracking/", {
+        await axios.post("http://52.78.246.65:8000/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
             'page_number': pageNumber,
             'pdf_id': pdfId,
             'coordinate': dimensionArr
-        }).then(() => {
+        }).then(res => {
+            if (res.status === 200) {
+                console.log("Success");
+                setIsTracking(false);
+                dimensionArr = [];
+            }
+            else {
+                console.log("Fail");
+            }
             webgazer.end();
             webgazer.showPredictionPoints(false);
-            dimensionArr = [];
-            setIsTracking(false);
             window.location.reload();
         });
     };
@@ -118,14 +124,20 @@ const Track = () => {
 
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
-        await axios.post("http://3.34.43.189:8000/eyetracking/", {
+        await axios.post("http://52.78.246.65:8000/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
             'page_number': pageNumber,
             'pdf_id': pdfId,
             'coordinate': dimensionArr,
-        }).then(() => {
+        }).then(res => {
+            if (res.status === 200) {
+                console.log("Success");
+            }
+            else {
+                console.log("Fail");
+            }
             dimensionArr = [];
         });
     };
@@ -156,7 +168,7 @@ const Track = () => {
                 flexGrow: 1,
             }}
         >
-            <Grid 
+            <Grid
                 container
                 columns={{ xs: 12, sm: 12, md: 12 }}
                 style={{ textAlign: "center" }}
@@ -165,25 +177,25 @@ const Track = () => {
                     <AliceCarousel
                         animationDuration={1}
                         keyboardNavigation={true}
+                        disableButtonsControls={true}
                         onSlideChange={onSlideChange}
                         onSlideChanged={onSlideChanged}
-                        disableButtonsControls={true}
                     >
                         {/* <img src="/img/s.png" style={{ width: "100%", height: 500 }}> 
                             </img>
                             <img src="/img/example2.png" style={{ width: "100%", height: 500 }}> 
                             </img> */}
                         {imgsUrl && imgsUrl.map((e, index) => (
-                            <img 
+                            <img
                                 key={index}
                                 src={e}
                                 style={{ width: "100%", height: "80vh" }}
                             />
                         ))}
                     </AliceCarousel>
-                    <Button onClick={onClickStart}>Start</Button>
-                    <Button onClick={onClickEnd}>End</Button>
-                    <Button onClick={onClickBack}>Back</Button>
+                    <Button onClick={onClickStart}>시작하기</Button>
+                    <Button onClick={onClickEnd}>종료하기</Button>
+                    <Button onClick={onClickBack}>돌아가기</Button>
                 </Grid>
             </Grid>
         </Box>
@@ -198,16 +210,16 @@ const Track = () => {
                     columns={columns}
                     pageSize={10}
                     rowsPerPageOptions={[10]}
+                    selectionModel={selectionModel}
                     onSelectionModelChange={(newSelectionModel) => {
                         setSelectionModel(newSelectionModel);
+                        console.log(newSelectionModel)
                     }}
-                    selectionModel={selectionModel}
-                    
                     style={{ align: "center" }}
                 />
             </div>
             <div style={{ marginTop: 10, textAlign: "center" }}>
-                <Button 
+                <Button
                     variant="contained"
                     size="large"
                     onClick={onClickTrack}
@@ -215,7 +227,6 @@ const Track = () => {
                     TRACK
                 </Button>
             </div>
-
         </>
     )
 }
