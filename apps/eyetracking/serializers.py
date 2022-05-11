@@ -65,7 +65,7 @@ class EyetrackingUserList(serializers.ModelSerializer):
     
     create_date = serializers.SerializerMethodField()
     def get_create_date(self,obj):
-        return obj['create_date'].date()
+        return obj['date']
 
     id = serializers.SerializerMethodField()
     def get_id(self,obj):

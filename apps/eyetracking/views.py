@@ -9,7 +9,7 @@ from pdf.serializers import PDFSerializer
 from django.db.models import F
 from apps.settings import STATIC_URL
 from .heatmap import Heatmapper
-
+from django.db.models.functions import TruncDate
 from PIL import Image,ImageDraw
 import matplotlib.pyplot as plt
 from apps.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_CUSTOME_DOMAIN, AWS_STORAGE_BUCKET_NAME
@@ -195,12 +195,10 @@ class EyetrackUser(APIView):
     def get(self,request):
         try:
             queryDict = {
-                "email" : request.GET.get("user_email"),
-                'pdf_id' : request.GET.get('pdf_id'),
-                'page_num' : request.GET.get('page_number')
+                'pdf_id' : request.GET.get('pdf_id')
             }
             
-            queryset = Eyetracking.objects.filter(pdf_fk = queryDict['pdf_id'],page_num=queryDict['page_num']).annotate(
+            queryset = Eyetracking.objects.filter(pdf_fk = queryDict['pdf_id']).annotate(
                 pdf_id=F('pdf_fk__pk'),
                 age=F('user_id__age'),
                 job = F("user_id__job"),
@@ -209,13 +207,14 @@ class EyetrackUser(APIView):
                 gender=F('user_id__gender'),
                 username=F('user_id__username'),
                 email=F('user_id__email'),
-            ).values('id','user_id','create_date','age','job','job_field','position','gender','username','email','pdf_id')
+                date = TruncDate('create_date')
+            ).values('user_id','date','age','job','job_field','position','gender','username','email','pdf_id').distinct().order_by('pdf_fk')
      
-            # print("query",queryset)
+            print("query",queryset)
             serializer = EyetrackingUserList(queryset,many = True)
-            print(serializer)
             return Response(serializer.data,status=status.HTTP_200_OK)
-        except:
+        except Exception as e:
+            print(e)
             return Response({'error_message': "user list 오류"})
     
         
