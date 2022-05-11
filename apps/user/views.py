@@ -55,15 +55,15 @@ class UserAPI(APIView):
             # 필수 항목 누락 검증
             for key in dataDict.keys():
                 if not dataDict[key]:
-                    return Response({"error_id": 1, "error_message": "%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key]}, status=HTTP_406_NOT_ACCEPTABLE)
+                    return Response({"status": 406, "error_id": 1, "error_message": "%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key]})
             
             # 중복 이메일 체크
             if User.objects.filter(email=dataDict["email"]):
-                return Response({"error_id": 2, "error_message": "중복된 이메일입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
+                return Response({"status": 406, "error_id": 2, "error_message": "중복된 이메일입니다."})
                 
             # 중복 닉네임 체크
             if User.objects.filter(username=dataDict["username"]):
-                return Response({"error_id": 3, "error_message": "중복된 이메일입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
+                return Response({"status": 406, "error_id": 3, "error_message": "중복된 닉네임입니다."})
             
             user = User(
                 username=dataDict["username"],
