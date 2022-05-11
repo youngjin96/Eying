@@ -1,3 +1,9 @@
+import { useState } from "react";
+
+import axios from 'axios';
+
+import { useNavigate } from "react-router-dom"
+
 import { Box, Button, Container, FormControlLabel, Grid, TextField } from "@mui/material"
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -8,24 +14,21 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import FormLabel from '@mui/material/FormLabel';
-import { useState } from "react";
+
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
+
 import { createUserWithEmailAndPassword } from "firebase/auth";
+
 import { auth } from "./Fbase";
-import axios from 'axios';
-import { useNavigate } from "react-router-dom"
-
-
-
 
 const Enroll = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [age, setAge] = useState(0);
     const [sex, setSex] = useState("");
-    const [personJob, setPersonJob] = useState([]);
+    const [userJob, setUserJob] = useState([]);
     const [confirmpassword, setConfirmPassword] = useState("");
-    const [selected, setSelected] = useState([]);
+    const [position, setPosition] = useState([]);
     const [image, setImage] = useState("");
     const [username, setUsername] = useState("");
     const [fields, setFields] = useState([]);
@@ -48,63 +51,28 @@ const Enroll = () => {
         }
     }
 
-    async function postinfo() {
-
-        let enfrm = new FormData();
+    const onClickEnroll = async () => {
+        var enfrm = new FormData();
         enfrm.append("username", username);
         enfrm.append("job_field", fields)
         enfrm.append("email", email);
         enfrm.append("password", password);
         enfrm.append("age", age);
         enfrm.append("gender", sex);
-        enfrm.append("job", personJob);
-        enfrm.append("position", selected);
+        enfrm.append("job", userJob);
+        enfrm.append("position", position);
         enfrm.append('card', image);
 
-        const res = await axios.post('http://3.36.117.66:8000/user/', enfrm)
-            .then(function (response) {
-                console.log(response);
-                alert("정상적으로 회원가입이 완료되었습니다.")
+        await axios.post('http://3.39.228.6:8000/user/', enfrm).then(() => {
+            createUserWithEmailAndPassword(auth, email, password).then(() => {
+                alert("정상적으로 회원가입이 완료되었습니다.");
                 navigate("/home");
-            })
-            .catch(function (error) {
-                if (error.response) {
-                    console.log(error.response.data);
-                    console.log(error.response.status);
-                    console.error(error);
-
-                    alert(JSON.stringify(error.response.data.error_message));
-
-
-                }
-                else if (error.request) {
-                    // 요청이 이루어 졌으나 응답을 받지 못했습니다.
-                    // `error.request`는 브라우저의 XMLHttpRequest 인스턴스 또는
-                    // Node.js의 http.ClientRequest 인스턴스입니다.
-                    console.log(error.request);
-                }
-                else {
-                    // 오류를 발생시킨 요청을 설정하는 중에 문제가 발생했습니다.
-                    console.log('Error', error.message);
-                }
-                console.log(error.config);
-            })
-
-        return res;
-    }
-
-
-
-    const onClickEnroll = () => {
-        postinfo();
-        createUserWithEmailAndPassword(auth, email, password).then(() => {
-
-            })
-            .catch((error) => {
-                console.error(error);
-                alert("정보를 다시 확인해주세요");
+            }).catch(error => {
+                alert(error);
             });
-
+        }).catch(error => {
+            alert(error.response.data.error_message);
+        });
     }
 
     const ITEM_HEIGHT = 48;
@@ -128,18 +96,18 @@ const Enroll = () => {
     let type = null;
     let options = null;
 
-    if (personJob === "중학생" || personJob === "고등학생") {
+    if (userJob === "중학생" || userJob === "고등학생") {
         type = student1;
-    } else if (personJob === "직장인") {
+    } else if (userJob === "직장인") {
         type = salary;
-    } else if (personJob === "대학생") {
+    } else if (userJob === "대학생") {
         type = student2;
     }
 
-    function getStyles(job, personJob, theme) {
+    function getStyles(job, userJob, theme) {
         return {
             fontWeight:
-                personJob.indexOf(job) === -1
+                userJob.indexOf(job) === -1
                     ? theme.typography.fontWeightRegular
                     : theme.typography.fontWeightMedium,
         };
@@ -167,11 +135,11 @@ const Enroll = () => {
 
 
     const handleChange = (event) => {
-        setPersonJob(event.target.value)
+        setUserJob(event.target.value)
     };
 
     const handleChange2 = (event) => {
-        setSelected(event.target.value)
+        setPosition(event.target.value)
     };
 
     const handleChange3 = (event) => {
@@ -217,6 +185,10 @@ const Enroll = () => {
             componentDidMount();
         }
 
+    }
+
+    const onClickBack = () => {
+        navigate("/login")
     }
 
 
@@ -304,7 +276,7 @@ const Enroll = () => {
                                 <Select
                                     labelId="demo-multiple-job-label"
                                     id="demo-multiple-job"
-                                    value={personJob}
+                                    value={userJob}
                                     onChange={handleChange}
                                     input={<OutlinedInput label="Job" />}
                                     MenuProps={MenuProps}
@@ -314,7 +286,7 @@ const Enroll = () => {
                                         <MenuItem
                                             key={job}
                                             value={job}
-                                            style={getStyles(job, personJob, theme)}
+                                            style={getStyles(job, userJob, theme)}
                                         >
                                             {job}
                                         </MenuItem>
@@ -326,7 +298,7 @@ const Enroll = () => {
                                 <Select
                                     labelId="demo-multiple-sub-label"
                                     id="demo-multiple-sub"
-                                    value={selected}
+                                    value={position}
                                     onChange={handleChange2}
                                     input={<OutlinedInput label="Sub" />}
                                     MenuProps={MenuProps}
@@ -361,31 +333,50 @@ const Enroll = () => {
                             </FormControl>
                         </Grid>
                         <Grid item xs={12}>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                style={{ display: 'none' }}
-                                id="upload-button-file"
-                                multiple
-                                onChange={onLoadFile}
-                            />
-                            <label htmlFor="upload-button-file">
-                                <Button
-                                    variant="outlined"
-                                    component="span"
-                                    style={{ marginTop: 5, color: "black" }}
-                                >
-                                    명함 Upload
+                            {image ? (
+                                <Button variant="outlined" disabled>
+                                    Upload Complete
                                 </Button>
-                            </label>
+                            ) : (   
+                                    <>
+                                        <input
+                                        type="file"
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                        id="upload-button-file"
+                                        multiple
+                                        onChange={onLoadFile}
+                                        />
+                                        <label htmlFor="upload-button-file">
+                                            <Button
+                                                variant="outlined"
+                                                component="span"
+                                                style={{ marginTop: 5, color: "black" }}
+                                            >
+                                                Upload
+                                            </Button>
+                                        </label>
+                                    </>
+                                )
+                            }
                         </Grid>
                         <Grid item xs={12}>
                             <Button
                                 fullWidth
                                 variant="contained"
-                                sx={{ mt: 3, mb: 2 }}
-                                onClick={onClickEnroll}>
+                                sx={{ mt: 2, mb: 2 }}
+                                onClick={onClickEnroll}
+                            >
                                 회원가입
+                            </Button>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                onClick={onClickBack}
+                            >
+                                돌아가기
                             </Button>
                         </Grid>
                     </Grid>

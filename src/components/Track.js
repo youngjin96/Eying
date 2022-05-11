@@ -48,12 +48,13 @@ const Track = () => {
                     setUserEmail(user.email);
                     setIsLoggedIn(true);
                     // 유저가 로그인했을 때 서버에서 데이터를 가져온다.
-                    axios.get('http://52.78.246.65:8000/pdf/').then(res => {
-                        if (res.status === 200) {
-                            console.log(res.status);
-                            setPdfs(res.data);
-                            setIsLoading(false);
+                    axios.get('http://3.39.228.6:8000/pdf/', {
+                        params: {
+                            view: true
                         }
+                    }).then(res => {
+                        setPdfs(res.data);
+                        setIsLoading(false);   
                     })
                 } else {
                     setIsLoading(false);
@@ -68,7 +69,7 @@ const Track = () => {
     const onClickTrack = async () => {
         setIsTracking(true);
         setIsLoading(true);
-        await axios.get('http://52.78.246.65:8000/pdf/search', {
+        await axios.get('http://3.39.228.6:8000/pdf/search', {
             params: {
                 pdf_id: selectionModel[0]
             }
@@ -95,7 +96,7 @@ const Track = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://52.78.246.65:8000/eyetracking/", {
+        await axios.post("http://3.39.228.6:8000/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
@@ -124,7 +125,7 @@ const Track = () => {
 
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
-        await axios.post("http://52.78.246.65:8000/eyetracking/", {
+        await axios.post("http://3.39.228.6:8000/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',

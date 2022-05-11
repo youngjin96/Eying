@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Box, Grid, Typography, Button } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
@@ -42,8 +42,7 @@ const Mypage = () => {
     const user = auth.currentUser;
     const [value, setValue] = useState(0);
     const [userEmail, setUserEmail] = useState("");
-    const [trackedEmail, setTrackedEmail] = useState("");
-    const [visualType, setVisualType] = useState("");
+    const [visualType, setVisualType] = useState("distribution");
     const [firstPdfs, setFirstPdfs] = useState([]); // 첫 번째 pdfs
     const [secondPdfs, setSecondPdfs] = useState([]); // 두 번째 pdfs
     const [showedPdfs, setShowedPdfs] = useState([]); // 테이블에 보여줄 pdfs
@@ -67,8 +66,6 @@ const Mypage = () => {
 
     // 사이드 바에서 유저가 선택한 탭 처리 함수
     const handleChange = (event, newValue) => {
-        event.defaultPrevented = true;
-        console.log(event);
         setValue(newValue);
         if (newValue === 1) {
             setIsLoading(true);
@@ -79,12 +76,9 @@ const Mypage = () => {
                     view: true
                 }
             }).then(res => {
-                if (res.status === 200) {
-                    console.log(res.status);
-                    setFirstPdfs(res.data);
-                    setShowedPdfs(res.data);
-                    setIsLoading(false);
-                }
+                setFirstPdfs(res.data);
+                setShowedPdfs(res.data);
+                setIsLoading(false);
             })
         } else if (newValue === 2) {
 
@@ -141,13 +135,9 @@ const Mypage = () => {
                         page_number: 1
                     }
                 }).then(res => {
-                    if (res.status === 200) {
-                        console.log(res.status);
-                        setTrackedEmail(res.data.user_email);
-                        setSecondPdfs(res.data);
-                        setShowedPdfs(res.data);
-                        setIsLoading(false);
-                    }
+                    setSecondPdfs(res.data);
+                    setShowedPdfs(res.data);
+                    setIsLoading(false);
                 })
             }
             // 두 번째 step에서 continue 눌렀을 때 
@@ -157,14 +147,11 @@ const Mypage = () => {
                 axios.get('http://3.39.228.6:8000/eyetracking/visualization/', {
                     params: {
                         pdf_id: pdfId,
-                        visual_type: "flow"
+                        visual_type: visualType
                     }
                 }).then(res => {
-                    if (res.status === 200) {
-                        console.log(res.status);
-                        setTrackedImages(res.data.visual_img);
-                        setIsLoading(false);
-                    }
+                    setTrackedImages(res.data.visual_img);
+                    setIsLoading(false);
                 })
             }
         }
@@ -194,7 +181,29 @@ const Mypage = () => {
         setStep(1);
         setShowedPdfs(firstPdfs);
     }
-    
+
+    const onClickVisualType = () => {
+        setIsLoading(true);
+        var type = "";
+        if (visualType === "distribution") {
+            setVisualType("flow");
+            type = "flow";
+        }
+        else {
+            setVisualType("distribution");
+            type = "distribution";
+        }
+        axios.get('http://3.39.228.6:8000/eyetracking/visualization/', {
+            params: {
+                pdf_id: pdfId,
+                visual_type: type
+            }
+        }).then(res => {
+            setTrackedImages(res.data.visual_img);
+            setIsLoading(false);
+        })
+    }
+
 
     // 로그인 안 됐을 때 보여줄 화면
     if (!isLoggedIn) return (
@@ -222,7 +231,7 @@ const Mypage = () => {
                         sx={{ borderRight: 1, borderColor: 'divider' }}
                     >
                         <Tab label="회원정보 변경" {...a11yProps(0)} />
-                        <Tab label="내 PDF" {...a11yProps(1)} onClick={onClickMyPdf}/>
+                        <Tab label="내 PDF" {...a11yProps(1)} onClick={onClickMyPdf} />
                         <Tab label="회원 탈퇴" {...a11yProps(2)} />
                     </Tabs>
                     <TabPanel value={value} index={0}>
@@ -232,77 +241,103 @@ const Mypage = () => {
                         {isLoading ? (
                             <Loading />
                         ) : (
-                            step === 1 ? (
-                                <>
-                                    <div style={{ height: 630, width: '80%', margin: "auto" }}>
-                                        <DataGrid
-                                            rows={showedPdfs}
-                                            columns={columns}
-                                            pageSize={10}
-                                            rowsPerPageOptions={[10]}
-                                            selectionModel={selectionModel}
-                                            onSelectionModelChange={(newSelectionModel) => {
-                                                setSelectionModel(newSelectionModel);
-                                            }}
-                                            onCellClick={(params, event) => {
-                                                
-                                                console.log(event);
-                                                console.log(params);
-                                                setPdfId(params.row.id);
-                                            }}
-                                            style={{ align: "center" }}
-                                        />
-                                    </div>
-                                    <Button onClick={onClickContinue} style={{ color: "black" }}>
-                                        NEXT
-                                    </Button>
-                                </>
-                            ) : (
-                                step === 2 ? (
+                                step === 1 ? (
                                     <>
                                         <div style={{ height: 630, width: '80%', margin: "auto" }}>
                                             <DataGrid
                                                 rows={showedPdfs}
-                                                columns={stepTwoColumns}
+                                                columns={columns}
                                                 pageSize={10}
                                                 rowsPerPageOptions={[10]}
                                                 selectionModel={selectionModel}
                                                 onSelectionModelChange={(newSelectionModel) => {
                                                     setSelectionModel(newSelectionModel);
                                                 }}
-                                                onCellClick={(params) => {
+                                                onCellClick={(params, event) => {
+
+                                                    console.log(event);
                                                     console.log(params);
                                                     setPdfId(params.row.id);
                                                 }}
                                                 style={{ align: "center" }}
                                             />
                                         </div>
-                                        <Button onClick={onClickContinue} style={{ color: "black" }}>
+                                        <Button size="large" onClick={onClickContinue} style={{ color: "black" }}>
                                             NEXT
-                                        </Button>
-                                        <Button onClick={onClickBack} style={{ color: "black" }}>
-                                            BACK
                                         </Button>
                                     </>
                                 ) : (
-                                    <>
-                                        <AliceCarousel
-                                            animationDuration={1}
-                                            keyboardNavigation={true}
-                                            disableButtonsControls={true}
-                                        >
-                                            {trackedImages && trackedImages.map((e, index) => (
-                                                <img 
-                                                    key={index}
-                                                    src={e}
-                                                    style={{ width: "80%", height: 500 }}
-                                                />
-                                            ))}
-                                        </AliceCarousel>
-                                        <Button onClick={onClickBack}>BACK</Button>
-                                    </>
+                                        step === 2 ? (
+                                            <>
+                                                <div style={{ height: 630, width: '80%', margin: "auto" }}>
+                                                    <DataGrid
+                                                        rows={showedPdfs}
+                                                        columns={stepTwoColumns}
+                                                        pageSize={10}
+                                                        rowsPerPageOptions={[10]}
+                                                        selectionModel={selectionModel}
+                                                        onSelectionModelChange={(newSelectionModel) => {
+                                                            setSelectionModel(newSelectionModel);
+                                                        }}
+                                                        onCellClick={(params) => {
+                                                            console.log(params);
+                                                            setPdfId(params.row.id);
+                                                        }}
+                                                        style={{ align: "center" }}
+                                                    />
+                                                </div>
+                                                <Button size="large" onClick={onClickBack} style={{ color: "black" }}>
+                                                    BACK
+                                                </Button>
+                                                <Button size="large" onClick={onClickContinue} style={{ color: "black" }}>
+                                                    NEXT
+                                                </Button>
+                                            </>
+                                        ) : (
+                                                <>
+                                                    <AliceCarousel
+                                                        animationDuration={1}
+                                                        keyboardNavigation={true}
+                                                        disableButtonsControls={true}
+                                                    >
+                                                        {trackedImages && trackedImages.map((e, index) => (
+                                                            <img
+                                                                key={index}
+                                                                src={e}
+                                                                style={{ width: "80%", height: 500 }}
+                                                            />
+                                                        ))}
+                                                    </AliceCarousel>
+                                                    {visualType === "distribution" ? 
+                                                        (
+                                                            <Button 
+                                                                variant="contained"
+                                                                size="large"
+                                                                onClick={onClickVisualType}
+                                                            >
+                                                                시선 흐름 보기
+                                                            </Button>
+                                                        ) : (
+                                                            <Button
+                                                                variant="contained"
+                                                                size="large"
+                                                                onClick={onClickVisualType}
+                                                            >
+                                                                분포도 보기
+                                                            </Button>
+                                                            )
+                                                    }
+                                                    <Button
+                                                        variant="contained"
+                                                        size="large"
+                                                        onClick={onClickBack}
+                                                        style={{marginLeft: 20}}
+                                                    >
+                                                        BACK
+                                                    </Button>
+                                                </>
+                                            )
                                     )
-                                )   
                             )
                         }
                     </TabPanel>
@@ -315,4 +350,4 @@ const Mypage = () => {
     )
 }
 
-export default React.memo(Mypage);
+export default Mypage;
