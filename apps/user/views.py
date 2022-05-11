@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework.status import *
 from rest_framework.views import APIView
 
 from .models import User
@@ -54,12 +55,16 @@ class UserAPI(APIView):
             # 필수 항목 누락 검증
             for key in dataDict.keys():
                 if not dataDict[key]:
-                    raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key])
+                    return Response({"error_id": 1, "error_message": "%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key]}, status=HTTP_406_NOT_ACCEPTABLE)
             
             # 중복 이메일 체크
             if User.objects.filter(email=dataDict["email"]):
-                raise Exception("이미 존재하는 이메일입니다.")
+                return Response({"error_id": 2, "error_message": "중복된 이메일입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
                 
+            # 중복 닉네임 체크
+            if User.objects.filter(username=dataDict["username"]):
+                return Response({"error_id": 3, "error_message": "중복된 이메일입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
+            
             user = User(
                 username=dataDict["username"],
                 password=make_password(dataDict["password"]),
