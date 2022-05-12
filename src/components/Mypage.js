@@ -204,7 +204,6 @@ const Mypage = () => {
         })
     }
 
-
     // 로그인 안 됐을 때 보여줄 화면
     if (!isLoggedIn) return (
         <IsLoggedIn />

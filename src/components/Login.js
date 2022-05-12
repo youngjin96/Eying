@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { auth } from "./Fbase";
-import { signInWithEmailAndPassword, setPersistence, browserSessionPersistence } from "firebase/auth";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+
+import { useNavigate } from 'react-router-dom';
+
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -9,8 +9,10 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { useNavigate } from 'react-router-dom';
 
+import { signInWithEmailAndPassword, setPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+
+import { auth } from "./Fbase";
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -20,6 +22,7 @@ const Login = () => {
     const onChange = (event) => {
         const { target: { name, value } } = event;
         if (name === "email") {
+            console.log(value);
             setEmail(value)
         } else if (name === "password") {
             setPassword(value)
@@ -39,12 +42,11 @@ const Login = () => {
     const signInWithGoogle = () => {
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                navigate("/home");
-            }).catch((error) => {
-                console.log(error);
-            })
+        signInWithPopup(auth, provider).then(() => {
+            navigate("/home");
+        }).catch((error) => {
+            console.log(error);
+        });
     }
 
     const onClickEnroll = () => {
@@ -52,7 +54,7 @@ const Login = () => {
     }
 
     const onKeyPress = (e) => {
-        if(e.key === 'Enter'){
+        if (e.key === 'Enter') {
             onClickLogin();
         }
     }
@@ -64,58 +66,58 @@ const Login = () => {
             </Avatar>
             <Typography component="h1" variant="h5">
                 Sign In
-                    </Typography>
+            </Typography>
             <Box component="form" noValidate sx={{ mt: 3 }}>
-                <Grid container spacing={2}>
+                <Grid
+                    container
+                    columns={{ xs: 12, sm: 12, md: 12 }}
+                    spacing={2}
+                    style={{ textAlign: "center" }}
+                >
                     <Grid item xs={12}>
                         <TextField
-                            fullWidth
-                            id="email"
                             label="Email Address"
                             name="email"
-                            autoComplete="email"
-                            value={email}
                             onChange={onChange}
+                            style={{ width: "50%" }}
                         />
                     </Grid>
                     <Grid item xs={12}>
                         <TextField
-                            fullWidth
-                            name="password"
                             label="Password"
+                            name="password"
                             type="password"
-                            id="password"
-                            autoComplete="new-password"
-                            value={password}
                             onChange={onChange}
                             onKeyPress={onKeyPress}
+                            style={{ width: "50%" }}
                         />
                     </Grid>
+                    <Grid item xs={12}>
+                        <Button
+                            variant="outlined"
+                            onClick={onClickLogin}
+                            style={{ color: "black", borderColor: "#a8a9a8", width: "50%" }}
+                        >
+                            로그인
+                        </Button>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button
+                            onClick={signInWithGoogle}
+                            style={{ color: 'black', textTransform: "none" }}
+                        >
+                            Continue With Google
+                        </Button>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button
+                            onClick={onClickEnroll}
+                            style={{ color: 'black', marginLeft: 10 }}
+                        >
+                            회원가입
+                        </Button>
+                    </Grid>
                 </Grid>
-                <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
-                    onClick={onClickLogin}
-                >
-                    로그인
-                        </Button>
-                <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
-                    onClick={signInWithGoogle}
-                >
-                    Continue with Google
-                        </Button>
-                <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
-                    onClick={onClickEnroll}
-                >
-                    회원가입
-                </Button>
             </Box>
         </Box>
     );
