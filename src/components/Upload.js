@@ -18,12 +18,29 @@ import { Link } from 'react-router-dom';
 
 import Loading from "./Loading";
 import IsLoggedIn from "./IsLoggedIn";
+import IsUploading from "./IsUploading";
 import { auth } from './Fbase';
 import { onAuthStateChanged } from "firebase/auth";
+
+const jobFields = [
+    "Art",
+    "Education",
+    "Fashion",
+    "Food",
+    "Insurance",
+    "IT",
+    "Law",
+    "Marketing",
+    "Medical",
+    "Sports",
+    "Student",
+    "Other"
+];
 
 const Upload = () => {
     const [isLoading, setIsLoading] = useState(true); // 로그인 판별을 위한 로딩 변수
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 유무 판별 변수
+    const [isUploading, setIsUploading] = useState(false);
 
     const [email, setEmail] = useState(""); // 유저 이메일 변수
     const [jobField, setJobField] = useState(""); // PDF 올릴 때 종류 변수
@@ -46,17 +63,14 @@ const Upload = () => {
 
     // PDF 업로드 함수
     const handlePdfFileChange = (e) => {
+        setIsUploading(true);
         var frm = new FormData();
         frm.append("pdf", e.target.files[0]);
         frm.append("email", email);
         frm.append("job_field", jobField);
-        axios.post('http://52.78.246.65:8000/pdf/', frm).then(res => {
-            if (res.status === 200) {
-                alert("PDF 업로드에 성공했습니다.");
-            }
-            else {
-                alert("PDF 업로드에 실패했습니다. 다시 시도해주세요.");
-            }
+        axios.post('http://13.124.148.91:8000/pdf/', frm).then(res => {
+            setIsUploading(false);
+            alert("업로드가 완료되었습니다.");
         });
     };
 
@@ -67,7 +81,7 @@ const Upload = () => {
 
     // 로딩 중일 때 보여줄 화면
     if (isLoading) return (
-       <Loading />
+        <Loading />
     )
 
     // 로그인이 안 되어 있을 때 보여줄 다이얼로그
@@ -75,6 +89,9 @@ const Upload = () => {
         <IsLoggedIn />
     )
 
+    else if (isUploading) return (
+        <IsUploading />
+    )
     // 본 페이지
     else return (
         <>
@@ -189,10 +206,14 @@ const Upload = () => {
                                 label="JobField"
                                 onChange={handleChange}
                             >
-                                <MenuItem value={"IT"}>IT</MenuItem>
-                                <MenuItem value={"ART"}>ART</MenuItem>
-                                <MenuItem value={"SPORTS"}>SPORTS</MenuItem>
-                                <MenuItem value={"ETC"}>ETC</MenuItem>
+                                {jobFields.map((field) => (
+                                    <MenuItem
+                                        key={field}
+                                        value={field}
+                                    >
+                                        {field}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                         <label htmlFor="contained-button-file">
@@ -200,8 +221,7 @@ const Upload = () => {
                                 variant="outlined"
                                 color="primary"
                                 component="span"
-                                style={{ marginTop: 5, color: "black" }}
-
+                                style={{ marginTop: 5, color: "black", borderColor: "#a8a9a8" }}
                             >
                                 Upload
                             </Button>
@@ -218,7 +238,7 @@ const Upload = () => {
                             variant="outlined"
                             color="primary"
                             component="span"
-                            style={{ marginTop: 5, color: "black" }}
+                            style={{ marginTop: 5, color: "black", borderColor: "#a8a9a8" }}
                             onClick={() => window.open('https://webgazer.cs.brown.edu/calibration.html?', '_blank')}
                         >
                             Continue
@@ -235,7 +255,7 @@ const Upload = () => {
                             variant="outlined"
                             color="primary"
                             component="span"
-                            style={{ marginTop: 5, color: "black" }}
+                            style={{ marginTop: 5, color: "black", borderColor: "#a8a9a8" }}
                         >
                             <Link to="/webgazer" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
                                 CONTINUE

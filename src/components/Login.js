@@ -22,7 +22,6 @@ const Login = () => {
     const onChange = (event) => {
         const { target: { name, value } } = event;
         if (name === "email") {
-            console.log(value);
             setEmail(value)
         } else if (name === "password") {
             setPassword(value)

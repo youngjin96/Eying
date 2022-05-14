@@ -4,15 +4,12 @@ import axios from 'axios';
 
 import { useNavigate } from "react-router-dom"
 
-import { Box, Button, Container, Grid, TextField } from "@mui/material"
-import { useTheme } from '@mui/material/styles';
+import { Box, Button, Grid, TextField } from "@mui/material"
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-
-import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
@@ -23,43 +20,42 @@ const middleHighStudent = ["1학년", "2학년", "3학년"];
 const collegeStudent = ["1학년", "2학년", "3학년", "4학년", "졸업예정자", "취준생"];
 // 계급 종류
 const salary = [
-    "인턴", 
-    "사원", 
-    "주임", 
-    "대리", 
-    "과장", 
-    "차장", 
-    "부장", 
-    "이사", 
-    "상무", 
-    "전무", 
-    "부사장", 
-    "사장", 
-    "부회장", 
+    "인턴",
+    "사원",
+    "주임",
+    "대리",
+    "과장",
+    "차장",
+    "부장",
+    "이사",
+    "상무",
+    "전무",
+    "부사장",
+    "사장",
+    "부회장",
     "회장"
 ];
 // 업계 종류
 const jobFields = [
     "Art",
     "Education",
-    "Fashion", 
-    "Food", 
-    "Insurance", 
-    "IT", 
-    "Law", 
-    "Marketing", 
-    "Medical", 
-    "Sports", 
-    "Student", 
+    "Fashion",
+    "Food",
+    "Insurance",
+    "IT",
+    "Law",
+    "Marketing",
+    "Medical",
+    "Sports",
+    "Student",
     "Other"
 ];
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
+// Select style
 const MenuProps = {
     PaperProps: {
         style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            maxHeight: 48 * 4.5 + 8,
             width: 250,
         },
     },
@@ -68,14 +64,14 @@ const MenuProps = {
 const Enroll = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [repeatPassword, setRepeatPassword] = useState("");
+    const [username, setUsername] = useState("");
     const [age, setAge] = useState(0);
     const [sex, setSex] = useState("");
-    const [userJob, setUserJob] = useState([]);
-    const [confirmpassword, setConfirmPassword] = useState("");
-    const [position, setPosition] = useState([]);
-    const [image, setImage] = useState("");
-    const [username, setUsername] = useState("");
-    const [fields, setFields] = useState([]);
+    const [fields, setFields] = useState("");
+    const [userJob, setUserJob] = useState("");
+    const [position, setPosition] = useState("");
+    const [image, setImage] = useState(""); // 명함 이미지
     const navigate = useNavigate();
 
     const onChange = (event) => {
@@ -84,17 +80,24 @@ const Enroll = () => {
             setEmail(value)
         } else if (name === "password") {
             setPassword(value)
+        } else if (name === "repeatPassword") {
+            setRepeatPassword(value)
+        } else if (name === "username") {
+            setUsername(value)
         } else if (name === "age") {
             setAge(value)
         } else if (name === "sex") {
-            setSex(event.target.value)
-        } else if (name === "confirmpassword") {
-            setConfirmPassword(value)
-        } else if (name === "username") {
-            setUsername(value)
+            setSex(value)
+        } else if (name === "jobField") {
+            setFields(value)
+        } else if (name === "job") {
+            setUserJob(value)
+        } else if (name === "position") {
+            setPosition(value)
         }
     }
 
+    // 회원가입 버튼 눌렀을 때 함수
     const onClickEnroll = async () => {
         var enfrm = new FormData();
         enfrm.append("username", username);
@@ -107,7 +110,7 @@ const Enroll = () => {
         enfrm.append("position", position);
         enfrm.append('card', image);
 
-        await axios.post('http://3.39.228.6:8000/user/', enfrm).then(() => {
+        await axios.post('http://13.124.148.91:8000/user/', enfrm).then(() => {
             createUserWithEmailAndPassword(auth, email, password).then(() => {
                 alert("정상적으로 회원가입이 완료되었습니다.");
                 navigate("/home");
@@ -130,22 +133,6 @@ const Enroll = () => {
         type = collegeStudent;
     }
 
-    const handleChange = (event) => {
-        setUserJob(event.target.value)
-    };
-
-    const handleChange2 = (event) => {
-        setPosition(event.target.value)
-    };
-
-    const handleChange3 = (event) => {
-        setFields(event.target.value)
-    };
-
-    const onLoadFile = (event) => {
-        setImage(event.target.files[0]);
-    }
-
     if (type) {
         options = type.map((el) => (
             <MenuItem
@@ -157,226 +144,227 @@ const Enroll = () => {
         ))
     }
 
-    function componentDidMount() {
-        // custom rule will have name 'isPasswordMatch'
-        ValidatorForm.addValidationRule('isPasswordMatch', (value) => {
-            if (value !== password) {
-                return false;
-            }
-            return true;
-        });
-    }
-
-    const onKeyUp = (event) => {
-        if (event.keycode === '9') {
-            componentDidMount();
-        }
+    const onLoadFile = (event) => {
+        setImage(event.target.files[0]);
     }
 
     const onClickBack = () => {
         navigate("/login")
     }
 
-    const handleSubmit = () => {
-
-    }
-
-    const handleSexChange = (event) => {
-        setSex(event.target.value);
-    }
-
     return (
-        <Container component="main" maxWidth="xs">
-            <Box
-                sx={{ marginTop: 5, display: 'flex', height: '90vh' }} >
-                <ValidatorForm noValidate onSubmit={handleSubmit} component="form" sx={{ mt: 3 }} >
-                    <Grid container columns={{ xs: 12, sm: 12, md: 12 }} spacing={2} direction="row" justifyContent="space-between">
-                        <Grid item xs={12}>
+        <Box
+            sx={{ marginTop: 5, display: 'flex', height: '90vh' }}
+        >
+            <Grid
+                container
+                columns={{ xs: 12, sm: 12, md: 12 }}
+                spacing={2}
+                direction="row"
+                justifyContent="space-between"
+                style={{ textAlign: "center" }}
+            >
+                <Grid item xs={12}>
+                    <TextField
+                        name="email"
+                        label="Email-Address"
+                        onChange={onChange}
+                        style={{ width: "40%" }}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        name="password"
+                        label="Password"
+                        type="password"
+                        onChange={onChange}
+                        value={password}
+                        style={{ width: "40%" }}
+                    />
+                </Grid>
+                <Grid item xs={12} >
+                    {password === repeatPassword ? (
+                        <TextField
+                            name="repeatPassword"
+                            label="Repeat Password"
+                            type="password"
+                            onChange={onChange}
+                            style={{ width: "40%" }}
+                        />
+                    ) : (
+                        repeatPassword === "" ? (
                             <TextField
-                                name="email"
-                                label="Email Address"
-                                onChange={onChange}
-                                style={{ width: "100%" }}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextValidator
-                                fullWidth
-                                label="Password"
-                                name="password"
-                                type="password"
-                                autoComplete="current-password"
-                                onChange={onChange}
-                                validators={['required']}
-                                errorMessages={['this field is required']}
-                                value={password}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextValidator
-                                fullWidth
-                                name="confirmpassword"
+                                name="repeatPassword"
                                 label="Repeat Password"
                                 type="password"
-                                autoComplete="repeat-password"
                                 onChange={onChange}
-                                validators={['isPasswordMatch', 'required']}
-                                errorMessages={['비밀번호가 일치하지 않습니다.', 'this field is required']}
-                                onClick={componentDidMount}
-                                onKeyUp={onKeyUp}
-                                value={confirmpassword}
+                                style={{ width: "40%" }}
                             />
-                        </Grid>
-                        <Grid item xs={12}>
+                        ) : (
                             <TextField
-                                fullWidth
-                                name="username"
-                                label="User Name"
-                                autoComplete="usernmae"
+                                error
+                                name="repeatPassword"
+                                label="Repeat Password"
+                                type="password"
+                                helperText="비밀번호가 일치하지 않습니다."
                                 onChange={onChange}
+                                style={{ width: "40%" }}
                             />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                name="age"
-                                label="Age"
-                                onChange={onChange}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <FormControl fullWidth>
-                                <InputLabel id="sex-label">Sex</InputLabel>
-                                <Select
-                                    labelId="sex-label"
-                                    id="sex"
-                                    value={sex}
-                                    label="Sex"
-                                    onChange={handleSexChange}
+                            )
+                        )
+                    }
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        name="username"
+                        label="User Name"
+                        autoComplete="usernmae"
+                        onChange={onChange}
+                        style={{ width: "40%" }}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        name="age"
+                        label="Age"
+                        onChange={onChange}
+                        style={{ width: "40%" }}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <FormControl style={{ width: "40%" }}>
+                        <InputLabel id="sex-label">Sex</InputLabel>
+                        <Select
+                            labelId="sex-label"
+                            name="sex"
+                            id="sex"
+                            value={sex}
+                            label="Sex"
+                            onChange={onChange}
+                        >
+                            <MenuItem value={"Male"}>Male</MenuItem>
+                            <MenuItem value={"Female"}>Female</MenuItem>
+                            <MenuItem value={"Other"}>Other</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                    <FormControl style={{ width: "40%" }}>
+                        <InputLabel id="job-field-label">Job Field</InputLabel>
+                        <Select
+                            labelId="job-field-label"
+                            id="job-field"
+                            name="jobField"
+                            value={fields}
+                            onChange={onChange}
+                            input={<OutlinedInput label="Job_Field" />}
+                            MenuProps={MenuProps}
+                            defaultValue={""}
+                        >
+                            {jobFields.map((field) => (
+                                <MenuItem
+                                    key={field}
+                                    value={field}
                                 >
-                                    <MenuItem value={10}>Male</MenuItem>
-                                    <MenuItem value={20}>Female</MenuItem>
-                                    <MenuItem value={30}>Other</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <FormControl fullWidth>
-                                <InputLabel id="job-field-label">Job Field</InputLabel>
-                                <Select
-                                    labelId="job-field-label"
-                                    id="job-field"
-                                    value={fields}
-                                    onChange={handleChange3}
-                                    input={<OutlinedInput label="Job_Field" />}
-                                    MenuProps={MenuProps}
-                                    defaultValue={""}
+                                    {field}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                    <FormControl style={{ width: "20%" }}>
+                        <InputLabel id="job-label">Job</InputLabel>
+                        <Select
+                            labelId="job-label"
+                            id="job"
+                            name="job"
+                            value={userJob}
+                            onChange={onChange}
+                            input={<OutlinedInput label="Job" />}
+                            MenuProps={MenuProps}
+                            defaultValue={""}
+                        >
+                            {jobs.map((job) => (
+                                <MenuItem
+                                    key={job}
+                                    value={job}
                                 >
-                                    {jobFields.map((field) => (
-                                        <MenuItem
-                                            key={field}
-                                            value={field}
-                                        >
-                                            {field}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <FormControl style={{ width: "50%" }}>
-                                <InputLabel id="demo-multiple-job-label">Job</InputLabel>
-                                <Select
-                                    labelId="demo-multiple-job-label"
-                                    id="demo-multiple-job"
-                                    value={userJob}
-                                    onChange={handleChange}
-                                    input={<OutlinedInput label="Job" />}
-                                    MenuProps={MenuProps}
-                                    defaultValue={""}
-                                >
-                                    {jobs.map((job) => (
-                                        <MenuItem
-                                            key={job}
-                                            value={job}
-                                        >
-                                            {job}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            <FormControl sx={{ width: "50%" }}>
-                                <InputLabel id="demo-multiple-sub-label">Grade</InputLabel>
-                                <Select
-                                    labelId="demo-multiple-sub-label"
-                                    id="demo-multiple-sub"
-                                    value={position}
-                                    onChange={handleChange2}
-                                    input={<OutlinedInput label="Sub" />}
-                                    MenuProps={MenuProps}
-                                    defaultValue={""}
-                                >
-                                    {options}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                            {image ? (
-                                <Button
-                                    fullWidth
-                                    variant="outlined"
-                                    disabled
-                                >
-                                    업로드 완료
-                                </Button>
-                            ) : (
-                                    <>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            style={{ display: 'none' }}
-                                            id="upload-button-file"
-                                            multiple
-                                            onChange={onLoadFile}
-                                        />
-                                        <label htmlFor="upload-button-file">
-                                            <Button
-                                                fullWidth
-                                                variant="outlined"
-                                                component="span"
-                                                style={{ marginTop: 5, color: "black", borderColor: "#a8a9a8" }}
-                                            >
-                                                명함 업로드
+                                    {job}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl sx={{ width: "20%" }}>
+                        <InputLabel id="demo-multiple-sub-label">Position</InputLabel>
+                        <Select
+                            labelId="demo-multiple-sub-label"
+                            id="demo-multiple-sub"
+                            name="position"
+                            value={position}
+                            onChange={onChange}
+                            input={<OutlinedInput label="Sub" />}
+                            MenuProps={MenuProps}
+                            defaultValue={""}
+                        >
+                            {options}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                    {image ? (
+                        <Button
+                            variant="outlined"
+                            disabled
+                            style={{ width: "40%" }}
+                        >
+                            업로드 완료
+                        </Button>
+                    ) : (
+                            <>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    id="upload-button-file"
+                                    multiple
+                                    onChange={onLoadFile}
+                                />
+                                <label htmlFor="upload-button-file">
+                                    <Button
+                                        variant="outlined"
+                                        component="span"
+                                        style={{ marginTop: 5, color: "black", borderColor: "#a8a9a8", width: "40%" }}
+                                    >
+                                        명함 업로드
                                             </Button>
-                                        </label>
-                                    </>
-                                )
-                            }
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Button
-                                variant="outlined"
-                                sx={{ mt: 2 }}
-                                onClick={onClickBack}
-                                style={{ color: "black", borderColor: "#a8a9a8", width: 100 }}
-                            >
-                                돌아가기
+                                </label>
+                            </>
+                        )
+                    }
+                </Grid>
+                <Grid item xs={6} style={{ textAlign: "end" }}>
+                    <Button
+                        variant="outlined"
+                        sx={{ mt: 2 }}
+                        onClick={onClickBack}
+                        style={{ color: "black", borderColor: "#a8a9a8", width: "15%" }}
+                    >
+                        돌아가기
                                 </Button>
-                        </Grid>
-                        <Grid item xs={6} style={{ textAlign: "end" }}>
-                            <Button
-                                variant="outlined"
-                                sx={{ mt: 2 }}
-                                onClick={onClickEnroll}
-                                style={{ color: "black", borderColor: "#a8a9a8", width: 100 }}
-                            >
-                                회원가입
+                </Grid>
+                <Grid item xs={6} style={{ textAlign: "start" }}>
+                    <Button
+                        variant="outlined"
+                        sx={{ mt: 2 }}
+                        onClick={onClickEnroll}
+                        style={{ color: "black", borderColor: "#a8a9a8", width: "15%" }}
+                    >
+                        회원가입
                                 </Button>
-                        </Grid>
-                    </Grid>
-                </ValidatorForm>
-            </Box>
-        </Container >
+                </Grid>
+            </Grid>
+        </Box>
     )
 }
 

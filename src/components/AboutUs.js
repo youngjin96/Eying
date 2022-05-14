@@ -57,13 +57,16 @@ const AboutUs = () => {
                             interval={3000}
                         >
                             <div>
-                                <img src="/img/back.png" style={{ height: 550, width: "95%" }} />
+                                <img src="/img/firstExample.png" style={{ height: 550, width: "95%" }} />
                             </div>
                             <div>
-                                <img src="/img/example.jpg" style={{ height: 550, width: "95%" }} />
+                                <img src="/img/thirdExample.png" style={{ height: 550, width: "95%" }} />
                             </div>
                             <div>
-                                <img src="/img/example2.png" style={{ height: 550, width: "95%" }} />
+                                <img src="/img/secondExample.png" style={{ height: 550, width: "95%" }} />
+                            </div>
+                            <div>
+                                <img src="/img/fourthExample.png" style={{ height: 550, width: "95%" }} />
                             </div>
                         </Carousel>
                     </Grid>
