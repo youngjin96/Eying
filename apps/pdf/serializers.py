@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from yaml import serialize
 from .models import PDFModel
 
 from drf_yasg.utils import swagger_serializer_method
