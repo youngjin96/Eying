@@ -1,5 +1,8 @@
 from rest_framework import serializers
+from yaml import serialize
 from .models import PDFModel
+
+from drf_yasg.utils import swagger_serializer_method
 
      
 class PDFSerializerLambdaField(serializers.SerializerMethodField):
@@ -11,10 +14,26 @@ class PDFSerializerLambdaField(serializers.SerializerMethodField):
     
     
 class PDFSerializer(serializers.ModelSerializer):
-    pdf_name = PDFSerializerLambdaField(lambda obj: obj.name)
-    user_name = PDFSerializerLambdaField(lambda obj: obj.user.username)
-    user_email = PDFSerializerLambdaField(lambda obj: obj.user.email)
-    imgs_url = PDFSerializerLambdaField(lambda obj: ["%s%d.jpg" % (obj.img_path, i) for i in range(obj.img_length)])
+    pdf_name = serializers.SerializerMethodField()
+    @swagger_serializer_method(serializer_or_field=serializers.CharField)
+    def get_pdf_name(self, obj):
+        return obj.name.rstrip(".pdf")
+    
+    user_name = serializers.SerializerMethodField()
+    @swagger_serializer_method(serializer_or_field=serializers.CharField)
+    def get_user_name(self, obj):
+        return obj.user.username
+    
+    user_email = serializers.SerializerMethodField()
+    @swagger_serializer_method(serializer_or_field=serializers.CharField)
+    def get_user_email(self, obj):
+        return obj.user.email
+    
+    imgs_url = serializers.SerializerMethodField()
+    @swagger_serializer_method(serializer_or_field=serializers.ListField)
+    def get_imgs_url(self, obj):
+        return ["%s%d.jpg" % (obj.img_path, i) for i in range(obj.img_length)]
+    
     
     class Meta:
         model = PDFModel

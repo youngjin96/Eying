@@ -17,22 +17,32 @@ from drf_yasg       import openapi
 class UserAPI(APIView):
     # 사용자 유효성 검사 (DB)
     @swagger_auto_schema(
-            operation_summary = '/user',
-            operation_description="로그인 기능을 하는 API입니다.",
-            responses={200 : UserSerializer},
-            manual_parameters=[
-            openapi.Parameter(
-            'email', 
-            openapi.IN_QUERY, 
-            description="사용자 이메일", 
-            type=openapi.TYPE_STRING)
-            ,
-            openapi.Parameter(
-            'password', 
-            openapi.IN_QUERY, 
-            description="사용자 비밀번호", 
-            type=openapi.TYPE_STRING)
-            ])
+        operation_summary='/user/',
+        operation_description="로그인 기능을 하는 API입니다.",
+        manual_parameters=[
+            openapi.Parameter('email', openapi.IN_QUERY, description="사용자 이메일", type=openapi.TYPE_STRING),
+            openapi.Parameter('password', openapi.IN_QUERY, description="사용자 비밀번호", type=openapi.TYPE_STRING)
+        ],
+        responses={
+            200 : UserSerializer,
+            400: openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "error_message": "포함되지 않은 또는 잘못된 데이터 정보"
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "error_message": "서버 내부에서 발생한 오류 내용"
+                    }
+                }
+            )
+        }
+    )
     @TIME_MEASURE
     def get(self, request):
         try:
@@ -42,7 +52,7 @@ class UserAPI(APIView):
             }
             
             if not queryDict["email"] or not queryDict["password"]:
-                return Response({"error_message": "아이디 / 패스워드 입력 오류입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
+                return Response({"error_message": "이메일 / 패스워드 입력 오류입니다."}, status=HTTP_400_BAD_REQUEST)
             
             user = User.objects.get(Q(email=queryDict["email"]))
             
@@ -50,32 +60,51 @@ class UserAPI(APIView):
                 serializer = UserSerializer(user, many=False)
                 return Response(serializer.data)
             else:
-                return Response({"error_message": "패스워드가 올바르지 않습니다."}, status=HTTP_406_NOT_ACCEPTABLE)
+                return Response({"error_message": "패스워드가 올바르지 않습니다."}, status=HTTP_400_BAD_REQUEST)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)})
+            return Response({'error_message': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 
     # 회원가입
     @swagger_auto_schema(
-        operation_summary="/user", 
+        operation_summary="/user/", 
         operation_description="회원가입시 요청되는 API입니다.", 
         request_body=openapi.Schema(
-        '회원 가입',
-        type=openapi.TYPE_OBJECT,
-        properties={
-            "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
-            "password": openapi.Schema('비밀번호', type=openapi.TYPE_STRING),
-            "username": openapi.Schema('사용자 이름', type=openapi.TYPE_STRING),
-            "age": openapi.Schema('나이', type=openapi.TYPE_STRING),
-            "job": openapi.Schema('직업', type=openapi.TYPE_STRING),
-            "job_field": openapi.Schema('직무 분야', type=openapi.TYPE_STRING),
-            "position": openapi.Schema('직급', type=openapi.TYPE_STRING),
-            "gender": openapi.Schema('성별', type=openapi.TYPE_STRING),
-            "credit": openapi.Schema('credit?', type=openapi.TYPE_STRING),
-            "card": openapi.Schema('card?', type=openapi.TYPE_STRING),
-
-        }),
-    responses={200: UserSerializer})
+            '회원가입',
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
+                "password": openapi.Schema('비밀번호', type=openapi.TYPE_STRING),
+                "username": openapi.Schema('닉네임', type=openapi.TYPE_STRING),
+                "age": openapi.Schema('나이', type=openapi.TYPE_INTEGER),
+                "job": openapi.Schema('직업', type=openapi.TYPE_STRING),
+                "job_field": openapi.Schema('직무 분야', type=openapi.TYPE_STRING),
+                "position": openapi.Schema('직급', type=openapi.TYPE_STRING),
+                "gender": openapi.Schema('성별', type=openapi.TYPE_STRING),
+                "credit": openapi.Schema('크레딧', type=openapi.TYPE_INTEGER),
+                "card": openapi.Schema('명함 이미지', type=openapi.TYPE_OBJECT),
+            }
+        ),
+        responses={
+            200: UserSerializer,
+            406: openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "error_message": "포함되지 않은 또는 잘못된 데이터 정보"
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "error_message": "서버 내부에서 발생한 오류 내용"
+                    }
+                }
+            )
+        }
+    )
     @TIME_MEASURE
     def post(self, request):
         try:
@@ -123,35 +152,54 @@ class UserAPI(APIView):
             return Response(serializer.data)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)})
-    
-     
+            return Response({'error_message': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+        
     # 사용자 수정
     @swagger_auto_schema(
-    operation_summary="/user", 
-    operation_description="사용자 정보 수정 시 요청되는 API입니다.", 
-    request_body=openapi.Schema(
-    '개인정보 변경',
-    type=openapi.TYPE_OBJECT,
-    properties={
-        "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
-        "password": openapi.Schema('비밀번호', type=openapi.TYPE_STRING),
-        "username": openapi.Schema('사용자 이름', type=openapi.TYPE_STRING),
-        "age": openapi.Schema('나이', type=openapi.TYPE_STRING),
-        "job": openapi.Schema('직업', type=openapi.TYPE_STRING),
-        "job_field": openapi.Schema('직무 분야', type=openapi.TYPE_STRING),
-        "position": openapi.Schema('직급', type=openapi.TYPE_STRING),
-        "gender": openapi.Schema('성별', type=openapi.TYPE_STRING),
-        "credit": openapi.Schema('credit?', type=openapi.TYPE_STRING),
-        "operator": openapi.Schema('operator?', type=openapi.TYPE_STRING),
-
-    }),
-    responses={200: UserSerializer})
+        operation_summary="/user/", 
+        operation_description="사용자 정보 수정 시 요청되는 API입니다.", 
+        request_body=openapi.Schema(
+            '개인정보 변경',
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
+                "password": openapi.Schema('비밀번호', type=openapi.TYPE_STRING),
+                "username": openapi.Schema('사용자 이름', type=openapi.TYPE_STRING),
+                "age": openapi.Schema('나이', type=openapi.TYPE_INTEGER),
+                "job": openapi.Schema('직업', type=openapi.TYPE_STRING),
+                "job_field": openapi.Schema('직무 분야', type=openapi.TYPE_STRING),
+                "position": openapi.Schema('직급', type=openapi.TYPE_STRING),
+                "gender": openapi.Schema('성별', type=openapi.TYPE_STRING),
+                "credit": openapi.Schema('크레딧', type=openapi.TYPE_INTEGER),
+                "operator": openapi.Schema('크레딧 연산', type=openapi.TYPE_STRING),
+            }
+        ),
+        responses={
+            200: UserSerializer,
+            406: openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "error_message": "포함되지 않은 또는 잘못된 데이터 정보"
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "error_message": "서버 내부에서 발생한 오류 내용"
+                    }
+                }
+            )
+        }
+    )
     @TIME_MEASURE
     def put(self, request):
         try:
             dataDict = {
                 "email": request.data.get("email"),
+                "new_email": request.data.get("new_email"),
                 "operator": request.data.get("operator"),
                 "credit": request.data.get("credit"),
                 "username": request.data.get("username"),
@@ -171,6 +219,12 @@ class UserAPI(APIView):
             if not user:
                 return Response({"error_message": "해당 이메일의 사용자가 존재하지 않습니다."}, status=HTTP_406_NOT_ACCEPTABLE)
             
+            if User.objects.filter(email=dataDict["new_email"]):
+                return Response({"error_message": "변경할 이메일이 이미 사용 중입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
+
+            if User.objects.filter(username=dataDict["username"]):
+                return Response({"error_message": "변경할 닉네임이 이미 사용 중입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
+            
             # 업데이트 (개별 업데이트는 user.save(update_fields=['', '', '', ...]))
             if dataDict["operator"] in ["+", "-", "="] and dataDict["credit"]:
                 if dataDict["operator"] == "+":
@@ -180,6 +234,8 @@ class UserAPI(APIView):
                 elif dataDict["operator"] == "=":
                     user.update(credit=int(dataDict["credit"]))
                 
+            if dataDict["new_email"]:
+                user.update(email=dataDict["new_email"])
             if dataDict["username"]:
                 user.update(username=dataDict["username"])
             if dataDict["age"]:
@@ -199,20 +255,39 @@ class UserAPI(APIView):
             return Response(serializer.data)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)})
+            return Response({'error_message': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 
        
     @swagger_auto_schema(
-    operation_summary="/user", 
-    operation_description="회원탈퇴 시 요청되는 API입니다.", 
-    request_body=openapi.Schema(
-    '회원 탈퇴',
-    type=openapi.TYPE_OBJECT,
-    properties={
-        "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
-
-    }),
-    responses={200: UserSerializer})
+        operation_summary="/user/", 
+        operation_description="회원탈퇴 시 요청되는 API입니다.", 
+        request_body=openapi.Schema(
+            '회원 탈퇴', 
+            type=openapi.TYPE_OBJECT, 
+            properties={
+                "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
+            }
+        ),
+        responses={
+            200: UserSerializer,
+            406: openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "error_message": "포함되지 않은 또는 잘못된 데이터 정보"
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "error_message": "서버 내부에서 발생한 오류 내용"
+                    }
+                }
+            )
+        }
+    )
     @TIME_MEASURE
     def delete(self, request):
         try:
@@ -235,32 +310,37 @@ class UserAPI(APIView):
             return Response(serializer.data)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)})
+            return Response({'error_message': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
                 
 class UserSearchAPI(APIView):
     @swagger_auto_schema(
-            operation_summary = '/user/search',
-            operation_description="사용자의 정보를 제공하는 하는 API입니다.",
-            responses={200 : UserSerializer},
-            manual_parameters=[
-            openapi.Parameter(
-            'user_id', 
-            openapi.IN_QUERY, 
-            description="사용자 고유 ID", 
-            type=openapi.TYPE_STRING)
-            ,
-            openapi.Parameter(
-            'email', 
-            openapi.IN_QUERY, 
-            description="사용자 이메일", 
-            type=openapi.TYPE_STRING)
-            ,
-            openapi.Parameter(
-            'username', 
-            openapi.IN_QUERY, 
-            description="사용자 이름", 
-            type=openapi.TYPE_STRING)
-            ])
+        operation_summary='/user/search/',
+        operation_description="사용자의 정보를 검색하는 API입니다.",
+        manual_parameters=[
+            openapi.Parameter('user_id', openapi.IN_QUERY, description="사용자 고유 ID", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('email', openapi.IN_QUERY, description="사용자 이메일", type=openapi.TYPE_STRING),
+            openapi.Parameter('username', openapi.IN_QUERY, description="사용자 이름", type=openapi.TYPE_STRING)
+        ],
+        responses={
+            200: UserSerializer,
+            400: openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "error_message": "포함되지 않은 또는 잘못된 데이터 정보"
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "error_message": "서버 내부에서 발생한 오류 내용"
+                    }
+                }
+            )
+        }
+    )
     @TIME_MEASURE
     def get(self, request):
         try:
@@ -283,10 +363,10 @@ class UserSearchAPI(APIView):
             
             # 일치하는 데이터가 없는 경우
             if not user:
-                return Response({"error_message": "일치하는 데이터가 없습니다."}, status=HTTP_406_NOT_ACCEPTABLE)
+                return Response({"error_message": "일치하는 데이터가 없습니다."}, status=HTTP_400_BAD_REQUEST)
             
             serializer = UserSerializer(user, many=True)
             return Response(serializer.data)
         except Exception as e:
             print(e)
-            return Response({'error_message': str(e)})
+            return Response({'error_message': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
