@@ -11,8 +11,28 @@ from django.contrib.auth.hashers import make_password, check_password
 from apps.decorator import TIME_MEASURE
 import config.policy as POLICY
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg       import openapi
+
 class UserAPI(APIView):
     # 사용자 유효성 검사 (DB)
+    @swagger_auto_schema(
+            operation_summary = '/user',
+            operation_description="로그인 기능을 하는 API입니다.",
+            responses={200 : UserSerializer},
+            manual_parameters=[
+            openapi.Parameter(
+            'email', 
+            openapi.IN_QUERY, 
+            description="사용자 이메일", 
+            type=openapi.TYPE_STRING)
+            ,
+            openapi.Parameter(
+            'password', 
+            openapi.IN_QUERY, 
+            description="사용자 비밀번호", 
+            type=openapi.TYPE_STRING)
+            ])
     @TIME_MEASURE
     def get(self, request):
         try:
@@ -36,6 +56,26 @@ class UserAPI(APIView):
             return Response({'error_message': str(e)})
 
     # 회원가입
+    @swagger_auto_schema(
+        operation_summary="/user", 
+        operation_description="회원가입시 요청되는 API입니다.", 
+        request_body=openapi.Schema(
+        '회원 가입',
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
+            "password": openapi.Schema('비밀번호', type=openapi.TYPE_STRING),
+            "username": openapi.Schema('사용자 이름', type=openapi.TYPE_STRING),
+            "age": openapi.Schema('나이', type=openapi.TYPE_STRING),
+            "job": openapi.Schema('직업', type=openapi.TYPE_STRING),
+            "job_field": openapi.Schema('직무 분야', type=openapi.TYPE_STRING),
+            "position": openapi.Schema('직급', type=openapi.TYPE_STRING),
+            "gender": openapi.Schema('성별', type=openapi.TYPE_STRING),
+            "credit": openapi.Schema('credit?', type=openapi.TYPE_STRING),
+            "card": openapi.Schema('card?', type=openapi.TYPE_STRING),
+
+        }),
+    responses={200: UserSerializer})
     @TIME_MEASURE
     def post(self, request):
         try:
@@ -84,8 +124,29 @@ class UserAPI(APIView):
         except Exception as e:
             print(e)
             return Response({'error_message': str(e)})
-        
+    
+     
     # 사용자 수정
+    @swagger_auto_schema(
+    operation_summary="/user", 
+    operation_description="사용자 정보 수정 시 요청되는 API입니다.", 
+    request_body=openapi.Schema(
+    '개인정보 변경',
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
+        "password": openapi.Schema('비밀번호', type=openapi.TYPE_STRING),
+        "username": openapi.Schema('사용자 이름', type=openapi.TYPE_STRING),
+        "age": openapi.Schema('나이', type=openapi.TYPE_STRING),
+        "job": openapi.Schema('직업', type=openapi.TYPE_STRING),
+        "job_field": openapi.Schema('직무 분야', type=openapi.TYPE_STRING),
+        "position": openapi.Schema('직급', type=openapi.TYPE_STRING),
+        "gender": openapi.Schema('성별', type=openapi.TYPE_STRING),
+        "credit": openapi.Schema('credit?', type=openapi.TYPE_STRING),
+        "operator": openapi.Schema('operator?', type=openapi.TYPE_STRING),
+
+    }),
+    responses={200: UserSerializer})
     @TIME_MEASURE
     def put(self, request):
         try:
@@ -139,7 +200,19 @@ class UserAPI(APIView):
         except Exception as e:
             print(e)
             return Response({'error_message': str(e)})
-        
+
+       
+    @swagger_auto_schema(
+    operation_summary="/user", 
+    operation_description="회원탈퇴 시 요청되는 API입니다.", 
+    request_body=openapi.Schema(
+    '회원 탈퇴',
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
+
+    }),
+    responses={200: UserSerializer})
     @TIME_MEASURE
     def delete(self, request):
         try:
@@ -165,6 +238,29 @@ class UserAPI(APIView):
             return Response({'error_message': str(e)})
                 
 class UserSearchAPI(APIView):
+    @swagger_auto_schema(
+            operation_summary = '/user/search',
+            operation_description="사용자의 정보를 제공하는 하는 API입니다.",
+            responses={200 : UserSerializer},
+            manual_parameters=[
+            openapi.Parameter(
+            'user_id', 
+            openapi.IN_QUERY, 
+            description="사용자 고유 ID", 
+            type=openapi.TYPE_STRING)
+            ,
+            openapi.Parameter(
+            'email', 
+            openapi.IN_QUERY, 
+            description="사용자 이메일", 
+            type=openapi.TYPE_STRING)
+            ,
+            openapi.Parameter(
+            'username', 
+            openapi.IN_QUERY, 
+            description="사용자 이름", 
+            type=openapi.TYPE_STRING)
+            ])
     @TIME_MEASURE
     def get(self, request):
         try:

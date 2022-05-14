@@ -4,8 +4,7 @@ from rest_framework import status
 from user.models import User
 from pdf.models import PDFModel
 from .models import Eyetracking
-from .serializers import EyetrackingSerializer,EyetrackingUserList,Userlist,CoordinateSerializer
-from pdf.serializers import PDFSerializer
+from .serializers import EyetrackingSerializer,EyetrackingUserList,Userlist
 from django.db.models import F
 from apps.settings import STATIC_URL
 from .heatmap import Heatmapper
@@ -20,6 +19,9 @@ import urllib.request
 import ast
 from apps.decorator import TIME_MEASURE
 import asyncio # 비동기 처리
+
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg       import openapi
 heatmapper = Heatmapper(
     point_diameter=100,  # the size of each point to be drawn
     point_strength=1,  # the strength, between 0 and 1, of each point to be drawn
@@ -96,7 +98,23 @@ class EyetrackList(APIView):
         except Exception as e: 
             print(e)
             return Response({'error_message': "시각화 오류"})
+   
+    @swagger_auto_schema(
+            operation_summary="/eyetracking", 
+            operation_description="Eyetracking을 한 데이터를 데이터베이스에 추가하는 POST API입니다. PPT 한장을 평가할 때마다 DB에 요청됩니다.", 
+            request_body=openapi.Schema(
+           'Eyetrack 등록',
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'user_email': openapi.Schema('평가자 이메일', type=openapi.TYPE_STRING),
+                'owner_email': openapi.Schema('PPT 소유자 이메일', type=openapi.TYPE_STRING),
+                'coordinate': openapi.Schema('시각 데이터', type=openapi.TYPE_STRING),
+                'page_num': openapi.Schema('PPT 페이지 번호', type=openapi.TYPE_STRING),
+                'pdf_id': openapi.Schema('PPT 고유 ID', type=openapi.TYPE_STRING),
+                'rating_time': openapi.Schema('평가 소요 시간', type=openapi.TYPE_STRING),
 
+            }),
+        responses={200: EyetrackingSerializer})
     def post(self,request):
         try:
             user_email = request.data.get('user_email')
@@ -135,6 +153,19 @@ class EyetrackList(APIView):
         except Exception as e:
             print(e)
     
+    @swagger_auto_schema(
+			operation_summary="/eyetracking", 
+            operation_description="Eyetracking을 한 데이터를 데이터베이스에 수정하는 PUT API입니다. PPT를 평가하다가 뒷장을 넘어가 추가로 평가하는 경우에 요청됩니다.", 
+            request_body=openapi.Schema(
+           'Eyetrack 수정',
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'user_email': openapi.Schema('평가자 이름', type=openapi.TYPE_STRING),
+                'owner_email': openapi.Schema('PPT 소유자 이메일', type=openapi.TYPE_STRING),
+                'pdf_id': openapi.Schema('PPT 고유 ID', type=openapi.TYPE_STRING),
+                'page_number': openapi.Schema('PPT 페이지 번호', type=openapi.TYPE_STRING),
+            }),
+        responses={200: EyetrackingSerializer})
     def put(self, request):
         user_id =  User.objects.get(email=request.data['user_email']).pk
         owner_id = User.objects.get(email=request.data['owner_email']).pk
@@ -179,19 +210,18 @@ class EyetrackList(APIView):
         serializer = EyetrackingSerializer(eyetrackdatas, many=False)
         return Response(serializer.data)
 
-class EyetrackPdf(APIView):
-    # 해당 유저가 올린 pdf 리스트
-    def get(self,request):
-        quertDict = {
-                "email": request.GET.get("user_email"),
-            }
-        query = User.objects.get(email=quertDict["email"])
-        queryset = PDFModel.objects.filter(user = query)
-        # query 
-        serializer = PDFSerializer(queryset,many =True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-        
 class EyetrackUser(APIView):
+    @swagger_auto_schema(
+            operation_summary = '/eyetrack/user',
+            operation_description="PPT를 평가한 User 정보를 제공하는 API입니다.",
+            responses={200 : 'Visualization Image Link'},
+            manual_parameters=[
+            openapi.Parameter(
+            'pdf_id', 
+            openapi.IN_QUERY, 
+            description="PPT의 고유 ID", 
+            type=openapi.TYPE_STRING)
+            ])
     def get(self,request):
         try:
             queryDict = {
@@ -218,12 +248,30 @@ class EyetrackUser(APIView):
             return Response({'error_message': "user list 오류"})
     
         
-class EyetrackVisualization(APIView):   
+class EyetrackVisualization(APIView):
+    @swagger_auto_schema(
+            operation_summary = '/eyetrack/visualization',
+            responses={200 : '시각화 이미지 리스트'},
+            operation_description="시각 분포와 시각 흐름에 대한 시각화를 진행하여 보관합니다. AWS S3에 데이터를 저장하고 있어 빠른 제공이 가능합니다.",
+            manual_parameters=[
+            openapi.Parameter(
+            'pdf_id', 
+            openapi.IN_QUERY, 
+            description="PPT 고유 ID", 
+            type=openapi.TYPE_STRING)
+            ,
+            openapi.Parameter(
+            'visual_type', 
+            openapi.IN_QUERY, 
+            description="시각 분포, 시각 흐름 중 원하는 데이터를 입력받습니다. (distrubution,flow)", 
+            type=openapi.TYPE_STRING)
+            ]) 
     def get(self,request): 
         try:
             queryDict = {
                 'pdf_id' : request.GET.get('pdf_id'),
                 'visual_type' : request.GET.get('visual_type'),
+                'user_email' : request.GET.get('user_email')
             }
 
             owner_id = PDFModel.objects.get(pk=queryDict["pdf_id"]).user.pk
