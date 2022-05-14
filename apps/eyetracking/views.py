@@ -41,8 +41,8 @@ class EyetrackList(APIView):
         global s3r
         print("시각화 처리")
         try:
-            save_flow_path = "media/public/user_{0}/pdf/{1}/{2}/images/{3}.jpg".format(owner_id,pdf_id,"flow",page_num)
-            save_distribution_path = "media/public/user_{0}/pdf/{1}/{2}/images/{3}.jpg".format(owner_id,pdf_id,"distribution",page_num)
+            save_flow_path = "media/public/user_{0}/pdf/{1}/{2}/{3}/images/{4}.jpg".format(owner_id,pdf_id,user_id,"flow",page_num)
+            save_distribution_path = "media/public/user_{0}/pdf/{1}/{2}/{3}/images/{4}.jpg".format(owner_id,pdf_id,user_id,"distribution",page_num)
             # 이미지 url
             img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/images/{2}.jpg".format(owner_id, pdf_id, page_num)
             
@@ -126,7 +126,6 @@ class EyetrackList(APIView):
             
             user_id =  User.objects.get(email=user_email).pk
             owner_id = User.objects.get(email=owner_email).pk
-            
             # 트래킹 데이터 이어쓰기
             if Eyetracking.objects.filter(pdf_fk=PDFModel.objects.get(pk=pdf_id),
                                         user_id=User.objects.get(pk=user_id),
@@ -152,6 +151,7 @@ class EyetrackList(APIView):
             return Response(serializer.data, status = status.HTTP_200_OK)
         except Exception as e:
             print(e)
+            return Response(e)
     
     @swagger_auto_schema(
 			operation_summary="/eyetracking", 
@@ -195,7 +195,7 @@ class EyetrackList(APIView):
         coordinate = eyetrackdatas.coordinate
         if type(coordinate) == str:
             coordinate = ast.literal_eval(coordinate)
-            
+        print("4")    
         request_coordinate = request.data['coordinate']
         if type(request_coordinate) == str:
             request_coordinate = ast.literal_eval(request_coordinate)
@@ -275,9 +275,10 @@ class EyetrackVisualization(APIView):
             }
 
             owner_id = PDFModel.objects.get(pk=queryDict["pdf_id"]).user.pk
+            user_id = User.objects.get(email=queryDict["user_email"]).pk
             
-            img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/{2}/images/".format(owner_id, queryDict['pdf_id'], queryDict['visual_type'])
-            image_page = Eyetracking.objects.filter(owner_id=owner_id, pdf_fk=queryDict['pdf_id']).values_list('page_num',flat=True).distinct()
+            img_path = STATIC_URL+"media/public/user_{0}/pdf/{1}/{2}/{3}/images/".format(owner_id, queryDict['pdf_id'],user_id, queryDict['visual_type'])
+            image_page = Eyetracking.objects.filter(owner_id=owner_id, pdf_fk=queryDict['pdf_id'],user_id = user_id).values_list('page_num',flat=True).distinct()
             
             visual_img = []
             for i in list(image_page):
