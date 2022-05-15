@@ -14,6 +14,8 @@ class UserSerializer(serializers.ModelSerializer):
         # fields = '__all__'    # 전체 필드 직렬화
         exclude = (             # 특정 필드 제외 직렬화
             'password',
+            'first_name',
+            'last_name',
             'is_superuser',
             'is_staff',
             'is_active',
