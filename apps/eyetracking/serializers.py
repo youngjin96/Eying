@@ -69,14 +69,18 @@ class EyetrackingUserList(serializers.ModelSerializer):
 
     id = serializers.SerializerMethodField()
     def get_id(self,obj):
-        return obj['pdf_id']
+        return obj['user_id']
 
+    pdf_id = serializers.SerializerMethodField()
+    def get_pdf_id(self, obj):
+        return obj['pdf_id']
     
     class Meta:
         model = Eyetracking
         # fields = '__all__'
         fields= (
             'id',
+            'pdf_id',
             'user_email',
             'user_name',
             'job',
