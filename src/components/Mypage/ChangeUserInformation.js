@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { auth } from './Fbase'
+import { auth } from '../Fbase'
 
 import axios from 'axios';
 
@@ -10,37 +10,37 @@ import { useNavigate } from "react-router-dom"
 
 import { onAuthStateChanged, updateEmail } from "firebase/auth";
 
-var newEmail = "";
+var userUpdateEmail = "";
 
-const UserInfo = () => {
+const ChangeUserInformation = () => {
     const navigate = useNavigate();
     const [userEmail, setUserEmail] = useState("");
 
-    useEffect(async () => {
+    useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUserEmail(user.email);
+                axios.get('http://52.78.155.2:8000/user/search/', {
+                    params: {
+                        email: user.email
+                    }
+                }).then(res => {
+
+                }).catch((error) => {
+                    console.log(error);
+                });
             }
         });
-        await axios.get('http://13.124.148.91:8000/user/search/', {
-            params: 
-            {
-                email: userEmail
-            }
-        }).then(res => {
-           
-        }).catch((error) => {
-            console.log(error);
-        });
+
     }, []);
 
 
     const onClickChangeEmail = () => {
-        const a = auth.currentUser;
-        updateEmail(a, newEmail).then(() => {
-            axios.put('http://13.124.148.91:8000/user/', {
+        const user = auth.currentUser;
+        updateEmail(user, userUpdateEmail).then(() => {
+            axios.put('http://52.78.155.2:8000/user/', {
                 email: userEmail,
-                new_email: newEmail
+                new_email: userUpdateEmail
             })
         }).catch((error) => {
             alert("재로그인 후 시도해주세요.")
@@ -50,7 +50,7 @@ const UserInfo = () => {
     const onChange = (event) => {
         const { target: { name, value } } = event;
         if (name === "email") {
-            newEmail = value;
+            userUpdateEmail = value;
         }
     }
 
@@ -82,4 +82,5 @@ const UserInfo = () => {
         </Grid>
     )
 }
-export default UserInfo;
+
+export default ChangeUserInformation;
