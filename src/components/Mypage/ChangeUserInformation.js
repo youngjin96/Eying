@@ -20,7 +20,7 @@ const ChangeUserInformation = () => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUserEmail(user.email);
-                axios.get('http://52.78.155.2:8000/user/search/', {
+                axios.get('http://13.125.233.170:8000/user/search/', {
                     params: {
                         email: user.email
                     }
@@ -38,7 +38,7 @@ const ChangeUserInformation = () => {
     const onClickChangeEmail = () => {
         const user = auth.currentUser;
         updateEmail(user, userUpdateEmail).then(() => {
-            axios.put('http://52.78.155.2:8000/user/', {
+            axios.put('http://13.125.233.170:8000/user/', {
                 email: userEmail,
                 new_email: userUpdateEmail
             })

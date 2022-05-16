@@ -16,9 +16,9 @@ import Select from '@mui/material/Select';
 
 import { Link } from 'react-router-dom';
 
-import Loading from "./Loading";
-import IsLoggedIn from "./IsLoggedIn";
-import IsUploading from "./IsUploading";
+import IsLoading from "./Environment/IsLoading";
+import IsLoggedIn from "./Environment/IsLoggedIn";
+import IsUploading from "./Environment/IsUploading";
 import { auth } from './Fbase';
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -81,7 +81,7 @@ const Upload = () => {
 
     // 로딩 중일 때 보여줄 화면
     if (isLoading) return (
-        <Loading />
+        <IsLoading />
     )
 
     // 로그인이 안 되어 있을 때 보여줄 다이얼로그

@@ -70,7 +70,6 @@ const AboutUs = () => {
                             </div>
                         </Carousel>
                     </Grid>
-
                 </Grid>
             </Box>
             <Box
@@ -149,7 +148,7 @@ const AboutUs = () => {
                             </ThemeProvider>
                         </Grid>
                         <Grid item xs={12} style={{ display: "flex", justifyContent: "center" }}>
-                            <img src="/img/location.png" style={{ width: 800, height: 500 }} />
+                            <img src="/img/location.png" style={{ width: "100%", height: 500 }} />
                         </Grid>
                         <Grid item xs={12} style={{ textAlign: "center", marginTop: 20 }}>
                             <Typography variant="caption" style={{ color: "#636261", marginTop: 10 }}>

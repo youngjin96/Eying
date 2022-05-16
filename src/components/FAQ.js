@@ -40,7 +40,7 @@ const Service_center = () => {
                 }}
             >
                 <ThemeProvider theme={theme}>
-                    <Grid container columns={{ xs: 6, sm: 6, md: 12 }} style={{ color: "#636261" }}>
+                    <Grid container columns={{ xs: 12, sm: 12, md: 12 }} style={{ color: "#636261" }}>
                         <Grid item xs={12}>
                             <Typography variant="h5" style={{ textAlign: "center", marginTop: 100 }}>
                                 F A Q
@@ -90,9 +90,9 @@ const Service_center = () => {
                                 </Table>
                             </TableContainer>
                         </Grid>
-                        <Grid container direction="row" columns={{ xs: 6, sm: 6, md: 12 }}>
+                        <Grid container direction="row" columns={{ xs: 12, sm: 12, md: 12 }}>
                             <Grid item xs={8} style={{ textAlign:"center"}}>
-                                <FormControl sx={{ m: 1, width: '25ch' }} variant="standard">
+                                <FormControl sx={{ m: 1, width: '40%' }} variant="standard">
                                     <InputLabel>Search</InputLabel>
                                     <Input
                                         id="standard-adornment-password"
@@ -109,7 +109,7 @@ const Service_center = () => {
                             <Grid item xs={4} >
                                 <Button
                                     variant="contained" 
-                                    style={{ backgroundColor: "#8b7758", marginTop: 20, marginLeft: 100 }}
+                                    style={{ backgroundColor: "#8b7758", marginTop: 20}}
                                 >
                                         글쓰기
                                 </Button>

@@ -1,6 +1,6 @@
 import { Box, CircularProgress } from '@mui/material';
 
-const Loading = () => {
+const IsLoading = () => {
     return (
         <Box
             sx={{
@@ -17,4 +17,4 @@ const Loading = () => {
     )
 }
 
-export default Loading;
+export default IsLoading;

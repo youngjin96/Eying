@@ -10,8 +10,8 @@ import "react-alice-carousel/lib/alice-carousel.css";
 
 import { onAuthStateChanged } from 'firebase/auth';
 
-import Loading from "./Loading";
-import IsLoggedIn from "./IsLoggedIn";
+import IsLoading from "./Environment/IsLoading";
+import IsLoggedIn from "./Environment/IsLoggedIn";
 import { auth } from './Fbase';
 
 const columns = [
@@ -48,7 +48,7 @@ const Track = () => {
                     setUserEmail(user.email);
                     setIsLoggedIn(true);
                     // 유저가 로그인했을 때 서버에서 데이터를 가져온다.
-                    axios.get('http://13.125.125.245:8000/pdf/').then(res => {
+                    axios.get('http://13.125.233.170:8000/pdf/').then(res => {
                         setPdfs(res.data);
                         setIsLoading(false);   
                     })
@@ -65,7 +65,7 @@ const Track = () => {
     const onClickTrack = async () => {
         setIsTracking(true);
         setIsLoading(true);
-        await axios.get('http://13.125.125.245:8000/pdf/search', {
+        await axios.get('http://13.125.233.170:8000/pdf/search', {
             params: {
                 pdf_id: selectionModel[0],
                 view: true
@@ -93,7 +93,7 @@ const Track = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://13.125.125.245:8000/eyetracking/", {
+        await axios.post("http://13.125.233.170:8000/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
@@ -122,7 +122,7 @@ const Track = () => {
 
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
-        await axios.post("http://13.125.125.245:8000/eyetracking/", {
+        await axios.post("http://13.125.233.170:8000/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
@@ -147,7 +147,7 @@ const Track = () => {
 
     // 로딩 중일 때 보여줄 화면
     if (isLoading) return (
-        <Loading />
+        <IsLoading />
     )
 
     // 로그인 안 됐을 때 보여줄 화면

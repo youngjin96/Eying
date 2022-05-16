@@ -23,12 +23,11 @@ const UserInformation = () => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUserEmail(user.email);
-                axios.get('http://52.78.155.2:8000/user/search/', {
+                axios.get('http://13.125.233.170:8000/user/search/', {
                     params: {
                         email: user.email
                     }
                 }).then(res => {
-                    console.log(res);
                     setUserName(res.data[0].username);
                     setUserAge(res.data[0].age);
                     setUserGender(res.data[0].gender);
@@ -49,62 +48,41 @@ const UserInformation = () => {
     }
 
     return (
-        <Grid container columnSpacing={{ xs: 1, sm: 2, md: 5 }} columns={{ xs: 3, sm: 6, md: 12 }}>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "end" }}>
-                <Typography>이메일 :</Typography>
+        <Grid 
+            container 
+            rowSpacing={{ xs: 3, sm: 3, md: 3}}
+            columns={{ xs: 12, sm: 12, md: 12 }}
+            alignItems="flex-end"
+            style={{ textAlign: "center", marginTop: 20 }}
+        >
+            <Grid item xs={12}>
+                <Typography>이메일 : {userEmail}</Typography>
             </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "start" }}>
-                {userEmail}
+            <Grid item xs={12}>
+                <Typography>이름 : {userName}</Typography>
             </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "end" }}>
-                <Typography>이름 :</Typography>
+            <Grid item xs={12}>
+                <Typography>나이 : {userAge}</Typography>
             </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "start" }}>
-                {userName}
+            <Grid item xs={12}>
+                <Typography>성별 : {userGender}</Typography>
             </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "end" }}>
-                <Typography>나이 :</Typography>
+            <Grid item xs={12}>
+                <Typography>분야 : {userJobField}</Typography>
             </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "start" }}>
-                {userAge}
+            <Grid item xs={12}>
+                <Typography>직업 : {userJob}</Typography>
             </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "end" }}>
-                <Typography>성별 :</Typography>
+            <Grid item xs={12}>
+                <Typography>계급 : {userPosition}</Typography>
             </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "start" }}>
-                {userGender}
+            <Grid item xs={12}>
+                <Typography>PDF 업로드 수 : {userPdfCount}</Typography>
             </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "end" }}>
-                <Typography>분야 :</Typography>
+            <Grid item xs={12}>
+                <Typography>포인트 : {userCredit}</Typography>
             </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "start" }}>
-                {userJobField}
-            </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "end" }}>
-                <Typography>직업 :</Typography>
-            </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "start" }}>
-                {userJob}
-            </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "end" }}>
-                <Typography>계급 :</Typography>
-            </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "start" }}>
-                {userPosition}
-            </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "end" }}>
-                <Typography>PDF 업로드 횟수 :</Typography>
-            </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "start" }}>
-                {userPdfCount}
-            </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "end" }}>
-                <Typography>포인트 :</Typography>
-            </Grid>
-            <Grid item xs={6} style={{ marginTop: 50, textAlign: "start" }}>
-                {userCredit}
-            </Grid>
-            <Grid item xs={12} style={{ marginTop: 50, textAlign: "center" }}>
+            <Grid item xs={12}>
                 <Button 
                     variant="outlined" 
                     onClick={onClickBuyPoint}

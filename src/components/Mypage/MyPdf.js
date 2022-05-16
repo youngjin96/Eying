@@ -10,7 +10,7 @@ import "react-alice-carousel/lib/alice-carousel.css";
 
 import { onAuthStateChanged } from "firebase/auth";
 
-import Loading from "../Loading";
+import IsLoading from "../Environment/IsLoading";
 import { auth } from '../Fbase'
 
 const columns = [
@@ -30,26 +30,24 @@ const stepTwoColumns = [
     { field: 'create_date', headerName: '날짜', width: 160, align: 'center', headerAlign: "center" },
 ];
 
+var userId = 0;
+var pdfId = 0;
+var trackedEmail = "";
+
 const MyPdf = () => {
     const [isLoading, setIsLoading] = useState(true);
-    const [step, setStep] = useState(1);
-    const [userEmail, setUserEmail] = useState("");
+    const [isClickedCell, setIsClickedCell] = useState(false); // 테이블 셀 클릭 여부
+    const [step, setStep] = useState(1); // 테이블 순서
     const [showedPdfs, setShowedPdfs] = useState([]); // 테이블에 보여줄 pdfs
     const [firstPdfs, setFirstPdfs] = useState([]); // 첫 번째 pdfs
     const [secondPdfs, setSecondPdfs] = useState([]); // 두 번째 pdfs
-    const [visualType, setVisualType] = useState("distribution");
-    const [trackedImages, setTrackedImages] = useState("");
-    
-    var userId = 0;
-    var pdfId = 0;
-    var trackedEmail = "";
-    var selectionModel = [];
+    const [visualType, setVisualType] = useState("distribution"); // 시각화 종류
+    const [trackedImages, setTrackedImages] = useState(""); // 시각화한 이미지들
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                setUserEmail(user.email);
-                axios.get('http://52.78.155.2:8000/pdf/search/', {
+                axios.get('http://13.125.233.170:8000/pdf/search/', {
                     params: {
                         email: user.email
                     }
@@ -64,7 +62,7 @@ const MyPdf = () => {
 
     const onClickContinue = () => {
         // PDF를 선택하지 않고 continue 버튼 눌렀을 때
-        if (selectionModel === undefined || selectionModel.length === 0) {
+        if (!isClickedCell) {
             return alert("PDF를 선택해주세요");
         }
         // PDF 선택 후 continue 버튼 눌렀을 때
@@ -73,23 +71,22 @@ const MyPdf = () => {
             if (step === 1) {
                 setIsLoading(true);
                 setStep(step + 1);
-                axios.get('http://52.78.155.2:8000/eyetracking/user/', {
+                axios.get('http://13.125.233.170:8000/eyetracking/user/', {
                     params: {
                         pdf_id: pdfId,
                     }
                 }).then(res => {
-                    console.log(res.data);
                     setSecondPdfs(res.data);
                     setShowedPdfs(res.data);
                     setIsLoading(false);
+                    setIsClickedCell(false);
                 })
             }
             // 두 번째 step에서 continue 눌렀을 때 
             else {
                 setIsLoading(true);
                 setStep(step + 1);
-                console.log(userId);
-                axios.get('http://52.78.155.2:8000/eyetracking/visualization/', {
+                axios.get('http://13.125.233.170:8000/eyetracking/visualization/', {
                     params: {
                         pdf_id: userId,
                         visual_type: visualType,
@@ -103,6 +100,7 @@ const MyPdf = () => {
         }
     }
 
+    // 뒤로 가기 버튼 눌렀을 때 step 조정, 테이블 row 조정
     const onClickBack = () => {
         if (step === 1) {
             setStep(1);
@@ -115,6 +113,7 @@ const MyPdf = () => {
         }
     }
 
+    // 시각화 종류 버튼 눌렀을 때 시각화 종류 조정
     const onClickVisualType = () => {
         setIsLoading(true);
         var type = "";
@@ -126,9 +125,8 @@ const MyPdf = () => {
             setVisualType("distribution");
             type = "distribution";
         }
-        console.log(userId);
         // TODO 파라미터 오류
-        axios.get('http://52.78.155.2:8000/eyetracking/visualization/', {
+        axios.get('http://13.125.233.170:8000/eyetracking/visualization/', {
             params: {
                 pdf_id: userId,
                 visual_type: type,
@@ -143,7 +141,7 @@ const MyPdf = () => {
     return (
         <>
             {isLoading ? (
-                <Loading />
+                <IsLoading />
             ) : (
                     step === 1 ? (
                         <>
@@ -153,20 +151,21 @@ const MyPdf = () => {
                                     columns={columns}
                                     pageSize={10}
                                     rowsPerPageOptions={[10]}
-                                    selectionModel={selectionModel}
-                                    onSelectionModelChange={(newSelectionModel) => {
-                                        selectionModel = newSelectionModel;
-                                    }}
                                     onCellClick={(params) => {
+                                        setIsClickedCell(true);
                                         pdfId = params.row.id;
                                         trackedEmail = params.row.user_email;
                                     }}
                                     style={{ align: "center" }}
                                 />
                             </div>
-                            <Button size="large" onClick={onClickContinue} style={{ color: "black" }}>
+                            <Button 
+                                size="large"
+                                onClick={onClickContinue}
+                                style={{ color: "black" }}
+                            >
                                 NEXT
-                                        </Button>
+                            </Button>
                         </>
                     ) : (
                             step === 2 ? (
@@ -177,23 +176,26 @@ const MyPdf = () => {
                                             columns={stepTwoColumns}
                                             pageSize={10}
                                             rowsPerPageOptions={[10]}
-                                            selectionModel={selectionModel}
-                                            onSelectionModelChange={(newSelectionModel) => {
-                                                selectionModel = newSelectionModel;
-                                            }}
                                             onCellClick={(params) => {
-                                                console.log(params);
+                                                setIsClickedCell(true);
                                                 userId = params.row.pdf_id;
-                                                console.log(userId);
                                                 trackedEmail = params.row.user_email;
                                             }}
                                             style={{ align: "center" }}
                                         />
                                     </div>
-                                    <Button size="large" onClick={onClickBack} style={{ color: "black" }}>
+                                    <Button 
+                                        size="large"
+                                        onClick={onClickBack}
+                                        style={{ color: "black" }}
+                                    >
                                         BACK
                                     </Button>
-                                    <Button size="large" onClick={onClickContinue} style={{ color: "black" }}>
+                                    <Button 
+                                        size="large"
+                                        onClick={onClickContinue}
+                                        style={{ color: "black" }}
+                                    >
                                         NEXT
                                     </Button>
                                 </>
@@ -208,7 +210,7 @@ const MyPdf = () => {
                                                 <img
                                                     key={index}
                                                     src={e}
-                                                    style={{ width: "80%", height: 500 }}
+                                                    style={{ width: "90%", height: 500, margin: "auto" }}
                                                 />
                                             ))}
                                         </AliceCarousel>

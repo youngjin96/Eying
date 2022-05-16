@@ -154,14 +154,13 @@ const Enroll = () => {
 
     return (
         <Box
-            sx={{ marginTop: 5, display: 'flex', height: '90vh' }}
+            sx={{ marginTop: 5, display: 'flex', height: '100vh' }}
         >
             <Grid
                 container
                 columns={{ xs: 12, sm: 12, md: 12 }}
-                spacing={2}
                 direction="row"
-                justifyContent="space-between"
+                justifyContent="space-evenly"
                 style={{ textAlign: "center" }}
             >
                 <Grid item xs={12}>
@@ -337,31 +336,29 @@ const Enroll = () => {
                                         style={{ marginTop: 5, color: "black", borderColor: "#a8a9a8", width: "40%" }}
                                     >
                                         명함 업로드
-                                            </Button>
+                                    </Button>
                                 </label>
                             </>
                         )
                     }
                 </Grid>
-                <Grid item xs={6} style={{ textAlign: "end" }}>
+                <Grid item xs={3} style={{textAlign: "center"}}>
                     <Button
                         variant="outlined"
-                        sx={{ mt: 2 }}
                         onClick={onClickBack}
-                        style={{ color: "black", borderColor: "#a8a9a8", width: "15%" }}
+                        style={{ color: "black", borderColor: "#a8a9a8", width: "25%" }}
                     >
                         돌아가기
-                                </Button>
+                    </Button>
                 </Grid>
-                <Grid item xs={6} style={{ textAlign: "start" }}>
+                <Grid item xs={3}>
                     <Button
                         variant="outlined"
-                        sx={{ mt: 2 }}
                         onClick={onClickEnroll}
-                        style={{ color: "black", borderColor: "#a8a9a8", width: "15%" }}
+                        style={{ color: "black", borderColor: "#a8a9a8", width: "25%" }}
                     >
                         회원가입
-                                </Button>
+                    </Button>
                 </Grid>
             </Grid>
         </Box>

@@ -11,7 +11,7 @@ import axios from 'axios';
 
 import { onAuthStateChanged, deleteUser } from "firebase/auth";
 
-import IsLoggedIn from "../IsLoggedIn";
+import IsLoggedIn from "../Environment/IsLoggedIn";
 import ChangeUserInformation from "./ChangeUserInformation";
 import UserInformation from "./UserInformation";
 import MyPdf from "./MyPdf";

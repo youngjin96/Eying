@@ -7,8 +7,8 @@ import { Box, Button, Grid } from "@mui/material";
 import "react-alice-carousel/lib/alice-carousel.css";
 import AliceCarousel from 'react-alice-carousel';
 
-import Loading from "./Loading";
-import IsLoggedIn from "./IsLoggedIn";
+import IsLoading from "./Environment/IsLoading";
+import IsLoggedIn from "./Environment/IsLoggedIn";
 import { auth } from './Fbase'
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -106,7 +106,7 @@ const WebGazer = () => {
 
     // loadng 중 일 때 보여줄 화면 (loading == true)
     if (isLoading) return (
-        <Loading />
+        <IsLoading />
     )
 
     else if (!isLoggedIn) return (
