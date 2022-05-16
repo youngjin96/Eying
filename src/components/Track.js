@@ -179,10 +179,6 @@ const Track = () => {
                         onSlideChange={onSlideChange}
                         onSlideChanged={onSlideChanged}
                     >
-                        {/* <img src="/img/s.png" style={{ width: "100%", height: 500 }}> 
-                            </img>
-                            <img src="/img/example2.png" style={{ width: "100%", height: 500 }}> 
-                            </img> */}
                         {imgsUrl && imgsUrl.map((e, index) => (
                             <img
                                 key={index}
