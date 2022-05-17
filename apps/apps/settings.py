@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'eyetracking.apps.EyetrackingConfig',
     'cs.apps.CsConfig',
     'drf_yasg',
+    'sslserver',
 ]
 
 MIDDLEWARE = [
