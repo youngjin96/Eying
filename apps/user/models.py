@@ -24,6 +24,8 @@ class User(AbstractUser):
             super().save(*args, **kwargs)
             self.card = temp_card
             super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)
             
     def __str__(self):
         return "%s (%s)" % (self.username, self.email)

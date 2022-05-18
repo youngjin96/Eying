@@ -1,3 +1,4 @@
+from io import BytesIO
 from rest_framework.response import Response
 from rest_framework.status import *
 from rest_framework.views import APIView
@@ -209,6 +210,7 @@ class UserAPI(APIView):
                 "position": request.data.get("position"),
                 "gender": request.data.get("gender"),
                 "password": request.data.get("password"),
+                "card": request.data.get("card"),
             }
             
             # 필수 항목 누락 검증
@@ -250,7 +252,11 @@ class UserAPI(APIView):
                 user.update(gender=dataDict["gender"])
             if dataDict["password"]:
                 user.update(password=make_password(dataDict["password"]))
-            
+            if dataDict["card"]:
+                u = User.objects.get(email=dataDict["email"])
+                u.card = dataDict["card"]
+                u.save()
+
             serializer = UserSerializer(user, many=True)
             return Response(serializer.data)
         except Exception as e:
