@@ -16,8 +16,8 @@ import { auth } from './Fbase';
 
 const columns = [
     { field: 'pdf_name', headerName: '제목', flex: 2, align: 'center', headerAlign: "center" },
-    { field: 'job_field', headerName: '업종', flex: 0.7, align: 'right', headerAlign: "center" },
-    { field: 'user_name', headerName: '작성자', flex: 0.7, align: 'right', headerAlign: "center" },
+    { field: 'job_field', headerName: '업종', flex: 0.7, align: 'center', headerAlign: "center" },
+    { field: 'user_name', headerName: '작성자', flex: 0.7, align: 'center', headerAlign: "center" },
     { field: 'upload_at', headerName: '등록일', flex: 0.5, align: 'right', headerAlign: "center" },
     { field: 'deadline', headerName: '마감일', flex: 0.5, align: 'right', headerAlign: "center" },
     { field: 'views', headerName: '조회수', flex: 0.3, align: 'right', headerAlign: "center" },
