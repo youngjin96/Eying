@@ -81,7 +81,6 @@ const AboutUs = () => {
                 }}
             >
                 <ThemeProvider theme={theme}>
-
                     <Grid container columns={{ xs: 3, sm: 6, md: 12 }} justifyContent="space-around">
                         <Grid item xs={12} style={{ color: "#636261", marginTop: 80, textAlign: "center" }}>
                             <Typography variant="h5">
@@ -148,7 +147,7 @@ const AboutUs = () => {
                             </ThemeProvider>
                         </Grid>
                         <Grid item xs={12} style={{ display: "flex", justifyContent: "center" }}>
-                            <img src="/img/location.png" style={{ width: "100%", height: 500 }} />
+                            <img src="/img/location.png" style={{ width: "70%", height: 500 }} />
                         </Grid>
                         <Grid item xs={12} style={{ textAlign: "center", marginTop: 20 }}>
                             <Typography variant="caption" style={{ color: "#636261", marginTop: 10 }}>

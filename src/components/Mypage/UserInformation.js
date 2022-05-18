@@ -11,6 +11,7 @@ import { onAuthStateChanged } from "firebase/auth";
 const UserInformation = () => {
     const [userEmail, setUserEmail] = useState("");
     const [userName, setUserName] = useState("");
+    const [userBusinessCard, setUserBusinessCard] = useState("");
     const [userAge, setUserAge] = useState();
     const [userGender, setUserGender] = useState("");
     const [userJobField, setUserJobField] = useState("");
@@ -23,12 +24,14 @@ const UserInformation = () => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUserEmail(user.email);
-                axios.get('http://13.125.233.170:8000/user/search/', {
+                axios.get("http://52.79.249.13/user/search", {
                     params: {
                         email: user.email
                     }
                 }).then(res => {
+                    console.log(res);
                     setUserName(res.data[0].username);
+                    setUserBusinessCard(res.data[0].card);
                     setUserAge(res.data[0].age);
                     setUserGender(res.data[0].gender);
                     setUserJobField(res.data[0].job_field);
@@ -50,7 +53,6 @@ const UserInformation = () => {
     return (
         <Grid 
             container 
-            rowSpacing={{ xs: 3, sm: 3, md: 3}}
             columns={{ xs: 12, sm: 12, md: 12 }}
             alignItems="flex-end"
             style={{ textAlign: "center", marginTop: 20 }}
@@ -58,30 +60,44 @@ const UserInformation = () => {
             <Grid item xs={12}>
                 <Typography>이메일 : {userEmail}</Typography>
             </Grid>
+            <hr style={{width: "50%", marginTop: 20}} />
             <Grid item xs={12}>
                 <Typography>이름 : {userName}</Typography>
             </Grid>
+            <hr style={{width: "50%", marginTop: 20}} />
+            <Grid item xs={12}>
+                <Typography>명함</Typography>
+                <img src={userBusinessCard} style={{ width: "50%", height: 300, marginTop: 20}} />
+            </Grid>
+            <hr style={{width: "50%", marginTop: 20}} />
             <Grid item xs={12}>
                 <Typography>나이 : {userAge}</Typography>
             </Grid>
+            <hr style={{width: "50%", marginTop: 20}} />
             <Grid item xs={12}>
                 <Typography>성별 : {userGender}</Typography>
             </Grid>
+            <hr style={{width: "50%", marginTop: 20}} />
             <Grid item xs={12}>
                 <Typography>분야 : {userJobField}</Typography>
             </Grid>
+            <hr style={{width: "50%", marginTop: 20}} />
             <Grid item xs={12}>
                 <Typography>직업 : {userJob}</Typography>
             </Grid>
+            <hr style={{width: "50%", marginTop: 20}} />
             <Grid item xs={12}>
                 <Typography>계급 : {userPosition}</Typography>
             </Grid>
             <Grid item xs={12}>
+            <hr style={{width: "50%", marginTop: 20}} />
                 <Typography>PDF 업로드 수 : {userPdfCount}</Typography>
             </Grid>
+            <hr style={{width: "50%", marginTop: 20}} />
             <Grid item xs={12}>
                 <Typography>포인트 : {userCredit}</Typography>
             </Grid>
+            <hr style={{width: "50%", marginTop: 20}} />
             <Grid item xs={12}>
                 <Button 
                     variant="outlined" 

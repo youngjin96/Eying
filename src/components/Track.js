@@ -15,12 +15,12 @@ import IsLoggedIn from "./Environment/IsLoggedIn";
 import { auth } from './Fbase';
 
 const columns = [
-    { field: 'pdf_name', headerName: '제목', flex: 1, align: 'center', headerAlign: "center" },
-    { field: 'job_field', headerName: '업종', width: 150, align: 'right', headerAlign: "center" },
-    { field: 'user_name', headerName: '작성자', width: 150, align: 'right', headerAlign: "center" },
-    { field: 'upload_at', headerName: '등록일', width: 160, align: 'right', headerAlign: "center" },
-    { field: 'deadline', headerName: '마감일', width: 160, align: 'right', headerAlign: "center" },
-    { field: 'views', headerName: '조회수', width: 90, align: 'right', headerAlign: "center" },
+    { field: 'pdf_name', headerName: '제목', flex: 2, align: 'center', headerAlign: "center" },
+    { field: 'job_field', headerName: '업종', flex: 0.7, align: 'right', headerAlign: "center" },
+    { field: 'user_name', headerName: '작성자', flex: 0.7, align: 'right', headerAlign: "center" },
+    { field: 'upload_at', headerName: '등록일', flex: 0.5, align: 'right', headerAlign: "center" },
+    { field: 'deadline', headerName: '마감일', flex: 0.5, align: 'right', headerAlign: "center" },
+    { field: 'views', headerName: '조회수', flex: 0.3, align: 'right', headerAlign: "center" },
 ];
 
 var dimensionArr = []; // webgazer x, y 좌표가 담길 배열
@@ -48,7 +48,7 @@ const Track = () => {
                     setUserEmail(user.email);
                     setIsLoggedIn(true);
                     // 유저가 로그인했을 때 서버에서 데이터를 가져온다.
-                    axios.get('http://13.125.233.170:8000/pdf/').then(res => {
+                    axios.get('http://52.79.249.13/pdf/').then(res => {
                         setPdfs(res.data);
                         setIsLoading(false);   
                     })
@@ -65,7 +65,7 @@ const Track = () => {
     const onClickTrack = async () => {
         setIsTracking(true);
         setIsLoading(true);
-        await axios.get('http://13.125.233.170:8000/pdf/search', {
+        await axios.get('http://52.79.249.13/pdf/search', {
             params: {
                 pdf_id: selectionModel[0],
                 view: true
@@ -93,7 +93,7 @@ const Track = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://13.125.233.170:8000/eyetracking/", {
+        await axios.post("http://52.79.249.13/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
@@ -122,7 +122,7 @@ const Track = () => {
 
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
-        await axios.post("http://13.125.233.170:8000/eyetracking/", {
+        await axios.post("http://52.79.249.13/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
@@ -198,7 +198,7 @@ const Track = () => {
     // 전체 PDF 데이터
     else return (
         <>
-            <div style={{ height: 630, width: '80%', margin: "auto", marginTop: 50, minWidth: 400 }}>
+            <div style={{ height: 630, width: '80%', margin: "auto", marginTop: 50 }}>
                 <DataGrid
                     rows={pdfs}
                     columns={columns}

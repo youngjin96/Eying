@@ -110,7 +110,7 @@ const Enroll = () => {
         enfrm.append("position", position);
         enfrm.append('card', image);
 
-        await axios.post('http://13.124.148.91:8000/user/', enfrm).then(() => {
+        await axios.post('http://52.79.249.13/user/', enfrm).then(() => {
             createUserWithEmailAndPassword(auth, email, password).then(() => {
                 alert("정상적으로 회원가입이 완료되었습니다.");
                 navigate("/home");
@@ -152,6 +152,21 @@ const Enroll = () => {
         navigate("/login")
     }
 
+    const validationRepeatPasswords = () => {
+        // 비밀번호 같은지 체크
+        if (!password) {
+            return false;
+        }
+        else {
+            if (password !== repeatPassword) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
     return (
         <Box
             sx={{ marginTop: 5, display: 'flex', height: '100vh' }}
@@ -176,8 +191,10 @@ const Enroll = () => {
                         name="password"
                         label="Password"
                         type="password"
-                        onChange={onChange}
                         value={password}
+                        onChange={onChange}
+                        error={password.length === 0 ? false : password.length < 6 ? true : false}
+                        helperText={password.length === 0 ? "" : password.length < 6 ? "6자리 이상 입력해주세요!" : ""}
                         style={{ width: "40%" }}
                     />
                 </Grid>
@@ -188,6 +205,8 @@ const Enroll = () => {
                             label="Repeat Password"
                             type="password"
                             onChange={onChange}
+                            error={validationRepeatPasswords()}
+                            helperText={!validationRepeatPasswords() ? "" : '비밀번호가 일치하지 않습니다.'}
                             style={{ width: "40%" }}
                         />
                     ) : (

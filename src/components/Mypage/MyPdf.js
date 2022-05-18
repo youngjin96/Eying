@@ -14,20 +14,20 @@ import IsLoading from "../Environment/IsLoading";
 import { auth } from '../Fbase'
 
 const columns = [
-    { field: 'pdf_name', headerName: '제목', flex: 1, align: 'center', headerAlign: "center" },
-    { field: 'job_field', headerName: '업종', width: 150, align: 'right', headerAlign: "center" },
-    { field: 'upload_at', headerName: '등록일', width: 160, align: 'right', headerAlign: "center" },
-    { field: 'deadline', headerName: '마감일', width: 160, align: 'right', headerAlign: "center" },
-    { field: 'views', headerName: '조회수', width: 90, align: 'right', headerAlign: "center" },
+    { field: 'pdf_name', headerName: '제목', flex: 2, align: 'center', headerAlign: "center" },
+    { field: 'job_field', headerName: '업종', flex: 0.7, align: 'center', headerAlign: "center" },
+    { field: 'upload_at', headerName: '등록일', flex: 0.5, align: 'right', headerAlign: "center" },
+    { field: 'deadline', headerName: '마감일', flex: 0.5, align: 'right', headerAlign: "center" },
+    { field: 'views', headerName: '조회수', flex: 0.3, align: 'right', headerAlign: "center" },
 ];
 
 const stepTwoColumns = [
-    { field: 'user_name', headerName: '평가자', flex: 1, width: 150, align: 'center', headerAlign: "center" },
-    { field: 'job_field', headerName: '업종', width: 150, align: 'center', headerAlign: "center" },
-    { field: 'job', headerName: '직업', width: 150, align: 'center', headerAlign: "center" },
-    { field: 'position', headerName: '계급', width: 150, align: 'center', headerAlign: "center" },
-    { field: 'gender', headerName: '성별', width: 160, align: 'center', headerAlign: "center" },
-    { field: 'create_date', headerName: '날짜', width: 160, align: 'center', headerAlign: "center" },
+    { field: 'user_name', headerName: '평가자', flex: 1, align: 'center', headerAlign: "center" },
+    { field: 'job_field', headerName: '업종', flex: 1, align: 'center', headerAlign: "center" },
+    { field: 'job', headerName: '직업', flex: 1, align: 'center', headerAlign: "center" },
+    { field: 'position', headerName: '계급', flex: 1, align: 'center', headerAlign: "center" },
+    { field: 'gender', headerName: '성별', flex: 1, align: 'center', headerAlign: "center" },
+    { field: 'create_date', headerName: '날짜', flex: 1, align: 'center', headerAlign: "center" },
 ];
 
 var userId = 0;
@@ -47,7 +47,7 @@ const MyPdf = () => {
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                axios.get('http://13.125.233.170:8000/pdf/search/', {
+                axios.get('http://52.79.249.13/pdf/search/', {
                     params: {
                         email: user.email
                     }
@@ -71,7 +71,7 @@ const MyPdf = () => {
             if (step === 1) {
                 setIsLoading(true);
                 setStep(step + 1);
-                axios.get('http://13.125.233.170:8000/eyetracking/user/', {
+                axios.get('http://52.79.249.13/eyetracking/user/', {
                     params: {
                         pdf_id: pdfId,
                     }
@@ -86,7 +86,7 @@ const MyPdf = () => {
             else {
                 setIsLoading(true);
                 setStep(step + 1);
-                axios.get('http://13.125.233.170:8000/eyetracking/visualization/', {
+                axios.get('http://52.79.249.13/eyetracking/visualization/', {
                     params: {
                         pdf_id: userId,
                         visual_type: visualType,
@@ -126,7 +126,7 @@ const MyPdf = () => {
             type = "distribution";
         }
         // TODO 파라미터 오류
-        axios.get('http://13.125.233.170:8000/eyetracking/visualization/', {
+        axios.get('http://52.79.249.13/eyetracking/visualization/', {
             params: {
                 pdf_id: userId,
                 visual_type: type,

@@ -77,7 +77,7 @@ const Mypage = () => {
 
     const onClickDeleteUser = () => {
         deleteUser(user).then(() => {
-            axios.post("http://52.78.155.2:8000/eyetracking/", {
+            axios.post("http://52.79.249.13/eyetracking/", {
                 'email': userEmail
             }).then(() => {
                 alert("정상적으로 회원탈퇴 되었습니다.")
@@ -100,7 +100,7 @@ const Mypage = () => {
             <Box
                 sx={{
                     width: '100%',
-                    height: '100vh',
+                    height: '100%',
                     display: 'flex',
                     background: '#ecebe9',
                     flexGrow: 1,

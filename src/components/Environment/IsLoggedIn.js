@@ -40,7 +40,7 @@ const IsLoggedIn = () => {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        이 페이지는 로그인 후 이용이 가능합니다.
+                        이 페이지는 로그인 후 이용이 가능합니다.<br />
                         로그인 페이지로 가서 로그인해주시기 바랍니다.
                     </DialogContentText>
                 </DialogContent>
