@@ -73,6 +73,7 @@ const ChangeUserInformation = () => {
     const [userUpdatePosition, setUserUpdatePosition] = useState("");
 
     const [userBusinessCard, setUserBusinessCard] = useState("");
+    const [isUploadBusinessCard, setIsUploadBusinessCard] = useState(false);
 
     const navigate = useNavigate();
 
@@ -85,7 +86,6 @@ const ChangeUserInformation = () => {
                         email: user.email
                     }
                 }).then(res => {
-                    console.log(res);
                     setUserName(res.data[0].username);
                     setUserJobField(res.data[0].job_field);
                     setUserJob(res.data[0].job);
@@ -209,8 +209,8 @@ const ChangeUserInformation = () => {
         frm.append("email", userEmail);
         frm.append("card", userUpdateBusinessCard);
         axios.put('https://eying.ga/user/', frm).then((res) => {
+            setIsUploadBusinessCard(true);
             alert("명함이 수정되었습니다.");
-            setUserBusinessCard(res.data[0].card);
         }).catch(error => {
             console.log(error);
         });
@@ -372,30 +372,50 @@ const ChangeUserInformation = () => {
                 </Button>
             </Grid>
             <hr style={{width: "100%", marginTop: 20}} />
-            <Grid item xs={6}>
-                <img src={userBusinessCard} style={{ width: "90%", height: 300 }} />
-            </Grid>
-            <Grid item xs={6}>
+            {isUploadBusinessCard ? (
                 <>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        id="upload-button-file"
-                        multiple
-                        onChange={onChangeUserBusinessCard}
-                    />
-                    <label htmlFor="upload-button-file">
+                    <Grid item xs={12}>
+                        <Typography>내 정보에 들어가 바뀐 명함을 확인해주세요.</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
                         <Button
+                            disabled
                             variant="outlined"
                             component="span"
-                            style={{ color: "black", borderColor: "#a8a9a8", marginTop: 30}}
+                            style={{ marginTop: 30}}
                         >
-                            새 명함 업로드
+                            업로드 완료
                         </Button>
-                    </label>
+                    </Grid>
                 </>
-            </Grid>
+            ) : (
+                <>
+                    <Grid item xs={6}>
+                        <img src={userBusinessCard} style={{ width: "90%", height: 300 }} />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                id="upload-button-file"
+                                multiple
+                                onChange={onChangeUserBusinessCard}
+                            />
+                            <label htmlFor="upload-button-file">
+                                <Button
+                                    variant="outlined"
+                                    component="span"
+                                    style={{ color: "black", borderColor: "#a8a9a8", marginTop: 30}}
+                                >
+                                    새 명함 업로드
+                                </Button>
+                            </label>
+                        </>
+                    </Grid> 
+                </>
+            )}
             <hr style={{width: "100%", marginTop: 20}} />
             <Grid item xs={12}>
                 <Button
