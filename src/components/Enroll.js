@@ -110,7 +110,7 @@ const Enroll = () => {
         enfrm.append("position", position);
         enfrm.append('card', image);
 
-        await axios.post('http://52.79.249.13/user/', enfrm).then(() => {
+        await axios.post('https://eying.ga/user/', enfrm).then(() => {
             createUserWithEmailAndPassword(auth, email, password).then(() => {
                 alert("정상적으로 회원가입이 완료되었습니다.");
                 navigate("/home");

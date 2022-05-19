@@ -24,7 +24,7 @@ const UserInformation = () => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUserEmail(user.email);
-                axios.get("http://52.79.249.13/user/search", {
+                axios.get("https://eying.ga/user/search", {
                     params: {
                         email: user.email
                     }
@@ -100,9 +100,9 @@ const UserInformation = () => {
             <hr style={{width: "50%", marginTop: 20}} />
             <Grid item xs={12}>
                 <Button 
+                    disabled
                     variant="outlined" 
                     onClick={onClickBuyPoint}
-                    style={{ color: "black", borderColor: "#a8a9a8" }}
                 >
                     포인트 구매
                 </Button>

@@ -80,7 +80,7 @@ const ChangeUserInformation = () => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUserEmail(user.email);
-                axios.get('http://52.79.249.13/user/search/', {
+                axios.get('https://eying.ga/user/search/', {
                     params: {
                         email: user.email
                     }
@@ -116,7 +116,7 @@ const ChangeUserInformation = () => {
     const onClickChangeEmail = () => {
         const user = auth.currentUser;
         updateEmail(user, userUpdateEmail).then(() => {
-            axios.put('http://52.79.249.13/user/', {
+            axios.put('https://eying.ga/user/', {
                 email: userEmail,
                 new_email: userUpdateEmail
             });
@@ -147,7 +147,7 @@ const ChangeUserInformation = () => {
     }
 
     const onClickChangeUsername = () => {
-        axios.put('http://52.79.249.13/user/', {
+        axios.put('https://eying.ga/user/', {
             email: userEmail,
             username: userUpdateName 
         }).then(() => {
@@ -159,7 +159,7 @@ const ChangeUserInformation = () => {
     }
 
     const onClickChangeUserJobField = () => {
-        axios.put('http://52.79.249.13/user/', {
+        axios.put('https://eying.ga/user/', {
             email: userEmail, 
             job_field: userUpdateJobField 
         }).then(() => {
@@ -171,7 +171,7 @@ const ChangeUserInformation = () => {
     }
 
     const onClickChangeUserJob = () => {
-        axios.put('http://52.79.249.13/user/', {
+        axios.put('https://eying.ga/user/', {
             email: userEmail, 
             job: userUpdateJob,
             position: userUpdatePosition
@@ -208,7 +208,7 @@ const ChangeUserInformation = () => {
         var frm = new FormData();
         frm.append("email", userEmail);
         frm.append("card", userUpdateBusinessCard);
-        axios.put('http://52.79.249.13/user/', frm).then((res) => {
+        axios.put('https://eying.ga/user/', frm).then((res) => {
             alert("명함이 수정되었습니다.");
             setUserBusinessCard(res.data[0].card);
         }).catch(error => {

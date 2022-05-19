@@ -47,7 +47,7 @@ const MyPdf = () => {
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                axios.get('http://52.79.249.13/pdf/search/', {
+                axios.get('https://eying.ga/pdf/search/', {
                     params: {
                         email: user.email
                     }
@@ -71,7 +71,7 @@ const MyPdf = () => {
             if (step === 1) {
                 setIsLoading(true);
                 setStep(step + 1);
-                axios.get('http://52.79.249.13/eyetracking/user/', {
+                axios.get('https://eying.ga/eyetracking/user/', {
                     params: {
                         pdf_id: pdfId,
                     }
@@ -86,7 +86,7 @@ const MyPdf = () => {
             else {
                 setIsLoading(true);
                 setStep(step + 1);
-                axios.get('http://52.79.249.13/eyetracking/visualization/', {
+                axios.get('https://eying.ga/eyetracking/visualization/', {
                     params: {
                         pdf_id: userId,
                         visual_type: visualType,
@@ -126,7 +126,7 @@ const MyPdf = () => {
             type = "distribution";
         }
         // TODO 파라미터 오류
-        axios.get('http://52.79.249.13/eyetracking/visualization/', {
+        axios.get('https://eying.ga/eyetracking/visualization/', {
             params: {
                 pdf_id: userId,
                 visual_type: type,

@@ -68,7 +68,7 @@ const Upload = () => {
         frm.append("pdf", e.target.files[0]);
         frm.append("email", email);
         frm.append("job_field", jobField);
-        axios.post('http://52.79.249.13/pdf/', frm).then(res => {
+        axios.post('https://eying.ga/pdf/', frm).then(res => {
             setIsUploading(false);
             alert("업로드가 완료되었습니다.");
         });

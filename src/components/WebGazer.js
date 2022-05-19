@@ -31,7 +31,7 @@ const WebGazer = () => {
                 if (user) {
                     setUserEmail(user.email);
                     setIsLoggedIn(true);
-                    axios.get('http://52.79.249.13/pdf/').then(res => {
+                    axios.get('https://eying.ga/pdf/').then(res => {
                         if (res.status === 200) {
                             setImgsUrl(res.data[0].imgs_url);
                             setPdfId(res.data[0].id);
@@ -60,7 +60,7 @@ const WebGazer = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         // 서버에 dataset 보내는 함수
-        await axios.post("http://52.79.249.13/eyetracking/", {
+        await axios.post("https://eying.ga/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
@@ -81,7 +81,7 @@ const WebGazer = () => {
 
     // Before swipe slide, post data to server
     const onSlideChange = async () => {
-        await axios.post("http://52.79.249.13/eyetracking/", {
+        await axios.post("https://eying.ga/eyetracking/", {
             'user_email': userEmail,
             'owner_email': ownerEmail,
             'rating_time': '00:00:00',
