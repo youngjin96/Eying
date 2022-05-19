@@ -35,20 +35,19 @@ const Gallery = () => {
     }
 
     const onClickSubmit = async () => {
-        try{
-            await axios.post("http://3.38.104.20:8000/cs/", {
+        await axios.post("https://eying.ga/cs/", {
             'name': name,
             'email': email,
             'phoneNumber': phoneNumber,
             'content': content,
-            });
+            
+        }).then((res) => {
+            console.log(res);
             alert("접수가 완료됐습니다.");
-            window.location.reload();
-        } catch (error){
-            alert("접수하지 못했습니다.");
-        }
-        
-    }
+        }).catch(error => {
+            alert(error);
+        });
+    };
 
     return (
         <>
@@ -105,7 +104,7 @@ const Gallery = () => {
                             </Typography>
                             <TextField
                                 id="name"
-                                label="Name"
+                                label="User Name"
                                 variant="standard"
                                 style={{ marginTop: 80, width: "40%", marginLeft: 100 }}
                                 onChange={onChange}

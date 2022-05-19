@@ -251,7 +251,7 @@ const Enroll = () => {
                 </Grid>
                 <Grid item xs={12}>
                     <FormControl style={{ width: "40%" }}>
-                        <InputLabel id="sex-label">Sex</InputLabel>
+                        <InputLabel id="sex-label">Gender</InputLabel>
                         <Select
                             labelId="sex-label"
                             name="sex"
@@ -365,7 +365,7 @@ const Enroll = () => {
                     <Button
                         variant="outlined"
                         onClick={onClickBack}
-                        style={{ color: "black", borderColor: "#a8a9a8", width: "25%" }}
+                        style={{ color: "black", borderColor: "#a8a9a8", width: 100 }}
                     >
                         돌아가기
                     </Button>
@@ -374,7 +374,7 @@ const Enroll = () => {
                     <Button
                         variant="outlined"
                         onClick={onClickEnroll}
-                        style={{ color: "black", borderColor: "#a8a9a8", width: "25%" }}
+                        style={{ color: "black", borderColor: "#a8a9a8", width: 100 }}
                     >
                         회원가입
                     </Button>

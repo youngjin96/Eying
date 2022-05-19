@@ -1,35 +1,28 @@
 import { useEffect, useState } from "react";
 
-import { Box, Grid, Typography, Button } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
-import { useNavigate } from 'react-router-dom';
-
-import axios from 'axios';
-
-import { onAuthStateChanged, deleteUser } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 
 import IsLoggedIn from "../Environment/IsLoggedIn";
 import ChangeUserInformation from "./ChangeUserInformation";
 import UserInformation from "./UserInformation";
 import MyPdf from "./MyPdf";
+import DeleteUser from "./DeleteUser";
 import { auth } from '../Fbase'
 
 const Mypage = () => {
-    const user = auth.currentUser;
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userEmail, setUserEmail] = useState("");
     const [value, setValue] = useState(0);
-    const navigate = useNavigate();
 
     useEffect(() => {
         try {
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     setIsLoggedIn(true);
-                    setUserEmail(user.email);
                 }
             });
         } catch (error) {
@@ -75,20 +68,7 @@ const Mypage = () => {
         };
     }
 
-    const onClickDeleteUser = () => {
-        deleteUser(user).then(() => {
-            axios.post("http://52.79.249.13/eyetracking/", {
-                'email': userEmail
-            }).then(() => {
-                alert("정상적으로 회원탈퇴 되었습니다.")
-                navigate("/home");
-            }).catch(error => {
-                alert(error);
-            })
-        }).catch(error => {
-            alert(error);
-        });
-    }
+    
 
     // 로그인 안 됐을 때 보여줄 화면
     if (!isLoggedIn) return (
@@ -134,7 +114,7 @@ const Mypage = () => {
                     <MyPdf />
                 </TabPanel>
                 <TabPanel value={value} index={4}>
-                    <Button onClick={onClickDeleteUser}>회원 탈퇴</Button>
+                    <DeleteUser />
                 </TabPanel>
             </Box>
         </>
