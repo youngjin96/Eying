@@ -75,10 +75,11 @@ class CSAPI(APIView):
                 "isFAQ": request.data.get("isfaq", False),
             }
             
+            
             # 필수 항목 누락 검증
             for key in dataDict.keys():
-                if not dataDict[key]:
-                    raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key])
+                if not dataDict[key] and key != "isFAQ":
+                    return Response({"error_message": "%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key]}, status=HTTP_406_NOT_ACCEPTABLE)
             
             cs = CS(
                 category=dataDict["category"],
