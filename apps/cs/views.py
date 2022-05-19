@@ -97,3 +97,41 @@ class CSAPI(APIView):
         except Exception as e:
             print(e)
             return Response({'error_message': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class CSSearchAPI(APIView):
+    @swagger_auto_schema(
+        operation_summary="/cs/search/", 
+        operation_description="FAQ 목록을 조회하는 API입니다.", 
+        manual_parameters=[
+            openapi.Parameter('isFAQ', openapi.IN_QUERY, description="FAQ 분류 (FAQ를 제외한 데이터는 이 파라미터 사용 X)", type=openapi.TYPE_BOOLEAN)
+        ],
+        responses={
+            200: CSSerializer(many=True),
+            500: openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "error_message": "서버 내부에서 발생한 오류 내용"
+                    }
+                }
+            )
+        }
+    )
+    @TIME_MEASURE
+    def get(self, request):
+        try:
+            queryDict = {
+                "isFAQ": request.GET.get("isFAQ")
+            }
+            print(queryDict)
+            if queryDict["isFAQ"]:
+                queryset = POLICY.ORDER_BY_RECENT(CS.objects.all().filter(isFAQ=True))
+            else:
+                queryset = POLICY.ORDER_BY_RECENT(CS.objects.all().filter(isFAQ=False))
+                
+            serializer = CSSerializer(queryset, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            print(e)
+            Response({"error_message": str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
