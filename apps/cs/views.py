@@ -41,16 +41,7 @@ class CSAPI(APIView):
     @swagger_auto_schema(
         operation_summary="/cs/", 
         operation_description="고객문의를 등록하는 API입니다.", 
-        request_body=openapi.Schema(
-            "고객문의",
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "name": openapi.Schema("Name", description="이름", type=openapi.TYPE_STRING),
-                "email": openapi.Schema("Email", description="이메일", type=openapi.TYPE_STRING),
-                "phoneNumber": openapi.Schema("PhoneNumber", description="연락처", type=openapi.TYPE_STRING),
-                "content": openapi.Schema("Content", description="내용", type=openapi.TYPE_STRING),
-            }
-        ),
+        request_body=CSSerializer,
         responses={
             200: CSSerializer,
             406: openapi.Response(
@@ -75,10 +66,13 @@ class CSAPI(APIView):
     def post(self, request):
         try:
             dataDict = {
+                "category": request.data.get("category", "General"),
                 "email": request.data.get("email"),
                 "phoneNumber": request.data.get("phoneNumber"),
+                "title": request.data.get("title", "None"),
                 "name": request.data.get("name"),
                 "content": request.data.get("content"),
+                "isFAQ": request.data.get("isfaq", False),
             }
             
             # 필수 항목 누락 검증
@@ -87,10 +81,13 @@ class CSAPI(APIView):
                     raise Exception("%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH[key])
             
             cs = CS(
+                category=dataDict["category"],
                 name=dataDict["name"],
                 email=dataDict["email"],
                 phoneNumber=dataDict["phoneNumber"],
+                title=dataDict["title"],
                 content=dataDict["content"],
+                isFAQ=dataDict["isFAQ"],
             )
             cs.save()
             

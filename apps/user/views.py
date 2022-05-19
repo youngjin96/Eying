@@ -1,4 +1,3 @@
-from io import BytesIO
 from rest_framework.response import Response
 from rest_framework.status import *
 from rest_framework.views import APIView
@@ -14,6 +13,7 @@ import config.policy as POLICY
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg       import openapi
+
 
 class UserAPI(APIView):
     # 사용자 유효성 검사 (DB)
@@ -70,22 +70,7 @@ class UserAPI(APIView):
     @swagger_auto_schema(
         operation_summary="/user/", 
         operation_description="회원가입시 요청되는 API입니다.", 
-        request_body=openapi.Schema(
-            '회원가입',
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
-                "password": openapi.Schema('비밀번호', type=openapi.TYPE_STRING),
-                "username": openapi.Schema('닉네임', type=openapi.TYPE_STRING),
-                "age": openapi.Schema('나이', type=openapi.TYPE_INTEGER),
-                "job": openapi.Schema('직업', type=openapi.TYPE_STRING),
-                "job_field": openapi.Schema('직무 분야', type=openapi.TYPE_STRING),
-                "position": openapi.Schema('직급', type=openapi.TYPE_STRING),
-                "gender": openapi.Schema('성별', type=openapi.TYPE_STRING),
-                "credit": openapi.Schema('크레딧', type=openapi.TYPE_INTEGER),
-                "card": openapi.Schema('명함 이미지', type=openapi.TYPE_OBJECT),
-            }
-        ),
+        request_body=UserSerializer,
         responses={
             200: UserSerializer,
             406: openapi.Response(
@@ -163,7 +148,8 @@ class UserAPI(APIView):
             '개인정보 변경',
             type=openapi.TYPE_OBJECT,
             properties={
-                "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
+                "email": openapi.Schema('기존 이메일', type=openapi.TYPE_STRING),
+                "new_email": openapi.Schema('변경 이메일', type=openapi.TYPE_STRING),
                 "password": openapi.Schema('비밀번호', type=openapi.TYPE_STRING),
                 "username": openapi.Schema('사용자 이름', type=openapi.TYPE_STRING),
                 "age": openapi.Schema('나이', type=openapi.TYPE_INTEGER),
@@ -173,7 +159,9 @@ class UserAPI(APIView):
                 "gender": openapi.Schema('성별', type=openapi.TYPE_STRING),
                 "credit": openapi.Schema('크레딧', type=openapi.TYPE_INTEGER),
                 "operator": openapi.Schema('크레딧 연산', type=openapi.TYPE_STRING),
-            }
+                "card": openapi.Schema('명함 이미지', type=openapi.TYPE_OBJECT),
+            },
+            required=["email"]
         ),
         responses={
             200: UserSerializer,
@@ -218,16 +206,17 @@ class UserAPI(APIView):
                 return Response({"error_message": "%s 데이터가 없습니다." % POLICY.QUERY_NAME_MATCH['email']}, status=HTTP_406_NOT_ACCEPTABLE)
             
             user = User.objects.filter(email=dataDict["email"])
+            
+            # 포함되지 않은 또는 잘못된 데이터 검증
             if not user:
                 return Response({"error_message": "해당 이메일의 사용자가 존재하지 않습니다."}, status=HTTP_406_NOT_ACCEPTABLE)
-            
             if User.objects.filter(email=dataDict["new_email"]):
                 return Response({"error_message": "변경할 이메일이 이미 사용 중입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
-
             if User.objects.filter(username=dataDict["username"]):
                 return Response({"error_message": "변경할 닉네임이 이미 사용 중입니다."}, status=HTTP_406_NOT_ACCEPTABLE)
             
-            # 업데이트 (개별 업데이트는 user.save(update_fields=['', '', '', ...]))
+            # 업데이트 (QuerySet 이기 때문에 update 함수 사용 가능 - 복수 데이터를 한 번에 업데이트)
+            # 수정 요청이 있는 데이터 업데이트
             if dataDict["operator"] in ["+", "-", "="] and dataDict["credit"]:
                 if dataDict["operator"] == "+":
                     user.update(credit=F("credit")+int(dataDict["credit"]))
@@ -235,7 +224,6 @@ class UserAPI(APIView):
                     user.update(credit=F("credit")-int(dataDict["credit"]))
                 elif dataDict["operator"] == "=":
                     user.update(credit=int(dataDict["credit"]))
-                
             if dataDict["new_email"]:
                 user.update(email=dataDict["new_email"])
             if dataDict["username"]:
@@ -272,7 +260,8 @@ class UserAPI(APIView):
             type=openapi.TYPE_OBJECT, 
             properties={
                 "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
-            }
+            },
+            required=["email"]
         ),
         responses={
             200: UserSerializer,

@@ -4,12 +4,12 @@ from .models import PDFModel
 from drf_yasg.utils import swagger_serializer_method
 
      
-class PDFSerializerLambdaField(serializers.SerializerMethodField):
-    def bind(self, field_name, parent):
-        super(serializers.SerializerMethodField, self).bind(field_name, parent)
+# class PDFSerializerLambdaField(serializers.SerializerMethodField):
+#     def bind(self, field_name, parent):
+#         super(serializers.SerializerMethodField, self).bind(field_name, parent)
         
-    def to_representation(self, value):
-        return self.method_name(value)
+#     def to_representation(self, value):
+#         return self.method_name(value)
     
     
 class PDFSerializer(serializers.ModelSerializer):
@@ -46,7 +46,6 @@ class PDFSerializer(serializers.ModelSerializer):
             'views',
             'user_name',
             'user_email',
-            'img_length',
             'imgs_url',
         )
    

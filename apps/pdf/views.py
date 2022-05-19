@@ -9,13 +9,13 @@ from .serializers import PDFSerializer
 
 from apps.decorator import TIME_MEASURE
 import config.policy as POLICY
-from apps.settings import DEBUG
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from unicodedata import normalize
 from datetime import datetime
+
 
 class PDFAPI(APIView):
     @swagger_auto_schema(
@@ -36,8 +36,9 @@ class PDFAPI(APIView):
                 "email": openapi.Schema('이메일', type=openapi.TYPE_STRING),
                 "job_field": openapi.Schema('분야', type=openapi.TYPE_STRING),
                 "pdf": openapi.Schema('파일', type=openapi.TYPE_OBJECT),
-                "deadline": openapi.Schema('보관기간(0000-00-00)', type=openapi.TYPE_STRING),
-            }
+                "deadline": openapi.Schema('0000-00-00', type=openapi.TYPE_STRING, default="D+7Day"),
+            },
+            required=["email", "job_field", "pdf"]
         ),
         responses={
             200: PDFSerializer,
@@ -117,8 +118,9 @@ class PDFAPI(APIView):
             type=openapi.TYPE_OBJECT,
             properties={
                 "pdf_id": openapi.Schema('파일 고유번호', type=openapi.TYPE_INTEGER),
-                "deadline": openapi.Schema('보관기간(0000-00-00)', type=openapi.TYPE_STRING),
-            }
+                "deadline": openapi.Schema('0000-00-00', type=openapi.TYPE_STRING),
+            },
+            required=["pdf_id"]
         ),
         responses={
             200: PDFSerializer,
@@ -175,7 +177,8 @@ class PDFAPI(APIView):
             type=openapi.TYPE_OBJECT,
             properties={
                 "pdf_id": openapi.Schema('파일 고유번호', type=openapi.TYPE_INTEGER),
-            }
+            },
+            required=["pdf_id"]
         ),
         responses={
             200: PDFSerializer,
