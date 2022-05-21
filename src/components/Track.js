@@ -85,9 +85,9 @@ const Track = () => {
             if (data == null) {
                 return;
             }
+            webgazer.removeMouseEventListeners();
             dimensionArr.push([Math.floor(data.x), Math.floor(data.y)]);
         }).begin();
-        webgazer.applyKalmanFilter(true);
     };
 
     // webgazer 종료 함수
