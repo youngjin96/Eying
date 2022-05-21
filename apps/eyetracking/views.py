@@ -22,6 +22,7 @@ import asyncio # 비동기 처리
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg       import openapi
+
 heatmapper = Heatmapper(
     point_diameter=100,  # the size of each point to be drawn
     point_strength=1,  # the strength, between 0 and 1, of each point to be drawn
@@ -227,7 +228,7 @@ class EyetrackUser(APIView):
             queryDict = {
                 'pdf_id' : request.GET.get('pdf_id')
             }
-            
+            owner_id = PDFModel.objects.get(pk=queryDict["pdf_id"]).user.pk
             queryset = Eyetracking.objects.filter(pdf_fk = queryDict['pdf_id']).annotate(
                 pdf_id=F('pdf_fk__pk'),
                 age=F('user_id__age'),
@@ -238,7 +239,7 @@ class EyetrackUser(APIView):
                 username=F('user_id__username'),
                 email=F('user_id__email'),
                 date = TruncDate('create_date')
-            ).values('user_id','date','age','job','job_field','position','gender','username','email','pdf_id').distinct().order_by('pdf_fk')
+            ).values('user_id','date','age','job','job_field','position','gender','username','email','pdf_id').exclude(user_id=owner_id).distinct().order_by('pdf_fk')
      
             print("query",queryset)
             serializer = EyetrackingUserList(queryset,many = True)
