@@ -292,7 +292,7 @@ class PDFSearchAPI(APIView):
                     
             # 일치하는 데이터가 없는 경우
             if not pdf:
-                return Response({"error_message": "일치하는 데이터가 없습니다."}, status=HTTP_406_NOT_ACCEPTABLE)
+                return Response({"error_message": "등록된 PDF가 없습니다."}, status=HTTP_406_NOT_ACCEPTABLE)
             
             serializer = PDFSerializer(pdf, many=True)
             return Response(serializer.data)
