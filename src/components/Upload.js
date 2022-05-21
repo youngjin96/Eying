@@ -1,37 +1,102 @@
-import React, { useEffect } from 'react';
-import { Button, Grid, Box, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { auth } from './Fbase'
+import React, { useEffect, useState } from 'react';
+
 import axios from 'axios';
-import { onAuthStateChanged } from "firebase/auth";
+
+import { Button, Grid, Box, Typography } from '@mui/material';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import PersonSearchOutlinedIcon from '@mui/icons-material/PersonSearchOutlined';
 import DifferenceOutlinedIcon from '@mui/icons-material/DifferenceOutlined';
 import RecommendOutlinedIcon from '@mui/icons-material/RecommendOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+
+import { Link } from 'react-router-dom';
+
+import IsLoading from "./Environment/IsLoading";
+import IsLoggedIn from "./Environment/IsLoggedIn";
+import IsUploading from "./Environment/IsUploading";
+import { auth } from './Fbase';
+import { onAuthStateChanged } from "firebase/auth";
+
+const jobFields = [
+    "Art",
+    "Education",
+    "Fashion",
+    "Food",
+    "Insurance",
+    "IT",
+    "Law",
+    "Marketing",
+    "Medical",
+    "Sports",
+    "Student",
+    "Other"
+];
 
 const Upload = () => {
-    // 처음 렌더링할 때 유저가 로그인이 되어있는지 확인 로그인 되어 있을 때만 페이지 사용 가능
+    const [isLoading, setIsLoading] = useState(true); // 로그인 판별을 위한 로딩 변수
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 유무 판별 변수
+    const [isUploading, setIsUploading] = useState(false);
+
+    const [email, setEmail] = useState(""); // 유저 이메일 변수
+    const [jobField, setJobField] = useState(""); // PDF 올릴 때 종류 변수
+
+    // 처음 렌더링 후 유저가 로그인이 되어있는지 확인 로그인한 상태가 아니라면 로그인 페이지로 이동
     useEffect(() => {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log(user.uid);
-            } else {
-                window.location.replace("login");
-                alert("You Need Login To Use This Service.");
-            }
-        })
+        // 유저 정보 가져오는 함수
+        try {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    setEmail(user.email);
+                    setIsLoggedIn(true);
+                }
+                setIsLoading(false);
+            });
+        } catch (error) {
+            console.log(error);
+        }
     }, []);
 
-    // pdf 업로드 함수
+    // PDF 업로드 함수
     const handlePdfFileChange = (e) => {
+        setIsUploading(true);
         var frm = new FormData();
-        frm.append("data", e.target.files[0]);
-        axios.post('http://54.180.126.190:8000/pdf/', frm);
-    }
+        frm.append("pdf", e.target.files[0]);
+        frm.append("email", email);
+        frm.append("job_field", jobField);
+        axios.post('https://eying.ga/pdf/', frm).then(res => {
+            setIsUploading(false);
+            alert("업로드가 완료되었습니다.");
+        }).catch(error => {
+            setIsUploading(false);
+            alert(error.response.data.error_message);
+        })
+    };
 
-    return (
+    // PDF 종류 골랐을 때
+    const handleChange = (event) => {
+        setJobField(event.target.value);
+    };
+
+    // 로딩 중일 때 보여줄 화면
+    if (isLoading) return (
+        <IsLoading />
+    )
+
+    // 로그인이 안 되어 있을 때 보여줄 다이얼로그
+    else if (!isLoggedIn) return (
+        <IsLoggedIn />
+    )
+
+    else if (isUploading) return (
+        <IsUploading />
+    )
+    // 본 페이지
+    else return (
         <>
             <Box
                 sx={{
@@ -123,7 +188,7 @@ const Upload = () => {
                 <Grid container spacing={{ xs: 2, md: 4 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 5 }}>
                     <Grid item xs={3} style={{ textAlign: "center" }}>
                         <Typography variant="subtitle1" style={{ color: "#636261" }}>
-                            1. Click This Button
+                            1. Choose Job Field & Click This Button
                         </Typography>
                         <Typography variant="subtitle1" style={{ color: "#636261" }}>
                             To Upload Your PDF
@@ -135,13 +200,31 @@ const Upload = () => {
                             required
                             onChange={handlePdfFileChange}
                         />
+                        <FormControl style={{ width: "80%" }}>
+                            <InputLabel id="demo-simple-select-label">Job Field</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={jobField}
+                                label="JobField"
+                                onChange={handleChange}
+                            >
+                                {jobFields.map((field) => (
+                                    <MenuItem
+                                        key={field}
+                                        value={field}
+                                    >
+                                        {field}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                         <label htmlFor="contained-button-file">
                             <Button
                                 variant="outlined"
                                 color="primary"
                                 component="span"
-                                style={{ marginTop: 5, color: "black" }}
-
+                                style={{ marginTop: 5, color: "black", borderColor: "#a8a9a8" }}
                             >
                                 Upload
                             </Button>
@@ -152,13 +235,13 @@ const Upload = () => {
                             2. Click This Button
                         </Typography>
                         <Typography variant="subtitle1" style={{ color: "#636261" }}>
-                            To Prevent Shaking Of The Gaze Point
+                            To Prevent Shaking Of The Gaze
                         </Typography>
                         <Button
                             variant="outlined"
                             color="primary"
                             component="span"
-                            style={{ marginTop: 5, color: "black" }}
+                            style={{ marginTop: 5, color: "black", borderColor: "#a8a9a8" }}
                             onClick={() => window.open('https://webgazer.cs.brown.edu/calibration.html?', '_blank')}
                         >
                             Continue
@@ -175,16 +258,16 @@ const Upload = () => {
                             variant="outlined"
                             color="primary"
                             component="span"
-                            style={{ marginTop: 5, color: "black" }}
+                            style={{ marginTop: 5, color: "black", borderColor: "#a8a9a8" }}
                         >
-                            <Link to="/webgazer" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                            <Link to="/track" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
                                 CONTINUE
                             </Link>
                         </Button>
                     </Grid>
                 </Grid>
                 <hr style={{ marginTop: 40 }} />
-                <Grid container container spacing={{ xs: 2, md: 4 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 20 }}>
+                <Grid container spacing={{ xs: 2, md: 4 }} columns={{ xs: 3, sm: 6, md: 12 }} style={{ marginTop: 20 }}>
                     <Grid item xs={3} style={{ textAlign: "center" }}>
                         <Typography variant="h5" style={{ color: "#636261" }}>
                             E x a m p l e

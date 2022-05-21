@@ -6,8 +6,8 @@ import AboutUs from "../components/AboutUs"
 import FAQ from "../components/FAQ"
 import Upload from "../components/Upload"
 import Enroll from "../components/Enroll"
-import WebGazer from '../components/WebGazer'
 import Track from '../components/Track'
+import Mypage from '../components/Mypage/Mypage'
 
 const Router = () => {
     return (
@@ -19,9 +19,9 @@ const Router = () => {
             <Route path="about_us" element={<AboutUs />} />
             <Route path="FAQ" element={<FAQ />} />
             <Route path="login" element={<Login />} />
-            <Route path="login/enroll" element={<Enroll />} />
-            <Route path="/webgazer" element={<WebGazer />} />
-            <Route path="/track" element={<Track />} />
+            <Route path="enroll" element={<Enroll />} />
+            <Route path="track" element={<Track />} />
+            <Route path="mypage" element={<Mypage />} />
         </Routes>
     );
 };

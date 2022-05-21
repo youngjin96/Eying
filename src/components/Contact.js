@@ -3,6 +3,7 @@ import { Box, Button, createTheme, Grid, IconButton, TextField, ThemeProvider, T
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
+import axios from 'axios';
 
 const Gallery = () => {
     const font = "'Roboto', sans-serif";
@@ -33,13 +34,19 @@ const Gallery = () => {
         }
     }
 
-    const onClickSubmit = () => {
-        // TODO 서버에 보내기
-        console.log(name);
-        console.log(email);
-        console.log(phoneNumber);
-        console.log(content);
-    }
+    const onClickSubmit = async () => {
+        await axios.post("https://eying.ga/cs/", {
+            'name': name,
+            'email': email,
+            'phoneNumber': phoneNumber,
+            'content': content
+        }).then((res) => {
+            console.log(res);
+            alert("접수가 완료됐습니다.");
+        }).catch(error => {
+            alert(error);
+        });
+    };
 
     return (
         <>
@@ -96,7 +103,7 @@ const Gallery = () => {
                             </Typography>
                             <TextField
                                 id="name"
-                                label="Name"
+                                label="User Name"
                                 variant="standard"
                                 style={{ marginTop: 80, width: "40%", marginLeft: 100 }}
                                 onChange={onChange}

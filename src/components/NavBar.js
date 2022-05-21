@@ -15,24 +15,25 @@ import { Link } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from './Fbase'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from "react-router-dom";
 
 
 const NavBar = () => {
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsLoggedIn(true);
-        console.log(user.uid);
       } else {
         setIsLoggedIn(false);
-        console.log("유저 없음");
       }
     })
   }, []);
 
-  const [anchorElNav, setAnchorElNav] = useState(null);
-  const [anchorElUser, setAnchorElUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -48,7 +49,7 @@ const NavBar = () => {
   };
   const onClickLogout = () => {
     signOut(auth).then(() => {
-      window.location.replace("http://localhost:3000/home");
+      navigate("/home")
     }).catch((error) => {
       alert(error.message);
     });
@@ -132,7 +133,7 @@ const NavBar = () => {
                 <MenuItem onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">
                     <Link to="track" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                      Track
+                      TRACK
                     </Link>
                   </Typography>
                 </MenuItem>
@@ -211,16 +212,17 @@ const NavBar = () => {
                   </IconButton>
                 </Tooltip>
               ) : (
-                  <Typography
-                    component="div"
-                    noWrap
-                    sx={{ my:4 }}
-                  >
-                    <Link to="login" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
-                      LOGIN
-                  </Link>
-                  </Typography>
-                )}
+                    <Typography
+                      component="div"
+                      noWrap
+                      sx={{ my:4 }}
+                    >
+                      <Link to="login" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                        LOGIN
+                      </Link>
+                    </Typography>
+                  )
+              }
               <Menu
                 sx={{ mt: '45px' }}
                 id="menu-appbar"
@@ -239,7 +241,9 @@ const NavBar = () => {
               >
                 <MenuItem onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">
-                    마이페이지
+                    <Link to="mypage" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                      마이페이지
+                    </Link>
                   </Typography>
                 </MenuItem>
                 <MenuItem onClick={handleCloseUserMenu}>
