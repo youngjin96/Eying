@@ -12,6 +12,7 @@ import ChangeUserInformation from "./ChangeUserInformation";
 import UserInformation from "./UserInformation";
 import MyPdf from "./MyPdf";
 import DeleteUser from "./DeleteUser";
+import MypageMain from "./MypageMain";
 import { auth } from '../Fbase'
 
 const Mypage = () => {
@@ -101,9 +102,9 @@ const Mypage = () => {
                     <Tab label="내 PDF" {...a11yProps(3)} />
                     <Tab label="회원 탈퇴" {...a11yProps(4)} />
                 </Tabs>
-                <TabPanel value={value} index={0}>
-                    이 페이지에서 자신의 정보를 조회하고 변경할 수 있습니다.
-                    </TabPanel>
+                <TabPanel value={value} index={0} style={{ textAlign: "center", width: "90%" }}>
+                    <MypageMain />
+                </TabPanel>
                 <TabPanel value={value} index={1} style={{ textAlign: "center", width: "90%" }}>
                     <UserInformation />
                 </TabPanel>

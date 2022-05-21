@@ -71,7 +71,10 @@ const Upload = () => {
         axios.post('https://eying.ga/pdf/', frm).then(res => {
             setIsUploading(false);
             alert("업로드가 완료되었습니다.");
-        });
+        }).catch(error => {
+            setIsUploading(false);
+            alert(error.response.data.error_message);
+        })
     };
 
     // PDF 종류 골랐을 때
@@ -257,7 +260,7 @@ const Upload = () => {
                             component="span"
                             style={{ marginTop: 5, color: "black", borderColor: "#a8a9a8" }}
                         >
-                            <Link to="/webgazer" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
+                            <Link to="/track" style={{ textDecoration: 'none', textTransform: 'none', color: "black" }}>
                                 CONTINUE
                             </Link>
                         </Button>

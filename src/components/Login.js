@@ -78,6 +78,7 @@ const Login = () => {
                             label="Email Address"
                             name="email"
                             onChange={onChange}
+                            onKeyPress={onKeyPress}
                             style={{ width: "50%" }}
                         />
                     </Grid>

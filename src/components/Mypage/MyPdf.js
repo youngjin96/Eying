@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Button } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 
 import axios from 'axios';
@@ -43,10 +43,13 @@ const MyPdf = () => {
     const [secondPdfs, setSecondPdfs] = useState([]); // 두 번째 pdfs
     const [visualType, setVisualType] = useState("distribution"); // 시각화 종류
     const [trackedImages, setTrackedImages] = useState(""); // 시각화한 이미지들
+    const [userEmail, setUserEmail] = useState("");
+    const [userTrackedImages, setUserTrackedImages] = useState("");
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                setUserEmail(user.email);
                 axios.get('https://eying.ga/pdf/search/', {
                     params: {
                         email: user.email
@@ -54,6 +57,9 @@ const MyPdf = () => {
                 }).then(res => {
                     setFirstPdfs(res.data);
                     setShowedPdfs(res.data);
+                    setIsLoading(false);
+                }).catch(error => {
+                    alert(error.response.data.error_message);
                     setIsLoading(false);
                 })
             }
@@ -94,8 +100,18 @@ const MyPdf = () => {
                     }
                 }).then(res => {
                     setTrackedImages(res.data.visual_img);
-                    setIsLoading(false);
-                })
+                }).then(() => {
+                    axios.get('https://eying.ga/eyetracking/visualization/', {
+                        params: {
+                            pdf_id: userId,
+                            visual_type: visualType,
+                            user_email: userEmail
+                        }
+                    }).then(res => {
+                        setUserTrackedImages(res.data.visual_img);
+                        setIsLoading(false);
+                    });
+                });
             }
         }
     }
@@ -125,7 +141,6 @@ const MyPdf = () => {
             setVisualType("distribution");
             type = "distribution";
         }
-        // TODO 파라미터 오류
         axios.get('https://eying.ga/eyetracking/visualization/', {
             params: {
                 pdf_id: userId,
@@ -134,7 +149,17 @@ const MyPdf = () => {
             }
         }).then(res => {
             setTrackedImages(res.data.visual_img);
-            setIsLoading(false);
+        }).then(() => {
+            axios.get('https://eying.ga/eyetracking/visualization/', {
+                params: {
+                    pdf_id: userId,
+                    visual_type: type,
+                    user_email: userEmail
+                }
+            }).then(res => {
+                setUserTrackedImages(res.data.visual_img);
+                setIsLoading(false);
+            })
         })
     }
 
@@ -200,48 +225,68 @@ const MyPdf = () => {
                                     </Button>
                                 </>
                             ) : (
-                                    <>
-                                        <AliceCarousel
-                                            animationDuration={1}
-                                            keyboardNavigation={true}
-                                            disableButtonsControls={true}
-                                        >
-                                            {trackedImages && trackedImages.map((e, index) => (
-                                                <img
-                                                    key={index}
-                                                    src={e}
-                                                    style={{ width: "90%", height: 500, margin: "auto" }}
-                                                />
-                                            ))}
-                                        </AliceCarousel>
-                                        {visualType === "distribution" ?
-                                            (
-                                                <Button
-                                                    variant="contained"
-                                                    size="large"
-                                                    onClick={onClickVisualType}
-                                                >
-                                                    시선 흐름 보기
-                                                </Button>
-                                            ) : (
-                                                <Button
-                                                    variant="contained"
-                                                    size="large"
-                                                    onClick={onClickVisualType}
-                                                >
-                                                    분포도 보기
-                                                </Button>
-                                            )
-                                        }
-                                        <Button
-                                            variant="contained"
-                                            size="large"
-                                            onClick={onClickBack}
-                                            style={{ marginLeft: 20 }}
-                                        >
-                                            BACK
-                                        </Button>
-                                    </>
+                                    <Grid container columns={{ xs: 6, sm: 12, md: 12 }}>
+                                        <Grid item xs={6}>
+                                            <AliceCarousel
+                                                animationDuration={1}
+                                                keyboardNavigation={true}
+                                                disableButtonsControls={true}
+                                            >
+                                                {userTrackedImages && userTrackedImages.map((e, index) => (
+                                                    <img
+                                                        key={index}
+                                                        src={e}
+                                                        style={{ width: "95%", height: 500 }}
+                                                    />
+                                                ))}
+                                            </AliceCarousel>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <AliceCarousel
+                                                animationDuration={1}
+                                                keyboardNavigation={true}
+                                                disableButtonsControls={true}
+                                            >
+                                                {trackedImages && trackedImages.map((e, index) => (
+                                                    <img
+                                                        key={index}
+                                                        src={e}
+                                                        style={{ width: "95%", height: 500 }}
+                                                    />
+                                                ))}
+                                            </AliceCarousel>
+                                        </Grid>
+                                        <Grid item xs={12}>
+
+                                            {visualType === "distribution" ?
+                                                (
+                                                    <Button
+                                                        variant="contained"
+                                                        size="large"
+                                                        onClick={onClickVisualType}
+                                                    >
+                                                        시선 흐름 보기
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        variant="contained"
+                                                        size="large"
+                                                        onClick={onClickVisualType}
+                                                    >
+                                                        분포도 보기
+                                                    </Button>
+                                                )
+                                            }
+                                            <Button
+                                                variant="contained"
+                                                size="large"
+                                                onClick={onClickBack}
+                                                style={{ marginLeft: 20 }}
+                                            >
+                                                BACK
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
                                 )
                         )
                 )

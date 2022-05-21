@@ -39,8 +39,7 @@ const Gallery = () => {
             'name': name,
             'email': email,
             'phoneNumber': phoneNumber,
-            'content': content,
-            
+            'content': content
         }).then((res) => {
             console.log(res);
             alert("접수가 완료됐습니다.");

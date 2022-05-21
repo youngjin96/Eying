@@ -183,7 +183,7 @@ const Track = () => {
                             <img
                                 key={index}
                                 src={e}
-                                style={{ width: "100%", height: "80vh" }}
+                                style={{ width: "100%", height: "75vh" }}
                             />
                         ))}
                     </AliceCarousel>

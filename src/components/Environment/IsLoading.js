@@ -1,19 +1,8 @@
-import { Box, CircularProgress } from '@mui/material';
+import "./css-loader.css";
 
 const IsLoading = () => {
     return (
-        <Box
-            sx={{
-                width: '100%',
-                height: '100%',
-                background: '#ecebe9',
-                flexGrow: 1,
-            }}
-        >
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <CircularProgress size={300} style={{ marginTop: "15%" }} />
-            </div>
-        </Box>
+        <div className="loader loader-default is-active"></div>
     )
 }
 
