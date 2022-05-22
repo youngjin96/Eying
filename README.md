@@ -7,8 +7,8 @@
             
 ### 주요 기능
 
-* Eye tracking을 통해 PDF파일을 시청하는 사용자들의 시선 추적
-* PDF 페이지 별 사용자와 평가자의 시선 데이터 비교 분석
+* Eye tracking을 통해 발표 자료를 시청하는 사용자들의 시선 추적
+* 발표 자료 페이지 별 시청자의 시선 데이터 비교 분석
 * 페이지 별 시선 분포 데이터 제공
 * 평가자 별 시선 흐름 데이터 제공
 
@@ -20,7 +20,7 @@
 
 *back-end
 
-<img src="https://img.shields.io/badge/MySQl-4479A1?style=for-the-badge&logo=mysql&logoColor=white"/><img src="https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white"/><img src="https://img.shields.io/badge/Amazon AWS-232F3E?style=for-the-badge&logo=amazon aws&logoColor=white"/>
+<img src="https://img.shields.io/badge/MySQl-4479A1?style=for-the-badge&logo=mysql&logoColor=white"/><img src="https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white"/><img src="https://img.shields.io/badge/Amazon AWS-232F3E?style=for-the-badge&logo=amazon aws&logoColor=white"/><img src="https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white"/><img src="https://img.shields.io/badge/gunicorn-%298729.svg?style=for-the-badge&logo=gunicorn&logoColor=white"/>
 
 ### 타겟
 
@@ -29,7 +29,7 @@
 
 
 ## 2. 소개 영상
-* 추후 업로드 예정
+[![Video Label](http://img.youtube.com/vi/Qwk2XAd6FpI/0.jpg)](https://youtu.be/Qwk2XAd6FpI)
 
 
 ## 3. 팀 소개
@@ -84,7 +84,6 @@
 ```
 
 
-## 4. 사용법
+## 4. 서비스 이용
 
 #### 사이트 주소 : https://capstone-frontend-d0d47.web.app 
-
