@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom';
 import IsLoading from "./Environment/IsLoading";
 import IsLoggedIn from "./Environment/IsLoggedIn";
 import IsUploading from "./Environment/IsUploading";
+import IntroduceVideo from "./Environment/IntroduceVideo";
 import { auth } from './Fbase';
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -276,6 +277,7 @@ const Upload = () => {
                             Show How To Use
                         </Typography>
                     </Grid>
+                    <IntroduceVideo />
                 </Grid>
             </Box>
         </>

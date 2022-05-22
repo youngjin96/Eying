@@ -119,11 +119,12 @@ const Enroll = () => {
                 alert("정상적으로 회원가입이 완료되었습니다.");
                 navigate("/home");
             }).catch(error => {
+                setIsLoading(false);
                 alert(error);
             });
         }).catch(error => {
-            alert(error.response.data.error_message);
             setIsLoading(false);
+            alert(error.response.data.error_message);
         });
     }
 
