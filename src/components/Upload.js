@@ -23,6 +23,8 @@ import IntroduceVideo from "./Environment/IntroduceVideo";
 import { auth } from './Fbase';
 import { onAuthStateChanged } from "firebase/auth";
 
+import "./Environment/css-loader.css";
+
 const jobFields = [
     "Art",
     "Education",

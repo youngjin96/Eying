@@ -8,6 +8,8 @@ import { DataGrid } from '@mui/x-data-grid';
 import AliceCarousel from 'react-alice-carousel';
 import "react-alice-carousel/lib/alice-carousel.css";
 
+import Swal from 'sweetalert2'
+
 import { onAuthStateChanged } from 'firebase/auth';
 
 import IsLoading from "./Environment/IsLoading";
@@ -42,7 +44,6 @@ const Track = () => {
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
     const [pageNumber, setpageNumber] = useState(0); // pdf 현재 페이지
 
-
     useEffect(() => {
         // 유저 정보 가져오는 함수
         try {
@@ -54,8 +55,9 @@ const Track = () => {
                     axios.get('https://eying.ga/pdf/').then(res => {
                         setPdfs(res.data);
                         setIsLoading(false);
-                    }).catch(error => {
-                        alert(error);
+                    }).catch(() => {
+                        alert("서버에 오류가 있습니다. 잠시 뒤에 이용바랍니다.");
+                        setIsLoading(false);
                     })
                 } else {
                     setIsLoading(false);
@@ -72,6 +74,17 @@ const Track = () => {
             alert("PDF를 선택해주세요.");
         }
         else {
+            Swal.fire({
+                icon: 'info',
+                title: '사용법',
+                html: '시작하기 버튼을 누른 뒤 카메라가 켜지면<br/>방향키를 눌러 PPT를 시청하시면 됩니다.<br/>시청이 끝난뒤 종료하기 버튼을 클릭하고<br/>돌아가기 버튼을 클릭해주세요.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
             setIsTracking(true);
             setIsLoading(true);
             await axios.get('https://eying.ga/pdf/search', {

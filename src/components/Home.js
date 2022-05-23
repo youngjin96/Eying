@@ -56,16 +56,22 @@ const Home = () => {
                             interval={3000}
                         >
                             <div>
-                                <img src="/img/firstExample.png" style={{ height: 550, width: "95%" }} />
+                                <img src="/img/example1.jpeg" style={{ height: 550, width: "95%" }} />
                             </div>
                             <div>
-                                <img src="/img/thirdExample.png" style={{ height: 550, width: "95%" }} />
+                                <img src="/img/example2.jpeg" style={{ height: 550, width: "95%" }} />
                             </div>
                             <div>
-                                <img src="/img/secondExample.png" style={{ height: 550, width: "95%" }} />
+                                <img src="/img/example3.jpeg" style={{ height: 550, width: "95%" }} />
                             </div>
                             <div>
-                                <img src="/img/fourthExample.png" style={{ height: 550, width: "95%" }} />
+                                <img src="/img/example4.jpeg" style={{ height: 550, width: "95%" }} />
+                            </div>
+                            <div>
+                                <img src="/img/example5.jpeg" style={{ height: 550, width: "95%" }} />
+                            </div>
+                            <div>
+                                <img src="/img/example6.jpeg" style={{ height: 550, width: "95%" }} />
                             </div>
                         </Carousel>
                     </Grid>
