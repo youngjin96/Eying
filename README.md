@@ -87,3 +87,10 @@
 ## 4. 서비스 이용
 
 #### 사이트 주소 : https://capstone-frontend-d0d47.web.app 
+
+< 사이트 이용 방법 >
+1. 회원가입 및 로그인
+2. UPLOAD 페이지에서 PPT 분야 선택 후 PDF 업로드
+3. UPLOAD 페이지에서 Calibration 진행 (웹캠을 통한 시선 추적으로, 정확도 향상을 위해 교정 진행)
+4. Mypage의 내 PDF 에서 시선 분석 결과 확인
+

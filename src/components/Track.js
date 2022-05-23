@@ -24,17 +24,20 @@ const columns = [
 ];
 
 var dimensionArr = []; // webgazer x, y 좌표가 담길 배열
+var countTrackPage = 0;
 
 const Track = () => {
     const webgazer = window.webgazer; // webgazer instance
     const [isLoading, setIsLoading] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isTracking, setIsTracking] = useState(false);
+    const [isClickStart, setIsClickStart] = useState(false);
 
     const [selectionModel, setSelectionModel] = useState();
     const [userEmail, setUserEmail] = useState(""); // 유저 이메일
-    const [ownerEmail, setOwnerEmail] = useState("");
+    const [ownerEmail, setOwnerEmail] = useState(""); // PDF 올린 유저 이메일
     const [pdfs, setPdfs] = useState([]); // 전체 pdf
+    const [pdfLength, setPdfLength] = useState(0);
     const [imgsUrl, setImgsUrl] = useState([]); // pdf image url 배열
     const [pdfId, setPdfId] = useState(0); // pdf 고유 아이디 값
     const [pageNumber, setpageNumber] = useState(0); // pdf 현재 페이지
@@ -50,37 +53,50 @@ const Track = () => {
                     // 유저가 로그인했을 때 서버에서 데이터를 가져온다.
                     axios.get('https://eying.ga/pdf/').then(res => {
                         setPdfs(res.data);
-                        setIsLoading(false);   
+                        setIsLoading(false);
+                    }).catch(error => {
+                        alert(error);
                     })
                 } else {
                     setIsLoading(false);
                 }
             });
         } catch (error) {
-            console.log(error);
+            alert(error);
         }
     }, []);
 
     // PDF를 고르고 Track 버튼 누른 경우
     const onClickTrack = async () => {
-        setIsTracking(true);
-        setIsLoading(true);
-        await axios.get('https://eying.ga/pdf/search', {
-            params: {
-                pdf_id: selectionModel[0],
-                view: true
-            }
-        }).then(res => {
-            if (res.status === 200) {
+        if (!selectionModel) {
+            alert("PDF를 선택해주세요.");
+        }
+        else {
+            setIsTracking(true);
+            setIsLoading(true);
+            await axios.get('https://eying.ga/pdf/search', {
+                params: {
+                    pdf_id: selectionModel[0],
+                    view: true
+                }
+            }).then(res => {
+                setPdfLength(res.data[0].imgs_url.length);
                 setImgsUrl(res.data[0].imgs_url);
                 setPdfId(res.data[0].id);
                 setOwnerEmail(res.data[0].user_email);
                 setIsLoading(false);
-            }
-        });
+            }).catch(error => {
+                alert(error);
+            });
+        }
     };
 
     const onClickStart = () => {
+        setIsClickStart(true);
+        if (userEmail !== ownerEmail) {
+            countTrackPage += 1;
+        }
+        webgazer.applyKalmanFilter(true);
         webgazer.setRegression('weightedRidge').setTracker('trackingjs').setGazeListener(function (data) {
             if (data == null) {
                 return;
@@ -91,32 +107,37 @@ const Track = () => {
 
     // webgazer 종료 함수
     const onClickEnd = async () => {
-        // 서버에 dataset 보내는 함수
-        await axios.post("https://eying.ga/eyetracking/", {
-            'user_email': userEmail,
-            'owner_email': ownerEmail,
-            'rating_time': '00:00:00',
-            'page_number': pageNumber,
-            'pdf_id': pdfId,
-            'coordinate': dimensionArr
-        }).then(res => {
-            if (res.status === 200) {
-                console.log("Success");
-                setIsTracking(false);
-                dimensionArr = [];
-            }
-            else {
-                console.log("Fail");
-            }
-            webgazer.end();
-            webgazer.showPredictionPoints(false);
-            window.location.reload();
-        });
+        if (!isClickStart) {
+            alert("시작하기 버튼을 눌러주세요.");
+        } else {
+            // 서버에 dataset 보내는 함수
+            await axios.post("https://eying.ga/eyetracking/", {
+                'user_email': userEmail,
+                'owner_email': ownerEmail,
+                'rating_time': '00:00:00',
+                'page_number': pageNumber,
+                'pdf_id': pdfId,
+                'coordinate': dimensionArr
+            }).then(res => {
+                if (isClickStart === true && countTrackPage >= pdfLength) {
+                    axios.put('https://eying.ga/user/', {
+                        email: userEmail,
+                        credit: 50,
+                        operator: "+"
+                    }).then(() => {
+                        alert("50 크레딧이 지급되었습니다. 돌아가기 버튼을 눌러주세요.");
+                    }).catch(error => {
+                        console.log(error);
+                    });
+                }
+                webgazer.end();
+                webgazer.showPredictionPoints(false);
+            });
+        }
     };
 
     const onClickBack = () => {
         window.location.replace("track");
-        alert("저장되었습니다.");
     };
 
     // Before swipe slide, post data to server
@@ -128,13 +149,9 @@ const Track = () => {
             'page_number': pageNumber,
             'pdf_id': pdfId,
             'coordinate': dimensionArr,
-        }).then(res => {
-            if (res.status === 200) {
-                console.log("Success");
-            }
-            else {
-                console.log("Fail");
-            }
+        }).then(() => {
+            countTrackPage += 1;
+            console.log(countTrackPage);
             dimensionArr = [];
         });
     };
@@ -206,7 +223,6 @@ const Track = () => {
                     selectionModel={selectionModel}
                     onSelectionModelChange={(newSelectionModel) => {
                         setSelectionModel(newSelectionModel);
-                        console.log(newSelectionModel)
                     }}
                     style={{ align: "center" }}
                 />
