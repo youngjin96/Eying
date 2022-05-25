@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+
 import { Box, Button, createTheme, Grid, IconButton, TextField, ThemeProvider, Typography } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
+
+import Swal from 'sweetalert2'
+
 import axios from 'axios';
 
 const Gallery = () => {
@@ -40,11 +44,33 @@ const Gallery = () => {
             'email': email,
             'phoneNumber': phoneNumber,
             'content': content
-        }).then((res) => {
-            console.log(res);
-            alert("접수가 완료됐습니다.");
+        }).then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: '접수 완료',
+                html: '고객님의 문의사항이 접수되었습니다.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            }).then(() => {
+                window.location.reload();
+            });
+            
         }).catch(error => {
-            alert(error);
+            Swal.fire({
+                icon: 'error',
+                title: '접수 실패',
+                html: error.response.data.error_message,
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
         });
     };
 

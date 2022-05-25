@@ -1,11 +1,18 @@
+import { useState, useEffect } from "react";
+
 import { Button, Grid, TextField, Typography, InputLabel, FormControl, OutlinedInput, FormHelperText } from "@mui/material"
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { useState, useEffect } from "react";
-import { updateEmail, onAuthStateChanged, sendPasswordResetEmail, signOut } from "firebase/auth";
-import { auth } from "../Fbase";
+
 import axios from 'axios';
+
+import Swal from 'sweetalert2'
+
 import { useNavigate } from "react-router-dom"
+
+import { updateEmail, onAuthStateChanged, sendPasswordResetEmail, signOut } from "firebase/auth";
+
+import { auth } from "../Fbase";
 
 const jobs = ["중학생", "고등학생", "대학생", "직장인"];
 const middleHighStudent = ["1학년", "2학년", "3학년"];
@@ -68,7 +75,7 @@ const ChangeUserInformation = () => {
 
     const [userJob, setUserJob] = useState("");
     const [userUpdateJob, setUserUpdateJob] = useState("");
-    
+
     const [userPosition, setUserPosition] = useState("");
     const [userUpdatePosition, setUserUpdatePosition] = useState("");
 
@@ -114,22 +121,69 @@ const ChangeUserInformation = () => {
     }
 
     const onClickChangeEmail = () => {
-        const user = auth.currentUser;
-        updateEmail(user, userUpdateEmail).then(() => {
-            axios.put('https://eying.ga/user/', {
-                email: userEmail,
-                new_email: userUpdateEmail
+        if (!userUpdateEmail) {
+            Swal.fire({
+                icon: 'error',
+                title: '변경 실패',
+                html: '변경할 이메일을 입력해주세요.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
             });
-            alert("이메일이 수정되었습니다.");
-            setUserEmail(userUpdateEmail);
-        }).catch((error) => {
-            alert("재로그인 후 시도해주세요.");
-            signOut(auth).then(() => {
-                navigate("/login")
-            }).catch((error) => {
-                alert(error.message);
-            });
-        })
+        }
+        else {
+            const user = auth.currentUser;
+            updateEmail(user, userUpdateEmail).then(() => {
+                axios.put('https://eying.ga/user/', {
+                    email: userEmail,
+                    new_email: userUpdateEmail
+                }).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '변경 완료',
+                        html: '고객님의 이메일이 변경되었습니다.',
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                        }
+                    });
+                    setUserEmail(userUpdateEmail);
+                }).catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '변경 실패',
+                        html: error.response.data.error_message,
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                        }
+                    });
+                });
+            }).catch(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: '변경 실패',
+                    html: "재로그인 후 시도해주세요.",
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then(() => {
+                    signOut(auth).then(() => {
+                        navigate("/login")
+                    });
+                });
+            })
+        }
     }
 
     const onClickChangePassword = () => {
@@ -147,41 +201,159 @@ const ChangeUserInformation = () => {
     }
 
     const onClickChangeUsername = () => {
-        axios.put('https://eying.ga/user/', {
-            email: userEmail,
-            username: userUpdateName 
-        }).then(() => {
-            alert("이름이 수정되었습니다.");
-            setUserName(userUpdateName);
-        }).catch(error => {
-            console.log(error);
-        });
+        if (!userUpdateName) {
+            Swal.fire({
+                icon: 'error',
+                title: '변경 실패',
+                html: '변경할 이름을 입력해주세요.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
+        }
+        else {
+            axios.put('https://eying.ga/user/', {
+                email: userEmail,
+                username: userUpdateName
+            }).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: '변경 완료',
+                    html: '고객님의 이름이 변경되었습니다.',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                });
+                setUserName(userUpdateName);
+            }).catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: '변경 실패',
+                    html: error.response.data.error_message,
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                })
+            });
+        }
     }
 
     const onClickChangeUserJobField = () => {
-        axios.put('https://eying.ga/user/', {
-            email: userEmail, 
-            job_field: userUpdateJobField 
-        }).then(() => {
-            alert("분야가 수정되었습니다.");
-            setUserJobField(userUpdateJobField);
-        }).catch(error => {
-            console.log(error);
-        });
+        if (!userUpdateJobField) {
+            Swal.fire({
+                icon: 'error',
+                title: '변경 실패',
+                html: '변경할 분야를 선택해주세요.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
+        }
+        else {
+            axios.put('https://eying.ga/user/', {
+                email: userEmail,
+                job_field: userUpdateJobField
+            }).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: '변경 완료',
+                    html: '고객님의 분야가 변경되었습니다.',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                });
+                setUserJobField(userUpdateJobField);
+            }).catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: '변경 실패',
+                    html: error.response.data.error_message,
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                });
+            });
+        }
     }
 
     const onClickChangeUserJob = () => {
-        axios.put('https://eying.ga/user/', {
-            email: userEmail, 
-            job: userUpdateJob,
-            position: userUpdatePosition
-        }).then(() => {
-            alert("직업과 계급이 수정되었습니다.");
-            setUserJob(userUpdateJob);
-            setUserPosition(userUpdatePosition);
-        }).catch(error => {
-            console.log(error);
-        });
+        if (!userUpdateJob) {
+            Swal.fire({
+                icon: 'error',
+                title: '변경 실패',
+                html: '변경할 직업을 선택해주세요.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
+        }
+        else if (!userUpdatePosition) {
+            Swal.fire({
+                icon: 'error',
+                title: '변경 실패',
+                html: '변경할 계급을 선택해주세요.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
+        }
+        else {
+            axios.put('https://eying.ga/user/', {
+                email: userEmail,
+                job: userUpdateJob,
+                position: userUpdatePosition
+            }).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: '변경 완료',
+                    html: '고객님의 직업과 분야가 변경되었습니다.',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                });
+                setUserJob(userUpdateJob);
+                setUserPosition(userUpdatePosition);
+            }).catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: '변경 실패',
+                    html: error.response.data.error_message,
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                });
+            });
+        }
     }
 
     if (userUpdateJob === "중학생" || userUpdateJob === "고등학생") {
@@ -195,8 +367,8 @@ const ChangeUserInformation = () => {
     if (type) {
         options = type.map((el) => (
             <MenuItem
-            key={el}
-            value={el}
+                key={el}
+                value={el}
             >
                 {el}
             </MenuItem>
@@ -208,21 +380,41 @@ const ChangeUserInformation = () => {
         var frm = new FormData();
         frm.append("email", userEmail);
         frm.append("card", userUpdateBusinessCard);
-        axios.put('https://eying.ga/user/', frm).then((res) => {
+        axios.put('https://eying.ga/user/', frm).then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: '변경 완료',
+                html: '고객님의 명함이 변경되었습니다.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
             setIsUploadBusinessCard(true);
-            alert("명함이 수정되었습니다.");
         }).catch(error => {
-            console.log(error);
+            Swal.fire({
+                icon: 'error',
+                title: '변경 실패',
+                html: error.response.data.error_message,
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
         });
     }
-    
+
     return (
-        <Grid container columns={{ xs: 6, sm: 12, md: 12 }} rowSpacing={{ xs: 2, sm: 2, md: 2}}>
+        <Grid container columns={{ xs: 6, sm: 12, md: 12 }} rowSpacing={{ xs: 2, sm: 2, md: 2 }}>
             <Grid item xs={3}>
-                <Typography style={{marginTop: 20}}>이메일</Typography>
+                <Typography style={{ marginTop: 20 }}>이메일</Typography>
             </Grid>
             <Grid item xs={3}>
-                <Typography style={{marginTop: 20}}>{userEmail}</Typography>
+                <Typography style={{ marginTop: 20 }}>{userEmail}</Typography>
             </Grid>
             <Grid item xs={3}>
                 <TextField
@@ -243,12 +435,12 @@ const ChangeUserInformation = () => {
                     변경하기
                 </Button>
             </Grid>
-            <hr style={{width: "100%", marginTop: 20}} />
+            <hr style={{ width: "100%", marginTop: 20 }} />
             <Grid item xs={3}>
-                <Typography style={{marginTop: 20}}>이름</Typography>
+                <Typography style={{ marginTop: 20 }}>이름</Typography>
             </Grid>
             <Grid item xs={3}>
-                <Typography style={{marginTop: 20}}>{userName}</Typography>
+                <Typography style={{ marginTop: 20 }}>{userName}</Typography>
             </Grid>
             <Grid item xs={3}>
                 <TextField
@@ -264,17 +456,17 @@ const ChangeUserInformation = () => {
                 <Button
                     variant="outlined"
                     onClick={onClickChangeUsername}
-                    style={{ color: "black", borderColor: "#a8a9a8", marginTop : 20 }}
+                    style={{ color: "black", borderColor: "#a8a9a8", marginTop: 20 }}
                 >
                     변경하기
                 </Button>
             </Grid>
-            <hr style={{width: "100%", marginTop: 20}} />
+            <hr style={{ width: "100%", marginTop: 20 }} />
             <Grid item xs={3}>
-                <Typography style={{marginTop: 20}}>분야</Typography>
+                <Typography style={{ marginTop: 20 }}>분야</Typography>
             </Grid>
             <Grid item xs={3}>
-                <Typography style={{marginTop: 20}}>{userJobField}</Typography>
+                <Typography style={{ marginTop: 20 }}>{userJobField}</Typography>
             </Grid>
             <Grid item xs={3}>
                 <FormControl style={{ width: "90%" }}>
@@ -308,12 +500,12 @@ const ChangeUserInformation = () => {
                     변경하기
                 </Button>
             </Grid>
-            <hr style={{width: "100%", marginTop: 20}} />
+            <hr style={{ width: "100%", marginTop: 20 }} />
             <Grid item xs={3}>
-                <Typography style={{marginTop: 20}}>직업</Typography>
+                <Typography style={{ marginTop: 20 }}>직업</Typography>
             </Grid>
             <Grid item xs={3}>
-                <Typography style={{marginTop: 20}}>{userJob}</Typography>
+                <Typography style={{ marginTop: 20 }}>{userJob}</Typography>
             </Grid>
             <Grid item xs={3}>
                 <FormControl style={{ width: "90%" }}>
@@ -340,10 +532,10 @@ const ChangeUserInformation = () => {
             </Grid>
             <Grid item xs={3}></Grid>
             <Grid item xs={3}>
-                <Typography style={{marginTop: 20}}>계급</Typography>
+                <Typography style={{ marginTop: 20 }}>계급</Typography>
             </Grid>
             <Grid item xs={3}>
-                <Typography style={{marginTop: 20}}>{userPosition}</Typography>
+                <Typography style={{ marginTop: 20 }}>{userPosition}</Typography>
             </Grid>
             <Grid item xs={3}>
                 <FormControl style={{ width: "90%" }}>
@@ -371,7 +563,7 @@ const ChangeUserInformation = () => {
                     변경하기
                 </Button>
             </Grid>
-            <hr style={{width: "100%", marginTop: 20}} />
+            <hr style={{ width: "100%", marginTop: 20 }} />
             {isUploadBusinessCard ? (
                 <>
                     <Grid item xs={12}>
@@ -382,41 +574,41 @@ const ChangeUserInformation = () => {
                             disabled
                             variant="outlined"
                             component="span"
-                            style={{ marginTop: 30}}
+                            style={{ marginTop: 30 }}
                         >
                             업로드 완료
                         </Button>
                     </Grid>
                 </>
             ) : (
-                <>
-                    <Grid item xs={6}>
-                        <img src={userBusinessCard} style={{ width: "90%", height: 300 }} />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                style={{ display: 'none' }}
-                                id="upload-button-file"
-                                multiple
-                                onChange={onChangeUserBusinessCard}
-                            />
-                            <label htmlFor="upload-button-file">
-                                <Button
-                                    variant="outlined"
-                                    component="span"
-                                    style={{ color: "black", borderColor: "#a8a9a8", marginTop: 30}}
-                                >
-                                    새 명함 업로드
+                    <>
+                        <Grid item xs={6}>
+                            <img src={userBusinessCard} style={{ width: "90%", height: 300 }} />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    id="upload-button-file"
+                                    multiple
+                                    onChange={onChangeUserBusinessCard}
+                                />
+                                <label htmlFor="upload-button-file">
+                                    <Button
+                                        variant="outlined"
+                                        component="span"
+                                        style={{ color: "black", borderColor: "#a8a9a8", marginTop: 30 }}
+                                    >
+                                        새 명함 업로드
                                 </Button>
-                            </label>
-                        </>
-                    </Grid> 
-                </>
-            )}
-            <hr style={{width: "100%", marginTop: 20}} />
+                                </label>
+                            </>
+                        </Grid>
+                    </>
+                )}
+            <hr style={{ width: "100%", marginTop: 20 }} />
             <Grid item xs={12}>
                 <Button
                     variant="outlined"

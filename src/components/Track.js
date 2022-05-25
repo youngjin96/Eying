@@ -71,7 +71,17 @@ const Track = () => {
     // PDF를 고르고 Track 버튼 누른 경우
     const onClickTrack = async () => {
         if (!selectionModel) {
-            alert("PDF를 선택해주세요.");
+            Swal.fire({
+                icon: 'error',
+                title: '선택한 PDF가 없습니다.',
+                html: 'Eyetrack을 진행할 PDF를 선택해주세요.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
         }
         else {
             Swal.fire({

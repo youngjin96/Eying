@@ -14,6 +14,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
+import Swal from 'sweetalert2'
+
 import { Link } from 'react-router-dom';
 
 import IsLoading from "./Environment/IsLoading";
@@ -73,10 +75,30 @@ const Upload = () => {
         frm.append("job_field", jobField);
         axios.post('https://eying.ga/pdf/', frm).then(res => {
             setIsUploading(false);
-            alert("업로드가 완료되었습니다.");
+            Swal.fire({
+                icon: 'success',
+                title: '업로드 완료',
+                html: '업로드가 완료되었습니다.<br/>다음 단계를 진행해주세요.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
         }).catch(error => {
             setIsUploading(false);
-            alert(error.response.data.error_message);
+            Swal.fire({
+                icon: 'error',
+                title: '업로드 실패',
+                html: error.response.data.error_message,
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
         })
     };
 

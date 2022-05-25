@@ -8,6 +8,8 @@ import axios from 'axios';
 import AliceCarousel from 'react-alice-carousel';
 import "react-alice-carousel/lib/alice-carousel.css";
 
+import Swal from 'sweetalert2'
+
 import { onAuthStateChanged } from "firebase/auth";
 
 import IsLoading from "../Environment/IsLoading";
@@ -59,7 +61,17 @@ const MyPdf = () => {
                     setShowedPdfs(res.data);
                     setIsLoading(false);
                 }).catch(error => {
-                    alert(error.response.data.error_message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: '변경 실패',
+                        html: error.response.data.error_message,
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                        }
+                    });
                     setIsLoading(false);
                 })
             }
@@ -69,7 +81,17 @@ const MyPdf = () => {
     const onClickContinue = () => {
         // PDF를 선택하지 않고 continue 버튼 눌렀을 때
         if (!isClickedCell) {
-            return alert("PDF를 선택해주세요");
+            Swal.fire({
+                icon: 'error',
+                title: '선택된 PDF가 없음',
+                html: "PDF를 선택하고 버튼을 눌러주세요.",
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
         }
         // PDF 선택 후 continue 버튼 눌렀을 때
         else {
@@ -92,6 +114,17 @@ const MyPdf = () => {
             else {
                 setIsLoading(true);
                 setStep(step + 1);
+                Swal.fire({
+                    icon: 'info',
+                    title: '안내',
+                    html: "왼쪽이 고객님의 시각데이터</br>오른쪽이 다른 사용자의 시각데이터입니다.<br/>방향키를 눌러 이미지를 넘길 수 있습니다.",
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                });
                 axios.get('https://eying.ga/eyetracking/visualization/', {
                     params: {
                         pdf_id: userId,
