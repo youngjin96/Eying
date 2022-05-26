@@ -26,7 +26,7 @@ const columns = [
 ];
 
 var dimensionArr = []; // webgazer x, y 좌표가 담길 배열
-var countTrackPage = 0;
+var countTrackPage = 1;
 
 const Track = () => {
     const webgazer = window.webgazer; // webgazer instance
@@ -34,6 +34,7 @@ const Track = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isTracking, setIsTracking] = useState(false);
     const [isClickStart, setIsClickStart] = useState(false);
+    const [isOwnPdf, setIsOwnPdf] = useState(false);
 
     const [selectionModel, setSelectionModel] = useState();
     const [userEmail, setUserEmail] = useState(""); // 유저 이메일
@@ -116,8 +117,8 @@ const Track = () => {
 
     const onClickStart = () => {
         setIsClickStart(true);
-        if (userEmail !== ownerEmail) {
-            countTrackPage += 1;
+        if (userEmail === ownerEmail) {
+            setIsOwnPdf(true);
         }
         webgazer.applyKalmanFilter(true);
         webgazer.setRegression('weightedRidge').setTracker('trackingjs').setGazeListener(function (data) {
@@ -153,15 +154,11 @@ const Track = () => {
                 'coordinate': dimensionArr
             }).then(() => {
                 if (isClickStart === true && countTrackPage >= pdfLength) {
-                    axios.put('https://eying.ga/user/', {
-                        email: userEmail,
-                        credit: 50,
-                        operator: "+"
-                    }).then(() => {
+                    if (isOwnPdf) {
                         Swal.fire({
                             icon: 'success',
                             title: 'Eyetrack 완료',
-                            html: '50 크레딧이 지급되었습니다.<br>돌아가기 버튼을 누르면 카메라가 꺼집니다.',
+                            html: '본인의 시각데이터가 저장되었습니다.<br>돌아가기 버튼을 누르면 카메라가 꺼집니다.',
                             showClass: {
                                 popup: 'animate__animated animate__fadeInDown'
                             },
@@ -169,9 +166,28 @@ const Track = () => {
                                 popup: 'animate__animated animate__fadeOutUp'
                             }
                         });
-                    }).catch(error => {
-                        console.log(error);
-                    });
+                    }
+                    else {
+                        axios.put('https://eying.ga/user/', {
+                            email: userEmail,
+                            credit: 50,
+                            operator: "+"
+                        }).then(() => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Eyetrack 완료',
+                                html: '50 크레딧이 지급되었습니다.<br>돌아가기 버튼을 누르면 카메라가 꺼집니다.',
+                                showClass: {
+                                    popup: 'animate__animated animate__fadeInDown'
+                                },
+                                hideClass: {
+                                    popup: 'animate__animated animate__fadeOutUp'
+                                }
+                            });
+                        }).catch(error => {
+                            console.log(error);
+                        });
+                    }
                 }
                 else {
                     Swal.fire({
