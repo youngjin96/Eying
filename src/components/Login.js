@@ -10,6 +10,8 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 
+import Swal from 'sweetalert2'
+
 import { signInWithEmailAndPassword, setPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 import { auth } from "./Fbase";
@@ -33,8 +35,18 @@ const Login = () => {
             return signInWithEmailAndPassword(auth, email, password).then(() => {
                 navigate("/home");
             });
-        }).catch((error) => {
-            alert(error.message);
+        }).catch(() => {
+            Swal.fire({
+                icon: 'error',
+                title: '로그인 실패',
+                html: '이메일 혹은 비밀번호를 확인해주세요.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
         });
     }
 

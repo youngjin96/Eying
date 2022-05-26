@@ -29,7 +29,6 @@ const UserInformation = () => {
                         email: user.email
                     }
                 }).then(res => {
-                    console.log(res);
                     setUserName(res.data[0].username);
                     setUserBusinessCard(res.data[0].card);
                     setUserAge(res.data[0].age);

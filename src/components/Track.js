@@ -131,7 +131,17 @@ const Track = () => {
     // webgazer 종료 함수
     const onClickEnd = async () => {
         if (!isClickStart) {
-            alert("시작하기 버튼을 눌러주세요.");
+            Swal.fire({
+                icon: 'warning',
+                title: '시작 버튼을 누르지 않음',
+                html: '시작하기 버튼을 누른 후 종료하기 버튼을 눌러주세요.',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
         } else {
             // 서버에 dataset 보내는 함수
             await axios.post("https://eying.ga/eyetracking/", {
@@ -141,16 +151,39 @@ const Track = () => {
                 'page_number': pageNumber,
                 'pdf_id': pdfId,
                 'coordinate': dimensionArr
-            }).then(res => {
+            }).then(() => {
                 if (isClickStart === true && countTrackPage >= pdfLength) {
                     axios.put('https://eying.ga/user/', {
                         email: userEmail,
                         credit: 50,
                         operator: "+"
                     }).then(() => {
-                        alert("50 크레딧이 지급되었습니다. 돌아가기 버튼을 눌러주세요.");
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Eyetrack 완료',
+                            html: '50 크레딧이 지급되었습니다.<br>돌아가기 버튼을 누르면 카메라가 꺼집니다.',
+                            showClass: {
+                                popup: 'animate__animated animate__fadeInDown'
+                            },
+                            hideClass: {
+                                popup: 'animate__animated animate__fadeOutUp'
+                            }
+                        });
                     }).catch(error => {
                         console.log(error);
+                    });
+                }
+                else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Eyetrack 미완료',
+                        html: '전체 PDF를 시청하지 않았습니다.<br>시청한 PDF의 시각데이터는 저장됩니다.',
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                        }
                     });
                 }
                 webgazer.end();
@@ -174,7 +207,6 @@ const Track = () => {
             'coordinate': dimensionArr,
         }).then(() => {
             countTrackPage += 1;
-            console.log(countTrackPage);
             dimensionArr = [];
         });
     };

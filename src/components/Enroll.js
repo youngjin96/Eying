@@ -4,6 +4,8 @@ import axios from 'axios';
 
 import { useNavigate } from "react-router-dom"
 
+import Swal from 'sweetalert2'
+
 import { Box, Button, Grid, TextField } from "@mui/material"
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
@@ -116,15 +118,36 @@ const Enroll = () => {
         await axios.post('https://eying.ga/user/', enfrm).then(() => {
             createUserWithEmailAndPassword(auth, email, password).then(() => {
                 setIsLoading(false);
-                alert("정상적으로 회원가입이 완료되었습니다.");
-                navigate("/home");
+                Swal.fire({
+                    icon: 'success',
+                    title: '회원가입 완료',
+                    html: '회원가입이 정상적으로 완료되었습니다.',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then(() => {
+                    navigate("/home");
+                });
             }).catch(error => {
                 setIsLoading(false);
                 alert(error);
             });
         }).catch(error => {
             setIsLoading(false);
-            alert(error.response.data.error_message);
+            Swal.fire({
+                icon: 'error',
+                title: '회원가입 실패',
+                html: error.response.data.error_message,
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
         });
     }
 
