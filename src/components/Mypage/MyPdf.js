@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Button, Grid } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 
 import axios from 'axios';
@@ -260,6 +260,12 @@ const MyPdf = () => {
                             ) : (
                                     <Grid container columns={{ xs: 6, sm: 12, md: 12 }}>
                                         <Grid item xs={6}>
+                                            <Typography variant="h3">Mine</Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="h3">Other's</Typography>
+                                        </Grid>
+                                        <Grid item xs={6} style={{marginTop: 20}}>
                                             <AliceCarousel
                                                 animationDuration={1}
                                                 keyboardNavigation={true}
@@ -274,7 +280,7 @@ const MyPdf = () => {
                                                 ))}
                                             </AliceCarousel>
                                         </Grid>
-                                        <Grid item xs={6}>
+                                        <Grid item xs={6} style={{marginTop: 20}}>
                                             <AliceCarousel
                                                 animationDuration={1}
                                                 keyboardNavigation={true}
@@ -289,8 +295,7 @@ const MyPdf = () => {
                                                 ))}
                                             </AliceCarousel>
                                         </Grid>
-                                        <Grid item xs={12}>
-
+                                        <Grid item xs={12} style={{marginTop: 20}}>
                                             {visualType === "distribution" ?
                                                 (
                                                     <Button

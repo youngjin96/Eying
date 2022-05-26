@@ -274,7 +274,7 @@ const Enroll = () => {
                         <Grid item xs={12}>
                             <TextField
                                 name="username"
-                                label="User Name"
+                                label="Nick Name"
                                 autoComplete="usernmae"
                                 onChange={onChange}
                                 style={{ width: "40%" }}

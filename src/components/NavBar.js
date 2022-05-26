@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -9,13 +11,16 @@ import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { useEffect, useState } from 'react';
 import { Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+import Swal from 'sweetalert2'
+
+import { Link, useNavigate } from 'react-router-dom';
+
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from './Fbase'
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useNavigate } from "react-router-dom";
+
 
 
 const NavBar = () => {
@@ -49,7 +54,19 @@ const NavBar = () => {
   };
   const onClickLogout = () => {
     signOut(auth).then(() => {
-      navigate("/home")
+      Swal.fire({
+        icon: 'success',
+        title: '로그아웃',
+        html: '정상적으로 로그아웃 했습니다.',
+        showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+        }
+      }).then(() => {
+        navigate("/home");
+      });
     }).catch((error) => {
       alert(error.message);
     });

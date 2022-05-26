@@ -94,7 +94,7 @@ const Mypage = () => {
                     onChange={handleChange}
                     aria-label="Vertical tabs example"
                     sx={{ borderRight: 1, borderColor: 'divider' }}
-                    style={{width: 100}}
+                    style={{width: 120}}
                 >
                     <Tab label="마이페이지" {...a11yProps(0)} />
                     <Tab label="내 정보" {...a11yProps(1)} />
