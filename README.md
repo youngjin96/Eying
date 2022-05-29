@@ -1,4 +1,10 @@
-## 1. 프로잭트 소개
+## 1. 프로젝트 소개
+
+<p align="center">
+            <img src="https://user-images.githubusercontent.com/65993842/170509543-dea7ed36-8406-4b77-a0b3-d0c4eca9962b.png" width="50%" />
+            <img src="https://user-images.githubusercontent.com/65993842/170509549-f39c3819-c476-4488-8957-ceb29a97e557.png" width="50%" />
+            <img src="https://user-images.githubusercontent.com/65993842/170509556-017a4672-25e0-4d3b-ada8-c36fbf434914.png" width="50%" />
+</p>
 
 ### 프로젝트 설명
 
@@ -12,6 +18,13 @@
 * 페이지 별 시선 분포 데이터 제공
 * 평가자 별 시선 흐름 데이터 제공
 
+
+### 타겟
+
+* 발표전 발표자료의 피드백이 필요한 학생, 직장인
+
+
+-----
 <div align=left><h1>📚 STACKS</h1></div> 
 
 *front-end
@@ -21,10 +34,6 @@
 *back-end
 
 <img src="https://img.shields.io/badge/MySQl-4479A1?style=for-the-badge&logo=mysql&logoColor=white"/><img src="https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white"/><img src="https://img.shields.io/badge/Amazon AWS-232F3E?style=for-the-badge&logo=amazon aws&logoColor=white"/><img src="https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white"/><img src="https://img.shields.io/badge/gunicorn-%298729.svg?style=for-the-badge&logo=gunicorn&logoColor=white"/>
-
-### 타겟
-
-* 발표전 발표자료의 피드백이 필요한 학생, 직장인
 
 
 
